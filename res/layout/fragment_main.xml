@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,11 +6,129 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.ovrhere.android.careerstack.MainActivity$PlaceholderFragment" >
+    
+    >
+    
+    <RelativeLayout 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content">	
+        
+		<ImageView
+		    android:id="@+id/careerstack_main_img_logo"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentTop="true"
+		    android:layout_centerHorizontal="true"
+		    android:layout_marginTop="40dp"
+		    android:contentDescription="@string/careerstack_img_careerstack_contentDescription"
+		    android:src="@drawable/ic_careerstack_light" />
+		
+		<ImageView
+		    android:id="@+id/careerstack_main_img_poweredBy"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_centerHorizontal="true"
+		    android:layout_below="@+id/careerstack_main_img_logo"
+		    android:layout_marginTop="5dp"
+		    android:contentDescription="@string/careerstack_img_poweredBy_contentDescription"
+		    android:src="@drawable/ic_powered_by_stackoverflow" />
+        
+	    <EditText
+	        android:id="@+id/careerstack_main_editin_keywords"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/careerstack_main_img_poweredBy"
+	        android:layout_centerHorizontal="true"
+	        android:layout_marginTop="30dp"
+	        android:ems="10"
+	        android:hint="@string/careerstack_input_hint_keywords"
+	        android:maxLines="1"
+	        android:singleLine="true"
+	         >
+	    </EditText>
+	
+	    <EditText
+	        android:id="@+id/careerstack_main_editin_location"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/careerstack_main_editin_keywords"
+	        android:layout_centerHorizontal="true"
+	        android:layout_marginTop="14dp"
+	        android:ems="10"
+	        android:hint="@string/careerstack_input_hint_location"
+	        android:maxLines="1"
+	        android:singleLine="true"
+	         />
+	    
+	    <RelativeLayout
+	        android:id="@+id/careerstack_main_layout_distance"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/careerstack_main_editin_location"
+	        android:layout_alignLeft="@+id/careerstack_main_editin_location"
+	        android:layout_marginTop="5dp" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+			    <SeekBar
+			    android:id="@+id/careerstack_main_seekBar_distance"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:layout_below="@+id/careerstack_main_text_distanceLabel"
+			    android:layout_alignLeft="@+id/careerstack_main_text_distanceLabel"
+			    android:progress="20"
+		        android:secondaryProgress="20" 
+		       	android:max="100"
+			    />
+		
+			<TextView
+			    android:id="@+id/careerstack_main_text_distanceLabel"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_alignParentTop="true"
+			    android:layout_alignParentLeft="true"
+			    android:text="@string/careerstack_label_distance"
+			    android:textAppearance="?android:attr/textAppearanceMedium" />
+			
+			<TextView
+			    android:id="@+id/careerstack_main_text_distanceValue"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_alignParentRight="true"
+			    android:layout_alignBottom="@+id/careerstack_main_text_distanceLabel"
+			    
+			    android:text="@string/careerstack_formatString_distanceValue_miles"
+			    android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+		</RelativeLayout>
+	
+	    <CheckBox
+	        android:id="@+id/careerstack_main_check_allowRemote"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/careerstack_main_layout_distance"
+	        android:layout_alignLeft="@+id/careerstack_main_editin_keywords"
+	        android:layout_marginTop="5dp" 
+	        android:layout_marginLeft="5dp"
+	        android:text="@string/careerstack_main_check_workRemotely" />
+	
+	    <CheckBox
+	        android:id="@+id/careerstack_main_check_offerRelocation"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/careerstack_main_layout_distance"
+	        android:layout_toRightOf="@+id/careerstack_main_check_allowRemote"
+	        android:layout_marginTop="5dp" 	        
+	        android:layout_marginLeft="15dp"
+	        android:text="@string/careerstack_main_check_offersRelocation" />
+	
+		
+		<Button
+		    android:id="@+id/careerstack_main_button_search"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_below="@+id/careerstack_main_check_offerRelocation"
+		    android:layout_centerHorizontal="true"
+		    android:layout_marginTop="30dp"
+		    android:text="@android:string/search_go" />
 
-</RelativeLayout>
+	</RelativeLayout>
+</ScrollView>

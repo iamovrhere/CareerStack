@@ -1,8 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2014 Jason J.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
 <resources>
 
+    <!-- The application name -->
     <string name="app_name">CareerStack</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Settings</string>    
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- The content description to describe career-stack image -->
+    <string name="careerstack_img_careerstack_contentDescription"
+        >Career Stack</string>
+    <!-- The content description to describe powered by image -->
+    <string name="careerstack_img_poweredBy_contentDescription"
+        >Powered By Careers 2 point o, by Stack Over Flow</string>
+
+    <!-- Hint value for keywords -->
+    <string name="careerstack_input_hint_keywords"
+        >Keywords (e.g. Android Java)</string>
+    <!-- Hint value for location -->
+    <string name="careerstack_input_hint_location"
+        >City, Country or Zip (e.g. New York)</string>
+
+    <!-- Label for the distance progress bar -->
+    <string name="careerstack_label_distance">Distance</string>
+    <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
+    <string name="careerstack_formatString_distanceValue_miles"
+        >%d miles</string>
+    <!-- Miles short. Prepared string for formating via String.format(). Takes one integer. -->
+    <string name="careerstack_formatString_distanceValue_milesShort"
+        >%d mi.</string>
+    <!-- Kilometers. Prepared string for formating via String.format(). Takes one integer. -->
+    <string name="careerstack_formatString_distanceValue_km">%d km</string>
+
+    <!-- Work remotely check string for main. -->
+    <string name="careerstack_main_check_workRemotely">Work remotely</string>
+    <!-- Offers relocation check string for main. -->
+    <string name="careerstack_main_check_offersRelocation"
+        >Offers relocation</string>
+    
+    <!-- The go/search button for the search results page.  -->
+    <string name="careerstack_searchResults_button_searchGo"
+        >Go</string>
+    
+    <!-- The retry label for the search results page. -->
+    <string name="careerstack_searchResults_label_retry"
+        >Cannot establish connection</string>
+    <!-- The retry button for the search results page. -->
+    <string name="careerstack_searchResults_button_retry"
+        >Retry</string>
+    
+    <!-- Work remotely check string for main. -->
+    <string name="careerstack_searchResults_check_workRemotely">Remote</string>
+    <!-- Offers relocation check string for main. -->
+    <string name="careerstack_searchResults_check_offersRelocation"
+        >Relocation</string>
 
 </resources>
