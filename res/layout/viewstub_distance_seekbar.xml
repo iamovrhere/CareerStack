@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       >
+
+	    <SeekBar
+	    android:id="@+id/careerstack_distanceSeekbar_seekBar"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/careerstack_distanceSeekbar_text_label"
+	    android:layout_alignLeft="@+id/careerstack_distanceSeekbar_text_label"
+	    android:max="100"
+	    />
+
+	<TextView
+	    android:id="@+id/careerstack_distanceSeekbar_text_label"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentTop="true"
+	    android:layout_alignParentLeft="true"
+	    android:text="@string/careerstack_label_distance"
+	    android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	<TextView
+	    android:id="@+id/careerstack_distanceSeekbar_text_value"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignBottom="@+id/careerstack_distanceSeekbar_text_label"
+	    
+	    android:text="@string/careerstack_formatString_distanceValue_miles"
+	    android:textAppearance="?android:attr/textAppearanceMedium" 
+	    android:textColor="@color/careerstack_translucent_grey"
+	    />
+
+</RelativeLayout>

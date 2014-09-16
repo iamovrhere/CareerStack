@@ -60,51 +60,26 @@
 	        android:singleLine="true"
 	         />
 	    
-	    <RelativeLayout
-	        android:id="@+id/careerstack_main_layout_distance"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@+id/careerstack_main_editin_location"
-	        android:layout_alignLeft="@+id/careerstack_main_editin_location"
-	        android:layout_marginTop="5dp" >
-
-			    <SeekBar
-			    android:id="@+id/careerstack_main_seekBar_distance"
-			    android:layout_width="match_parent"
-			    android:layout_height="wrap_content"
-			    android:layout_below="@+id/careerstack_main_text_distanceLabel"
-			    android:layout_alignLeft="@+id/careerstack_main_text_distanceLabel"
-			    android:progress="20"
-		        android:secondaryProgress="20" 
-		       	android:max="100"
-			    />
-		
-			<TextView
-			    android:id="@+id/careerstack_main_text_distanceLabel"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:layout_alignParentTop="true"
-			    android:layout_alignParentLeft="true"
-			    android:text="@string/careerstack_label_distance"
-			    android:textAppearance="?android:attr/textAppearanceMedium" />
-			
-			<TextView
-			    android:id="@+id/careerstack_main_text_distanceValue"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:layout_alignParentRight="true"
-			    android:layout_alignBottom="@+id/careerstack_main_text_distanceLabel"
-			    
-			    android:text="@string/careerstack_formatString_distanceValue_miles"
-			    android:textAppearance="?android:attr/textAppearanceSmall" />
-	
-		</RelativeLayout>
+	    
+	    <ViewStub
+		    android:id="@+id/careerstack_main_viewStub_distance"
+		    android:inflatedId="@+id/careerstack_main_viewStub_distance"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    
+       		android:layout_below="@+id/careerstack_main_editin_location"
+       		android:layout_alignLeft="@+id/careerstack_main_editin_location"
+		    android:layout_marginTop="5dp"
+		    
+		    android:layout="@layout/viewstub_distance_seekbar"
+		    
+		    />
 	
 	    <CheckBox
 	        android:id="@+id/careerstack_main_check_allowRemote"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@+id/careerstack_main_layout_distance"
+	        android:layout_below="@+id/careerstack_main_viewStub_distance"
 	        android:layout_alignLeft="@+id/careerstack_main_editin_keywords"
 	        android:layout_marginTop="5dp" 
 	        android:layout_marginLeft="5dp"
@@ -114,7 +89,7 @@
 	        android:id="@+id/careerstack_main_check_offerRelocation"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@+id/careerstack_main_layout_distance"
+	        android:layout_below="@+id/careerstack_main_viewStub_distance"
 	        android:layout_toRightOf="@+id/careerstack_main_check_allowRemote"
 	        android:layout_marginTop="5dp" 	        
 	        android:layout_marginLeft="15dp"
@@ -129,6 +104,8 @@
 		    android:layout_centerHorizontal="true"
 		    android:layout_marginTop="30dp"
 		    android:text="@android:string/search_go" />
+
+		
 
 	</RelativeLayout>
 </ScrollView>
