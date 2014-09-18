@@ -15,6 +15,7 @@
  */
 package com.ovrhere.android.careerstack.ui.fragments;
 
+import android.app.Activity;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -33,20 +34,26 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
+import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 import com.ovrhere.android.careerstack.ui.wrappers.SeekBarWrapper;
 
 /**
  * The main starting fragment. Currently a splash screen + entry screen.
+ * Expects Activity to implement {@link OnFragmentRequestListener}, will throw 
+ * {@link ClassCastException} otherwise.
  * 
  * @author Jason J.
- * @version 0.1.0-20140916
+ * @version 0.2.0-20140917
  */
 public class MainFragment extends Fragment 
 implements OnClickListener, OnCheckedChangeListener, 
-	SeekBarWrapper.OnProgressChanged {
+	SeekBarWrapper.OnValueChangedListener {
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = 
-	MainFragment.class.getSimpleName();
+			MainFragment.class.getSimpleName();
+	/** The suggested fragment tag. */
+	final static public String FRAGTAG = CLASS_NAME;
+	
 	/**Logtag for debugging purposes. */
 	final static private String LOGTAG = CLASS_NAME;
 	/** Whether or not to debug. */
@@ -93,6 +100,12 @@ implements OnClickListener, OnCheckedChangeListener,
 	private SeekBarWrapper distanceSeekBarWrapper = null;
 	/** The current distance. Used for saved states. */
 	private int currentDistanceValue = 0;
+	/** The fragment request listener from main. */
+	private OnFragmentRequestListener mFragmentRequestListener = null;
+	
+	/** Used in {@link #onSaveInstanceState(Bundle)} to determine if 
+	 * views are visible. */
+	private boolean viewBuilt = false;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End members
@@ -103,6 +116,9 @@ implements OnClickListener, OnCheckedChangeListener,
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		if (viewBuilt == false){
+			return; //no view? don't bother.
+		}
 		outState.putString(KEY_KEYWORD_TEXT, et_keywords.getText().toString());
 		outState.putString(KEY_LOCATION_TEXT, et_location.getText().toString());
 		
@@ -117,11 +133,35 @@ implements OnClickListener, OnCheckedChangeListener,
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_main, container,
 				false);
+		currentDistanceValue = 
+				getResources().getInteger(R.integer.careerstack_seekBar_default);
+
 		initInputs(rootView);
 		if (savedInstanceState != null){
 			processSavedState(rootView, savedInstanceState);
 		}
+		viewBuilt = true;
 		return rootView;
+	}
+	
+	@Override
+	public void onDestroyView() {
+		super.onDestroy();
+		viewBuilt = false;
+	}
+	
+	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			this.mFragmentRequestListener = 
+					(OnFragmentRequestListener) activity;
+		} catch (ClassCastException e){
+			Log.e(LOGTAG, "Activity must implement :" +
+					OnFragmentRequestListener.class.getSimpleName());
+			throw e;
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +235,7 @@ implements OnClickListener, OnCheckedChangeListener,
 					r.getInteger(R.integer.careerstack_seekBar_max),
 					r.getInteger(R.integer.careerstack_seekBar_step)
 					);
-			distanceSeekBarWrapper.setOnProgressChangedListener(this);
+			distanceSeekBarWrapper.setOnValueChangedListener(this);
 			distanceSeekBarWrapper.setProgress(currentDistanceValue);
 			return true;
 		} else {
@@ -250,6 +290,29 @@ implements OnClickListener, OnCheckedChangeListener,
 		return -1;
 	}
 	
+	/** Builds the bundle and sends the request off */
+	private void prepareAndRequestSearch() {
+		Bundle args = new Bundle();
+		args.putString(SearchResultsFragment.KEY_KEYWORD_TEXT, 
+				et_keywords.getText().toString());
+		args.putString(SearchResultsFragment.KEY_LOCATION_TEXT, 
+				et_location.getText().toString());
+		
+		args.putBoolean(SearchResultsFragment.KEY_RELOCATE_OFFER, 
+				cb_relocationOffered.isChecked());
+		args.putBoolean(SearchResultsFragment.KEY_REMOTE_ALLOWED, 
+				cb_remoteAllowed.isChecked());
+		if (getDistance() > 0){
+			args.putInt(SearchResultsFragment.KEY_DISTANCE, 
+					getDistance());
+		}
+		
+		mFragmentRequestListener.onRequestNewFragment(
+				SearchResultsFragment.newInstance(args), 
+				SearchResultsFragment.class.getName(), 
+				false);
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Implemented listeners
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,10 +348,13 @@ implements OnClickListener, OnCheckedChangeListener,
 				Log.d(LOGTAG, "Relocation:"+cb_relocationOffered.isChecked());
 				Log.d(LOGTAG, "Distance:"+getDistance());
 			}
+
 			//TODO search action (i.e. launch intent/fragment)
-			break;
+			
+			prepareAndRequestSearch();
 		}		
 	}
+	
 	
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
