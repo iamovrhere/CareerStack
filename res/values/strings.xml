@@ -27,6 +27,9 @@
     <!-- End titles -->
     <eat-comment />
 
+    <!-- Starts Main fragment strings -->
+    <eat-comment />
+    
     <!-- The content description to describe career-stack image -->
     <string name="careerstack_img_careerstack_contentDescription"
         >Career Stack</string>
@@ -58,6 +61,11 @@
     <string name="careerstack_main_check_offersRelocation"
         >Offers relocation</string>
     
+    <!-- End Main fragment strings -->
+    <eat-comment />
+    
+    <!-- Starts Results fragment strings -->
+    <eat-comment />
     <!-- The go/search button for the search results page.  -->
     <string name="careerstack_searchResults_button_searchGo"
         >Go</string>
@@ -75,7 +83,19 @@
     <string name="careerstack_searchResults_check_offersRelocation"
         >Relocation</string>
     
-    <!-- Simple no matching results statement. -->
+    <!-- Simply no matching results statement. -->
     <string name="careerstack_careerlist_noResults">No matching results</string>
+    
+    <!-- Ends Results fragment strings -->
+    <eat-comment />
+    
+    <!-- Starts career item fragment strings -->
+    <eat-comment />
+    <!-- The open career link button. -->
+    <string name="careerstack_careerItem_button_openLink">Open Link</string>
+    <!-- The share this job button. -->
+    <string name="careerstack_careerItem_button_shareJob">Share this job</string>
+    <!-- Last update string. Formatted. -->
+    <string name="careerstack_formatString_updatedDate">Last updated: %s</string>
 
 </resources>

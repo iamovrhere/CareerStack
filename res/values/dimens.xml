@@ -1,9 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2014 Jason J.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
 <resources>
 
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_vertical_margin">16dp</dimen>
-    
+    <!-- The dialog margins -->
     <dimen name="dialog_margins">10dp</dimen>
+    
+    <!-- Sizes for main frag -->
+    <eat-comment />
+    <!-- The maximum allowed width for the text input.  This will allow 
+    match_parent on smaller screens and 600dp on larger ones. -->
+    <style name="careerstack_main_text_width">
+        <item name="android:layout_width">match_parent</item>
+    </style>
+    
+    <!-- Logo margin top -->
+    <dimen name="careerstack_main_logo_marginTop">25dp</dimen>
+    <!-- Powered by margin top -->
+    <dimen name="careerstack_main_poweredBy_marginTop">5dp</dimen>
+    <!-- Powered by margin bottom -->
+    <dimen name="careerstack_main_poweredBy_marginBottom">30dp</dimen>
+    
+    <!-- Margin between text inputs.-->
+    <dimen name="careerstack_main_text_marginTop">14dp</dimen>
+    <!-- Inter-view top margin -->
+    <dimen name="careerstack_main_interView_marginTop">5dp</dimen>
+    <!-- Allow remote side margin -->
+    <dimen name="careerstack_main_allowRemote_marginLeft">5dp</dimen>    
+    <!-- Relocation side margin -->
+    <dimen name="careerstack_main_relocate_marginLeft">15dp</dimen>
+    
+    <!-- Search Margin top margin -->
+    <dimen name="careerstack_main_searchButton_marginTop">30dp</dimen>
 
 </resources>
