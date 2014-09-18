@@ -15,25 +15,66 @@
  */
 package com.ovrhere.android.careerstack.ui;
 
+import java.util.ArrayList;
+
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.ui.fragments.MainFragment;
+import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 
-public class MainActivity extends ActionBarActivity {
+/** The main entry point into the application.
+ * @author Jason J.
+ * @version 0.1.0-20140917
+ */
+public class MainActivity extends ActionBarActivity 
+	implements OnFragmentRequestListener, OnBackStackChangedListener {
+	/** Class name for debugging purposes. */
+	final static private String CLASS_NAME = MainActivity.class.getSimpleName();
+	
+	/** Bundle key. The last fragment to be loaded (and so reloaded). */
+	final static private String KEY_FRAG_TAG_TACK = 
+			CLASS_NAME + ",KEY_LAST_FRAG_TAG";
+	
+	/** The main fragment tag. */
+	final static private String TAG_MAIN_FRAG = 
+			MainFragment.FRAGTAG;
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// End constants
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** The list of all fragments in play. */
+	final private ArrayListStack<String> fragTagStack = new ArrayListStack<String>();
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putStringArrayList(KEY_FRAG_TAG_TACK, fragTagStack.getArrayList());
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.container, new MainFragment()).commit();
+		getSupportFragmentManager().addOnBackStackChangedListener(this);
+		
+		if (savedInstanceState == null) {			
+			loadFragment( new MainFragment(), TAG_MAIN_FRAG, false);
+		} else {
+			if (savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK) != null){
+				fragTagStack.addAll(savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK));
+			}
+			reattachLastFragment();
 		}
+		
 	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -47,11 +88,138 @@ public class MainActivity extends ActionBarActivity {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		switch (item.getItemId()) {
+		case R.id.action_settings:
 			return true;
+
+		default:
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	@Override
+	public boolean onSupportNavigateUp() {
+	    //This method is called when the up button is pressed. Just the pop back stack.
+	    getSupportFragmentManager().popBackStack();
+	    fragTagStack.pop();
+	    return true;
+	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Helper method
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Reattaches the last fragment. And resets back button. */
+	private void reattachLastFragment() {
+		String currentTag = fragTagStack.peek();
+		if (currentTag != null){
+			Fragment frag = getSupportFragmentManager()
+					.findFragmentByTag(currentTag);
+			getSupportFragmentManager().beginTransaction()
+					.attach(frag).commit();
+		}
+		
+		checkHomeButtonBack();
+	}
 
+	/** Checks to see whether to enable the action bar back. */
+	private void checkHomeButtonBack() {
+		boolean canback = getSupportFragmentManager().getBackStackEntryCount() > 0;
+		//boolean canback = fragTagStack.size() > 0;
+		getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
+	}
+	
+	/** Loads a fragment either by adding or replacing and then adds it to
+	 * the fragTagList.
+	 * @param fragment The fragment to add
+	 * @param tag The tag to give the fragment
+	 * @param backStack <code>true</code> to add to backstack, 
+	 * <code>false</code> to not.
+	 */
+	private void loadFragment(Fragment fragment, String tag, 
+			boolean backStack){
+		FragmentManager fragManager = getSupportFragmentManager();
+		String currentFragTag = fragTagStack.peek();
+		if (backStack){
+			fragManager.beginTransaction()
+				.addToBackStack(currentFragTag)
+				.replace(R.id.container, fragment, tag).commit();
+		} else {
+			fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			fragManager.beginTransaction()
+					.replace(R.id.container, fragment, tag)
+					.commit();
+			fragTagStack.clear();
+		}
+		checkHomeButtonBack();
+		fragTagStack.push(tag);		
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Internal classes
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Simple wrapper to manage array list as a stack. */
+	@SuppressWarnings("unused")
+	private static class ArrayListStack <Obj>{
+		final private ArrayList<Obj> listStack = new ArrayList<Obj>();
+		
+		/** Returns stack size. */
+		public int size(){ return listStack.size(); }
+		
+		/** Clears all elements */
+		public void clear(){ listStack.clear(); }
+		
+		/** Adds all elements to stack. */
+		public void addAll(ArrayList<Obj> arrayList){	
+			listStack.addAll(arrayList); }
+		
+		/** Returns all elements to as {@link ArrayList}. */
+		public ArrayList<Obj> getArrayList(){
+			return this.listStack;	}
+		
+		/** Pushes object onto "stack" */
+		public boolean push(Obj object){	return listStack.add(object);	}
+		
+		/** Pops the last element and returns it or <code>null</code>. */
+		public Obj pop(){
+			if (listStack.size() > 0){
+				return listStack.remove(listStack.size()-1);
+			}
+			return null;
+		}
+		/** Displays last element without removing it. (or null) */
+		public Obj peek(){
+			if (listStack.size() > 0){
+				return listStack.get(listStack.size()-1);
+			}
+			return null;
+		}
+		
+		
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Implemented listeners
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public boolean onRequestNewFragment(Fragment fragment, String tag,
+			boolean backStack) {
+		loadFragment(fragment, tag, backStack);
+		return true;
+	}
+	
+	@Override
+	public boolean onRequestHideActionBar(boolean hide) {
+		// TODO Auto-generated method stub
+		return false;
+	}	
+	
+
+	@Override
+	public void onBackStackChanged() {
+		checkHomeButtonBack();
+	}
+		
+	
 }
