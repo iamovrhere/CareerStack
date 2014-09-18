@@ -32,7 +32,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
  * <b>Remember to discard of this object when changing context.</b>
  * </p>
  * @author Jason J.
- * @version 0.1.0-20140916
+ * @version 0.2.0-20140916
  */
 public class SeekBarWrapper implements OnSeekBarChangeListener {
 	/** Exception for when step <= 0 */
@@ -49,7 +49,7 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The progress listener. Can be null. */
-	private OnProgressChanged onProgressChangedListener = null;
+	private OnValueChangedListener onValueChangedListener = null;
 	/** An optional extra listener for external objects to perform 
 	 * their own actions in {@link OnSeekBarChangeListener}. Can be null. */
 	private OnSeekBarChangeListener extraListener = null;
@@ -112,14 +112,14 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 		this.extraListener = extraListener;
 	}
 	
-	/** Sets the progress listener which is fired every time the 
+	/** Sets the value/progress listener which is fired every time the 
 	 * {@link OnSeekBarChangeListener#onProgressChanged(SeekBar, int, boolean)}
 	 * is fired.
-	 * @param onProgressChangedListener The listener to receive updated values
+	 * @param onValueChangedListener The listener to receive updated values
 	 */
-	public void setOnProgressChangedListener(
-			OnProgressChanged onProgressChangedListener) {
-		this.onProgressChangedListener = onProgressChangedListener;
+	public void setOnValueChangedListener(
+			OnValueChangedListener onValueChangedListener) {
+		this.onValueChangedListener = onValueChangedListener;
 	}
 	
 	
@@ -133,7 +133,7 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	/** Calculates and returns the seekbar's <i>value</i>
 	 * @return The stepped seek bar value (not to be confused with progress) */
 	public int getValue() {
-		return seekBar.getProgress() + min;
+		return (seekBar.getProgress() + min)/step * step;
 	}
 	
 	/** Returns the seekbar as set in constructor.
@@ -162,7 +162,7 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	/** Informs listeners that the value has changed (after calculations)
 	 * @author Jason J.
 	 * @version 0.1.0-20140916	 */
-	public static interface OnProgressChanged {
+	public static interface OnValueChangedListener {
 		/** Updates the listener with the new (recalculated) value. 
 		 * @param value		 */
 		public void onValueUpdate(int value);
@@ -176,8 +176,8 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	public void onProgressChanged(SeekBar seekBar, int progress,
 			boolean fromUser) {
 		progress = recalculateProgress(progress);
-		if (onProgressChangedListener != null){
-			onProgressChangedListener.onValueUpdate(progress + min);
+		if (onValueChangedListener != null){
+			onValueChangedListener.onValueUpdate(progress + min);
 		}
 		if (extraListener != null){
 			extraListener.onProgressChanged(seekBar, progress, fromUser);

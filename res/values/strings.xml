@@ -20,6 +20,12 @@
     <string name="app_name">CareerStack</string>
     <string name="action_settings">Settings</string>    
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+    <!-- The title for the DistanceDialogFragment -->
+    <string name="careerstack_dialog_distance_title">Set Distance</string>
+    
+    <!-- End titles -->
+    <eat-comment />
 
     <!-- The content description to describe career-stack image -->
     <string name="careerstack_img_careerstack_contentDescription"
@@ -68,5 +74,8 @@
     <!-- Offers relocation check string for main. -->
     <string name="careerstack_searchResults_check_offersRelocation"
         >Relocation</string>
+    
+    <!-- Simple no matching results statement. -->
+    <string name="careerstack_careerlist_noResults">No matching results</string>
 
 </resources>
