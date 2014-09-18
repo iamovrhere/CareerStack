@@ -16,6 +16,8 @@
 package com.ovrhere.android.careerstack.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,16 +33,21 @@ import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.1.0-20140917
+ * @version 0.2.0-20140918
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnFragmentRequestListener, OnBackStackChangedListener {
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = MainActivity.class.getSimpleName();
 	
-	/** Bundle key. The last fragment to be loaded (and so reloaded). */
+	/** Bundle key. The last fragment to be loaded (and so reloaded). 
+	 * Array<String> */
 	final static private String KEY_FRAG_TAG_TACK = 
-			CLASS_NAME + ",KEY_LAST_FRAG_TAG";
+			CLASS_NAME + ".KEY_LAST_FRAG_TAG";
+	/** Bundle key. The group of saved states to retain.
+	 *  Hashmap<String,Bundle>/Serializable. */
+	final static private String KEY_FRAG_SAVED_STATES = 
+			CLASS_NAME + ".KEY_FRAG_SAVED_STATES";
 	
 	/** The main fragment tag. */
 	final static private String TAG_MAIN_FRAG = 
@@ -50,14 +57,21 @@ public class MainActivity extends ActionBarActivity
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** The list of all fragments in play. */
-	final private ArrayListStack<String> fragTagStack = new ArrayListStack<String>();
+	final private ArrayListStack<String> fragTagStack = 
+			new ArrayListStack<String>();
+	/** A map of all back stack fragment states. 
+	 * Key: fragment tag (String), Value: savedState (Bundle) */
+	final private HashMap<String, Bundle> fragSavedStates =
+			new HashMap<String, Bundle>();
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putStringArrayList(KEY_FRAG_TAG_TACK, fragTagStack.getArrayList());
+		outState.putSerializable(KEY_FRAG_SAVED_STATES, fragSavedStates);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,7 +82,14 @@ public class MainActivity extends ActionBarActivity
 			loadFragment( new MainFragment(), TAG_MAIN_FRAG, false);
 		} else {
 			if (savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK) != null){
-				fragTagStack.addAll(savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK));
+				fragTagStack.addAll(
+						savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK));
+			}
+			if (savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES) != null){
+				try {
+			fragSavedStates.putAll((Map<? extends String, ? extends Bundle>) 
+					savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES));
+				} catch (ClassCastException e){}
 			}
 			reattachLastFragment();
 		}
@@ -102,7 +123,7 @@ public class MainActivity extends ActionBarActivity
 	public boolean onSupportNavigateUp() {
 	    //This method is called when the up button is pressed. Just the pop back stack.
 	    getSupportFragmentManager().popBackStack();
-	    fragTagStack.pop();
+	    fragTagStack.pop();	    
 	    return true;
 	}
 	
@@ -140,10 +161,10 @@ public class MainActivity extends ActionBarActivity
 	private void loadFragment(Fragment fragment, String tag, 
 			boolean backStack){
 		FragmentManager fragManager = getSupportFragmentManager();
-		String currentFragTag = fragTagStack.peek();
 		if (backStack){
+			String prevTag = fragTagStack.peek();
 			fragManager.beginTransaction()
-				.addToBackStack(currentFragTag)
+				.addToBackStack(prevTag)
 				.replace(R.id.container, fragment, tag).commit();
 		} else {
 			fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -151,6 +172,7 @@ public class MainActivity extends ActionBarActivity
 					.replace(R.id.container, fragment, tag)
 					.commit();
 			fragTagStack.clear();
+			fragSavedStates.clear();
 		}
 		checkHomeButtonBack();
 		fragTagStack.push(tag);		
@@ -214,6 +236,17 @@ public class MainActivity extends ActionBarActivity
 		// TODO Auto-generated method stub
 		return false;
 	}	
+	
+	@Override
+	public boolean onRequestHoldSavedState(String tag, Bundle savedState) {
+		fragSavedStates.put(tag, savedState);
+		return true;
+	}
+	
+	@Override
+	public Bundle onRequestPopSavedState(String tag) {
+		return fragSavedStates.remove(tag);
+	}
 	
 
 	@Override
