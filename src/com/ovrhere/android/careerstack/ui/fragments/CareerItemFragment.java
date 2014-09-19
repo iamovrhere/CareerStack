@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +17,17 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.TextView.BufferType;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
+import com.ovrhere.android.careerstack.utils.CompatClipboard;
+import com.ovrhere.android.careerstack.utils.ToastManager;
 
 /**
  * The listing of a job item.
  * @author Jason J.
- * @version 0.1.0-20140818
+ * @version 0.2.0-20140819
  */
 public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Class name for debugging purposes. */
@@ -44,6 +48,8 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	
 	/** The local instance of career item to display. */
 	private CareerItem careerItem = null;
+	/** The simple toast manager. */
+	private ToastManager toastManager = null;
 	
 	/**
 	 * Use this factory method createa new Career framgnet.
@@ -84,6 +90,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_career_item, container, false);
+		toastManager = new ToastManager(getActivity());
 		initOutputViews(rootView);
 		initButtons(rootView);
 		return rootView;
@@ -104,12 +111,17 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		
 		TextView companyEtc = (TextView)
 				rootView.findViewById(R.id.careerstack_careerItem_text_companyLocationEtc);
-		companyEtc.setText(careerItem.getCompanyLocationEtc());	
+		companyEtc.setText( /* Be warned: This will keep html styling; 
+								toString() will remove it. */
+					Html.fromHtml(careerItem.getCompanyLocationEtc()),  
+					BufferType.SPANNABLE
+				);	
 		
 		TextView updateDate = (TextView)
 				rootView.findViewById(R.id.careerstack_careerItem_text_updateDate);
 		updateDate.setText(
-				String.format(getString(R.string.careerstack_formatString_updatedDate),
+				String.format(getString(R.string.careerstack_formatString_publishUpdateDate),
+						processDate(careerItem.getPublishDate()),
 						processDate(careerItem.getUpdateDate()))
 				);
 	}
@@ -126,8 +138,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		openLink.setOnClickListener(this);
 		Button copyUrl = (Button)
 				rootView.findViewById(R.id.careerstack_careerItem_button_copyUrl);
-		copyUrl.setOnClickListener(this); //TODO finish copy url
-		copyUrl.setVisibility(View.GONE); 
+		copyUrl.setOnClickListener(this);  
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +154,14 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		} catch(Exception e){
 			Log.e(LOGTAG, "Unexpected error: "+ e);
 		}
+	}
+	/** Copies url. */
+	private void copyUrl(){
+		String url = careerItem.getUrl();
+		CompatClipboard.copyToClipboard(getActivity(), 
+				getString(android.R.string.copyUrl), 
+				url);
+		toastManager.toastShort(getString(R.string.careerstack_toast_copiedLink));
 	}
 	
 	/** Processes the date into a semi-readble string of 
@@ -168,8 +187,8 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 			launchUrl();
 			break;
 		case R.id.careerstack_careerItem_button_copyUrl:
-			break;
-			
+			copyUrl();
+			break;			
 		case R.id.careerstack_careerItem_button_share:
 			break;
 

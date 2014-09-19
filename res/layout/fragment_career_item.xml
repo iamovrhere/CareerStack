@@ -48,6 +48,7 @@
 		android:text="Company Inc, At location!"
 		android:textAppearance="?android:attr/textAppearanceMedium" 
 		tools:ignore="HardcodedText"
+		android:textColor="@color/careerstack_translucent_grey"
 		/>
 	    
 	    <Button
@@ -85,9 +86,11 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
 		android:layout_below="@+id/careerstack_careerItem_button_openLink"
-		android:layout_marginTop="10dp"
-		android:text="@string/careerstack_formatString_updatedDate"
-		android:textAppearance="?android:attr/textAppearanceSmall" />
+		android:layout_marginTop="15dp"
+		android:text="@string/careerstack_formatString_publishUpdateDate" 
+		android:textSize="14sp"
+		android:textColor="@color/careerstack_translucent_grey"
+		/>
 
 	    <TextView
 		android:id="@+id/careerstack_careerItem_text_jobDescription"

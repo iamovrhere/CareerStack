@@ -48,12 +48,12 @@
     <string name="careerstack_label_distance">Distance</string>
     <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
     <string name="careerstack_formatString_distanceValue_miles"
-        >%d miles</string>
+        >%1$d miles</string>
     <!-- Miles short. Prepared string for formating via String.format(). Takes one integer. -->
     <string name="careerstack_formatString_distanceValue_milesShort"
-        >%d mi.</string>
+        >%1$d mi.</string>
     <!-- Kilometers. Prepared string for formating via String.format(). Takes one integer. -->
-    <string name="careerstack_formatString_distanceValue_km">%d km</string>
+    <string name="careerstack_formatString_distanceValue_km">%1$d km</string>
 
     <!-- Work remotely check string for main. -->
     <string name="careerstack_main_check_workRemotely">Work remotely</string>
@@ -95,7 +95,10 @@
     <string name="careerstack_careerItem_button_openLink">Open Link</string>
     <!-- The share this job button. -->
     <string name="careerstack_careerItem_button_shareJob">Share this job</string>
-    <!-- Last update string. Formatted. -->
-    <string name="careerstack_formatString_updatedDate">Last updated: %s</string>
+    <!-- Published & last update string. Formatted: accepts 2 strigns. -->
+    <string name="careerstack_formatString_publishUpdateDate"
+        >Published: %1$s. \nLast updated: %2$s</string>
+    <!-- Copied Link. -->
+    <string name="careerstack_toast_copiedLink">Copied link to clipboard</string>
 
 </resources>

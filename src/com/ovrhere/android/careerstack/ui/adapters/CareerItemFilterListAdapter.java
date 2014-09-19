@@ -16,9 +16,11 @@
 package com.ovrhere.android.careerstack.ui.adapters;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,31 +36,38 @@ import com.ovrhere.android.careerstack.dao.CareerItem;
 /** The career item filter list adapter.
  * <p><b>Filtering will be done at a later date.</b></p>
  * @author Jason J.
- * @version 0.1.0-20140914
+ * @version 0.2.0-20140916
  */
 public class CareerItemFilterListAdapter extends BaseAdapter implements
 		Filterable {
 	/* For debugging purposes. 
 	//final static private String LOGTAG = CareerItemFilterListAdapter.class
 			.getSimpleName(); */
+	/** Approx. Month in millis. */
+	final static private long MONTH_IN_MILLIS = DateUtils.WEEK_IN_MILLIS * 5;
+	/** The date format in {@link #getRelativeTime(Context, Date)}. */
+	@SuppressWarnings("unused")
+	final static private String DATE_FORMAT = "yyyy/MM/dd";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	/** The list of all career items. */
-	private List<CareerItem> careerItems = new ArrayList<CareerItem>();
 	/** The current inflater in use. */
 	private LayoutInflater inflater = null;
+	
+	/** The list of all career items. */
+	private List<CareerItem> careerItems = new ArrayList<CareerItem>();
 	/**The layout resource, default is 
 	 * <code>android.R.layout.simple_list_item_2</code> */
 	private int layoutResource = android.R.layout.simple_list_item_2; 
-		
+	
 	/** Builds the adapter using the layout:
 	 * <code>android.R.layout.simple_list_item_2</code>
 	 * @param context The current context. 	 */
 	public CareerItemFilterListAdapter(Context context) {
 		this.inflater = (LayoutInflater) 
 				context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
 	}
 	/** Resets the career items to be new set. 
 	 * @param careerItems The career items to reset to.
@@ -77,15 +86,21 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 	public boolean isEmpty() {
 		return careerItems.size() <= 0;
 	}
-	
-	/** May return 1 when empty.
+		
+	/**
 	 * {@inheritDoc}
+	 * @return The count of items or 1 when empty
+	 * @see #isEmpty()
 	 */
 	@Override
 	public int getCount() {
 		return careerItems.size() > 0 ? careerItems.size()  : 1 ;
 	}
 
+	/** 
+	 * {@inheritDoc}
+	 * @return The data at the specified position or <code>null</code> when empty.
+	 */
 	@Override
 	public CareerItem getItem(int position) {
 		return careerItems.size() > 0 ? careerItems.get(position) : null;
@@ -105,7 +120,7 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 			holder = new Holder();
 			holder.jobTitle = (TextView) 
 					convertView.findViewById(android.R.id.text1);
-			holder.companyLocationEtc = (TextView) 
+			holder.companyLocationEtc_andDate = (TextView) 
 					convertView.findViewById(android.R.id.text2);
 			
 			convertView.setTag(holder);
@@ -123,7 +138,10 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 		
 		CareerItem item = careerItems.get(position);
 		holder.jobTitle.setText(item.getTitle());
-		holder.companyLocationEtc.setText(item.getCompanyLocationEtc());
+		holder.companyLocationEtc_andDate.setText(
+				item.getCompanyLocationEtc() + " - " + 
+				getRelativeTime(convertView.getContext(),item.getUpdateDate())
+				);
 		
 		return convertView;
 	}
@@ -131,8 +149,27 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 	/** Holder pattern. */
 	private static class Holder {
 		public TextView jobTitle = null;
-		public TextView companyLocationEtc = null;
-	}	
+		public TextView companyLocationEtc_andDate = null;
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Helper methods
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Converts date to relative time. */
+	static private String getRelativeTime(Context context, Date date){
+		long millis = date.getTime();
+		//We should never be exceeding a month anyway
+		/*if (MONTH_IN_MILLIS < new Date().getTime() - millis){
+			return new SimpleDateFormat(DATE_FORMAT, Locale.US).format(millis);
+		}*/
+		String time = DateUtils.getRelativeDateTimeString(context, millis, 
+				DateUtils.MINUTE_IN_MILLIS, MONTH_IN_MILLIS, 
+				DateUtils.FORMAT_NO_MONTH_DAY).toString();
+		int commaIndex = time.lastIndexOf(",");
+		if (commaIndex > 0){
+			return time.substring(0, commaIndex);
+		} return time;
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Implemented interfaces
