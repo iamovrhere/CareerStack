@@ -36,18 +36,13 @@ import com.ovrhere.android.careerstack.dao.CareerItem;
 /** The career item filter list adapter.
  * <p><b>Filtering will be done at a later date.</b></p>
  * @author Jason J.
- * @version 0.2.0-20140916
+ * @version 0.3.0-20140921
  */
 public class CareerItemFilterListAdapter extends BaseAdapter implements
 		Filterable {
 	/* For debugging purposes. 
 	//final static private String LOGTAG = CareerItemFilterListAdapter.class
 			.getSimpleName(); */
-	/** Approx. Month in millis. */
-	final static private long MONTH_IN_MILLIS = DateUtils.WEEK_IN_MILLIS * 5;
-	/** The date format in {@link #getRelativeTime(Context, Date)}. */
-	@SuppressWarnings("unused")
-	final static private String DATE_FORMAT = "yyyy/MM/dd";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
@@ -59,7 +54,7 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 	private List<CareerItem> careerItems = new ArrayList<CareerItem>();
 	/**The layout resource, default is 
 	 * <code>android.R.layout.simple_list_item_2</code> */
-	private int layoutResource = android.R.layout.simple_list_item_2; 
+	private int layoutResource = R.layout.row_my_simple_list_item; 
 	
 	/** Builds the adapter using the layout:
 	 * <code>android.R.layout.simple_list_item_2</code>
@@ -158,13 +153,9 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 	/** Converts date to relative time. */
 	static private String getRelativeTime(Context context, Date date){
 		long millis = date.getTime();
-		//We should never be exceeding a month anyway
-		/*if (MONTH_IN_MILLIS < new Date().getTime() - millis){
-			return new SimpleDateFormat(DATE_FORMAT, Locale.US).format(millis);
-		}*/
 		String time = DateUtils.getRelativeDateTimeString(context, millis, 
-				DateUtils.MINUTE_IN_MILLIS, MONTH_IN_MILLIS, 
-				DateUtils.FORMAT_NO_MONTH_DAY).toString();
+						DateUtils.MINUTE_IN_MILLIS, DateUtils.YEAR_IN_MILLIS, 
+						0).toString();
 		int commaIndex = time.lastIndexOf(",");
 		if (commaIndex > 0){
 			return time.substring(0, commaIndex);
