@@ -23,6 +23,9 @@
     <!-- The dialog margins -->
     <dimen name="dialog_margins">10dp</dimen>
     
+    <!-- Search frag screen margins -->
+    <dimen name="frag_search_horizontal_margin">9dp</dimen>
+    
     <!-- Sizes for main frag -->
     <eat-comment />
     <!-- The maximum allowed width for the text input.  This will allow 
@@ -49,5 +52,14 @@
     
     <!-- Search Margin top margin -->
     <dimen name="careerstack_main_searchButton_marginTop">30dp</dimen>
+    
+    <!-- Sizes for Career Item frag -->
+    <eat-comment />
+    <!-- Inter-Text top margin -->
+    <dimen name="careerstack_careeritem_interText_marginTop">5dp</dimen>
+    <!-- Buttons top margin -->
+    <dimen name="careerstack_careeritem_button_marginTop">10dp</dimen>
+    <!-- Buttons bottom margin -->
+    <dimen name="careerstack_careeritem_button_marginBottom">10dp</dimen>
 
 </resources>

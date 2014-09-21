@@ -22,7 +22,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    
+    android:id="@+id/careerstack_careerItem_scrollView"
     >
     
     <RelativeLayout 
@@ -44,7 +44,7 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
 		android:layout_below="@+id/careerstack_careerItem_text_jobTitle"
-		android:layout_marginTop="5dp"
+		android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
 		android:text="Company Inc, At location!"
 		android:textAppearance="?android:attr/textAppearanceMedium" 
 		tools:ignore="HardcodedText"
@@ -58,7 +58,8 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
 		android:layout_below="@+id/careerstack_careerItem_text_companyLocationEtc"
-		android:layout_marginTop="10dp"
+		android:layout_marginTop="@dimen/careerstack_careeritem_button_marginTop"
+		android:layout_marginBottom="@dimen/careerstack_careeritem_button_marginBottom"
 		android:text="@string/careerstack_careerItem_button_openLink" />
 
 	    <Button
@@ -86,7 +87,7 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
 		android:layout_below="@+id/careerstack_careerItem_button_openLink"
-		android:layout_marginTop="15dp"
+		android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
 		android:text="@string/careerstack_formatString_publishUpdateDate" 
 		android:textSize="14sp"
 		android:textColor="@color/careerstack_translucent_grey"
@@ -98,7 +99,7 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
 		android:layout_below="@+id/careerstack_careerItem_text_updateDate"
-		android:layout_marginTop="5dp"
+		android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
 		android:text="Description: Willing to program in exchange for currency"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		tools:ignore="HardcodedText" />

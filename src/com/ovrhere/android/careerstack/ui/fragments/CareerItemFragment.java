@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
@@ -27,7 +28,7 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
 /**
  * The listing of a job item.
  * @author Jason J.
- * @version 0.2.0-20140819
+ * @version 0.2.1-20140821
  */
 public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Class name for debugging purposes. */
@@ -39,6 +40,11 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Bundle Key. The career item for this fragment. Parcelable/CareerItem. */
 	final static private String KEY_CAREER_ITEM =
 			CLASS_NAME +".KEY_CAREER_ITEM";
+	/** Bundle Key. The scroll position as a ratio of 
+	 * <code>pos/height</code>. Float. */
+	final static private String KEY_SCROLL_POSITION_RATIO =
+			CLASS_NAME +".KEY_SCROLL_POSITION_RATIO";
+	
 	/** The output date format string to use. */
 	final static private String DATE_FORMAT = "yyyy-MM-dd HH:mm";
 	
@@ -50,6 +56,8 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	private CareerItem careerItem = null;
 	/** The simple toast manager. */
 	private ToastManager toastManager = null;
+	/** The parent scroll view. */
+	private ScrollView sv_scrollView = null;
 	
 	/**
 	 * Use this factory method createa new Career framgnet.
@@ -74,6 +82,9 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putParcelable(KEY_CAREER_ITEM, careerItem);
+		outState.putFloat(
+			KEY_SCROLL_POSITION_RATIO, 
+			(float)sv_scrollView.getScrollY()/(float)sv_scrollView.getHeight());
 	}
 
 	@Override
@@ -89,16 +100,39 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_career_item, container, false);
+		View rootView = inflater.inflate(R.layout.fragment_career_item, 
+				container, false);
 		toastManager = new ToastManager(getActivity());
 		initOutputViews(rootView);
 		initButtons(rootView);
+		initScrollView(rootView, savedInstanceState);
 		return rootView;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Initialization & helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Initializes the scroll view. */
+	private void initScrollView(View rootView, Bundle saveState){
+		sv_scrollView = (ScrollView)
+				rootView.findViewById(R.id.careerstack_careerItem_scrollView);
+		if (saveState == null){
+			return;
+		}
+		/* We use a ratio because the height WILL change between orientation.
+		 * As such, scrolling to a pixel will be inaccurate between rotations,
+		 * slowly creeping upwards.	 */
+		final float scrollRatio = 
+				saveState.getFloat(KEY_SCROLL_POSITION_RATIO);
+		
+		sv_scrollView.post(new Runnable() {@Override
+			public void run() {
+				float height = sv_scrollView.getHeight();
+				sv_scrollView.scrollBy(0, (int) (height * scrollRatio));
+			}
+		});
+	}
+	
 	/** Initializes the output views. */
 	private void initOutputViews(View rootView){
 		TextView jobTitle = (TextView)

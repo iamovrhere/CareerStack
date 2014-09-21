@@ -1,11 +1,13 @@
 package com.ovrhere.android.careerstack.ui.fragments;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,6 +26,7 @@ import android.widget.ListView;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
+import com.ovrhere.android.careerstack.model.CareersStackOverflowModel;
 import com.ovrhere.android.careerstack.ui.adapters.CareerItemFilterListAdapter;
 import com.ovrhere.android.careerstack.ui.fragments.dialogs.DistanceDialogFragment;
 import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
@@ -31,10 +34,11 @@ import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 /**
  * The fragment to perform searches and display cursory results.
  * @author Jason J.
- * @version 0.1.0-20140918
+ * @version 0.2.0-20140920
  */
 public class SearchResultsFragment extends Fragment 
-implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {	
+implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
+	Handler.Callback {	
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = SearchResultsFragment.class
 			.getSimpleName();	
@@ -61,25 +65,41 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 	 * {@link #isLoadingResults}. Boolean */
 	final static private String KEY_IS_LOADING_RESULTS = 
 			CLASS_NAME +".KEY_IS_LOADING_RESULTS";
+	/** Bundle key. Whether or not the fragment has failed with last results
+	 * {@link #resultsTimeout}. Boolean */
+	final static private String KEY_RESULTS_TIMEOUT = 
+			CLASS_NAME +".KEY_RESULTS_TIMEOUT";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Start public keys
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/*
+	 * Using a quick cheat here: Could rebuilt the argument bundles for the model
+	 * OR we can just rename our keys to be the model's and reuse state/argument
+	 * bundles (with mild augmentation if necessary).
+	 * 
+	 * Option 2 it is!
+	 */
+	
+	/** Bundle key. The value of tags. String */
+	final static public String KEY_TAG_TEXT = 
+			CareersStackOverflowModel.KEY_TAG_TEXT;
 	/** Bundle key. The value of keyword. String */
 	final static public String KEY_KEYWORD_TEXT = 
-			CLASS_NAME + ".KEY_KEYWORD_TEXT";
+			CareersStackOverflowModel.KEY_KEYWORD_TEXT;
 	/** Bundle key. The value of location. String. */
 	final static public String KEY_LOCATION_TEXT = 
-			CLASS_NAME + ".KEY_LOCATION_TEXT";
+			CareersStackOverflowModel.KEY_LOCATION_TEXT;
 	/** Bundle key. The whether the remote check is set. Boolean. */
 	final static public String KEY_REMOTE_ALLOWED = 
-			CLASS_NAME + ".KEY_REMOTE_ALLOWED";
+			CareersStackOverflowModel.KEY_REMOTE_ALLOWED;
 	/** Bundle key. The whether the relocation check is set. Boolean. */
 	final static public String KEY_RELOCATE_OFFER = 
-			CLASS_NAME + ".KEY_RELOCATE_OFFER";
+			CareersStackOverflowModel.KEY_RELOCATE_OFFER;
 	/** Bundle Key. The current distance in the seek bar. Int. */
 	final static public String KEY_DISTANCE = 
-			CLASS_NAME + ".KEY_DISTANCE";
+			CareersStackOverflowModel.KEY_DISTANCE;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
@@ -95,6 +115,8 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 	private CompoundButton cb_relocationOffered =  null;
 	/** The button used for distance. */
 	private Button btn_distance = null;
+	/** The button used for searching. */
+	private Button btn_search = null;
 	
 	/** The container for retry. */
 	private View retryContainer = null;
@@ -113,14 +135,22 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 	
 	/** The current distance. Used for saved states. */
 	private int currentDistanceValue = 0;
+	
 	/** If the fragment is currently loading results. */
 	private boolean isLoadingResults = false;
+	/** If the fragment failed during last load. */
+	private boolean resultsTimeout = false;
 		
 	/** The fragment request listener from main. */
 	private OnFragmentRequestListener mFragmentRequestListener = null;
 	/** Used in {@link #onSaveInstanceState(Bundle)} to determine if 
 	 * views are visible. */
 	private boolean viewBuilt = false;
+	
+	/** The async model for making requests. */
+	private CareersStackOverflowModel asyncModel = null;
+	/** The args for previous query performed. Starts off as args. */ 
+	private Bundle prevQuery = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End members
@@ -146,6 +176,23 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 		buildSaveState(outState);
 	}
 	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		asyncModel = new CareersStackOverflowModel(getActivity());
+		asyncModel.addMessageHandler(new Handler(this));
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (isLoadingResults){
+			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_PAUSE_QUERY);
+		}
+		asyncModel.dispose();
+	}
+	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,19 +207,37 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 		initOutputs(rootView);
 		Bundle backStackState = 
 				mFragmentRequestListener.onRequestPopSavedState(TAG_BACKSTACK_STATE);
-		if (savedInstanceState != null){
-			processArgBundle(savedInstanceState);
-		} else if (backStackState != null){
+		
+		//ensure the view is built first, as requests are still heavy
+		
+		if (backStackState != null){
 			debugSavedState(backStackState);
 			processArgBundle(backStackState);
+		} else if (savedInstanceState != null){
+			processArgBundle(savedInstanceState);			
 		} else if (getArguments() != null) {
-			processArgBundle(getArguments());
+			Bundle args = getArguments();
+			processArgBundle(args);
 			//if no values set, request.
-			populateDummyValues();
+			sendRequest(args);
 		} 
+		
 		viewBuilt = true;
 		return rootView;
 	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (isLoadingResults){
+			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RESUME_QUERY);
+		}
+		//prevQuery still empty?
+		if (prevQuery == null){
+			prevQuery = getArguments(); //still set args
+		}
+	}
+	
 	
 	@Override
 	public void onDestroyView() {
@@ -257,9 +322,9 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 		btn_distance = (Button) 
 				rootView.findViewById(R.id.careerstack_searchResults_button_distance);
 		btn_distance.setOnClickListener(this);
-		Button search = (Button) 
+		btn_search = (Button) 
 				rootView.findViewById(R.id.careerstack_searchResults_button_search);
-		search.setOnClickListener(this);
+		btn_search.setOnClickListener(this);
 		Button cancelSearch = (Button) 
 				rootView.findViewById(R.id.careerstack_searchResults_button_cancel);
 		cancelSearch.setOnClickListener(this);
@@ -292,6 +357,15 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 		updateDistanceButton(currentDistanceValue);
 		
 		isLoadingResults = args.getBoolean(KEY_IS_LOADING_RESULTS);
+		resultsTimeout = args.getBoolean(KEY_RESULTS_TIMEOUT);
+		
+		if (resultsTimeout){
+			showRetryBlock();
+		} else if (isLoadingResults){
+			showLoadingBlock();
+		} else {
+			showResults();
+		}
 		
 		if (args.getParcelableArrayList(KEY_CAREER_LIST) != null){
 			try {
@@ -315,39 +389,96 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 			
 			outState.putBoolean(KEY_RELOCATE_OFFER, cb_relocationOffered.isChecked());
 			outState.putBoolean(KEY_REMOTE_ALLOWED, cb_remoteAllowed.isChecked());		
+			
 			outState.putInt(KEY_DISTANCE, currentDistanceValue);
 			outState.putParcelableArrayList(KEY_CAREER_LIST, careerList);
 			
 			outState.putBoolean(KEY_IS_LOADING_RESULTS, isLoadingResults);
+			outState.putBoolean(KEY_RESULTS_TIMEOUT, resultsTimeout);
 		}
 		debugSavedState(outState);
 	}
 	
+	/** Debugs the saved state (provided {@link #DEBUG} is true. */
+	private void debugSavedState(Bundle outState){
+		if (DEBUG){
+			for(String key : outState.keySet()){
+				Log.d(LOGTAG,
+						String.format("Bundle pair: [%s] -> [%s]", key,
+								outState.get(key))
+						);
+			}
+			Log.d(LOGTAG, "careerList size: " + careerList.size());
+		}
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// View updates start here
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Same as calling {@link #enableInput(boolean)} with
+	 * <code>isLoadingResults == false</code> value.	 */
+	private void checkInput(){
+		enableInput(isLoadingResults == false);
+	}
+	
+	/** Enables or disables input based upon the input given.
+	 * @param enabled <code>true</code> to enable buttons and edit views,
+	 * <code>false</code> to disable.	 */
+	private void enableInput(boolean enabled){
+		et_keywords.setEnabled(enabled);
+		et_location.setEnabled(enabled);
+		
+		cb_relocationOffered.setEnabled(enabled);
+		cb_remoteAllowed.setEnabled(enabled);
+		
+		btn_search.setEnabled(enabled);
+		
+		//more convoluted logic for the distance button
+		if (enabled){
+			//Forcibly check with text watcher.
+			locationTextWatcher.afterTextChanged(
+						et_location.getEditableText()
+					);
+		} else {
+			btn_distance.setEnabled(false);
+		}
+		
+	}
+	
 	/** Shows the retry block, hiding the other 2 views. Sets
-	 * {@link #isLoadingResults} to false.	 */
+	 * {@link #isLoadingResults} to false and 
+	 * {@link #resultsTimeout} to <code>true</code>	 */
 	private void showRetryBlock(){
 		retryContainer.setVisibility(View.VISIBLE);
 		progressContainer.setVisibility(View.GONE);
 		lv_resultsView.setVisibility(View.GONE);
 		isLoadingResults = false;
+		resultsTimeout = true;
+		checkInput();
 	}
 	
 	/** Shows the loading/progress block, hiding the other 2 views. Sets
-	 * {@link #isLoadingResults} to true.	 */
+	 * {@link #isLoadingResults} to true and 
+	 * {@link #resultsTimeout} to <code>false</code>.	 */
 	private void showLoadingBlock(){
 		retryContainer.setVisibility(View.GONE);
 		progressContainer.setVisibility(View.VISIBLE);
 		lv_resultsView.setVisibility(View.GONE);
 		isLoadingResults = true;
+		resultsTimeout = false;
+		checkInput();
 	}
 	
 	/** Shows the list view, hiding the other 2 views. Sets
-	 * {@link #isLoadingResults} to false.	 */
+	 * {@link #isLoadingResults} to false and 
+	 * {@link #resultsTimeout} to <code>false</code>	 */
 	private void showResults(){
 		retryContainer.setVisibility(View.GONE);
 		progressContainer.setVisibility(View.GONE);
 		lv_resultsView.setVisibility(View.VISIBLE);
 		isLoadingResults = false;
+		resultsTimeout = false;
+		checkInput();
 	}
 	
 	/** Updates the distance button's text & value of currentDistanceValue. */
@@ -366,82 +497,36 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 						));
 		currentDistanceValue = value;
 	}
-	/** Populates the list with dummy values for testing. */
-	private void populateDummyValues(){
-		careerList.clear();
-		//is joke! See? Yeah, bored. 
-		CareerItem.Builder buildCareer = new CareerItem.Builder();
-		buildCareer.setDetails(
-				"Mid-to-Senior Java/Android Developer", 
-				"Touch Lab Inc (New York, NY)", 
-				"Are you a great dev who wants to work on new and interesting "
-				+ "projects, with new problems to solve all the time? We’re "
-				+ "looking for great devs who want to work on really interesting "
-				+ "projects.\n\n"  +  
-
-				"You know that Android is the dominant smartphone platform, and "
-				+ "will be powering many different types of devices in the years "
-				+ "to come.  At Touch Lab, Android is all that we do and our goal "
-				+ "is to be the best Android development shop around.  Period.  "
-				+ "Come help us make that happen.\n\n"+
-
-				"We need developers that want to help define what great software "
-				+ "development is, both for Android specifically, and small, "
-				+ "agile teams in general.\n\n...", 
-				"http://careers.stackoverflow.com/jobs/64475/mid-to-senior-java-android-developer-touch-lab-inc", 
-				new Date());
-		careerList.add(buildCareer.create());
-		
-		buildCareer = new CareerItem.Builder();
-		buildCareer.setDetails(
-				"Sr. QA Engineer - Mobile Automation", 
-				"Pandora Media, Inc. (Oakland, CA)", "Description 2", 
-				"http://careers.stackoverflow.com/jobs/67335/sr-qa-engineer-mobile-automation-pandora-media-inc", 
-				new Date());
-		careerList.add(buildCareer.create());
-		
-		buildCareer = new CareerItem.Builder();
-		buildCareer.setDetails(
-				"Android Developer", 
-				"The LateRooms Group (Manchester, UK)", "Description 3", 
-				"http://careers.stackoverflow.com/jobs/55085/android-developer-the-laterooms-group", 
-				new Date());
-		careerList.add(buildCareer.create());
-		
-		buildCareer = new CareerItem.Builder();
-		buildCareer.setDetails(
-				"Software Developer - Android Apps", 
-				"Esri, Inc. (Redlands, CA)", "Description 4", 
-				"http://careers.stackoverflow.com/jobs/65631/software-developer-android-apps-esri-inc", 
-				new Date());
-		careerList.add(buildCareer.create());
-		
-		buildCareer = new CareerItem.Builder();
-		buildCareer.setDetails(
-				"Senior Android Developer (m/f)", 
-				"XING AG (Hamburg, Deutschland)", "Description 5", 
-				"http://careers.stackoverflow.com/jobs/47374/senior-android-developer-m-f-xing-ag", 
-				new Date());
-		careerList.add(buildCareer.create());
-		
-		resultAdapter.setCareerItems(careerList);
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Request updates start here
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** Prepares and sends request off to model.
+	 * Sets {@link #prevQuery}.
+	 * @param args The args to modify for sending.  */
+	private void sendRequest(Bundle args){
+		if (prevQuery == null){ //should never be, but in case
+			prevQuery = new Bundle();
+		}
+		prevQuery.putAll(args);
+		//TODO another units check here
+		prevQuery.putBoolean(CareersStackOverflowModel.KEY_USE_METRIC, false);
+		prevQuery.remove(KEY_IS_LOADING_RESULTS);
+		prevQuery.remove(KEY_CAREER_LIST);
+		asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RECORD_QUERY, prevQuery);
 	}
 	
-	/** Debugs the saved state (provided {@link #DEBUG} is true. */
-	private void debugSavedState(Bundle outState){
-		if (DEBUG){
-			for(String key : outState.keySet()){
-				Log.d(LOGTAG,
-						String.format("Bundle pair: [%s] -> [%s]", key,
-								outState.get(key))
-						);
-			}
-			Log.d(LOGTAG, "careerList size: " + careerList.size());
-		}
+	/** Prepares and sends request. */
+	private void prepareAndSendRequest(){
+		Bundle args = new Bundle();
+		buildSaveState(args);
+		sendRequest(args);
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Implementer listeners
+	/// Implemented listeners
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The text watcher for the location. */
@@ -468,10 +553,10 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()){
-		//TODO set up buttons
 		case R.id.careerstack_searchResults_button_search:
-			//TODO actual searching
+			prepareAndSendRequest();
 			break;
+			
 		case R.id.careerstack_searchResults_button_distance:
 			DistanceDialogFragment dialog = 
 				DistanceDialogFragment.newInstance(this,
@@ -480,11 +565,14 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 			dialog.show(getFragmentManager(), 
 					DistanceDialogFragment.class.getName());			
 			break;
+			
 		case R.id.careerstack_searchResults_button_retry:
-			//TODO retry last search (ignoring fields)
+			sendRequest(prevQuery);
 			break;
+			
 		case R.id.careerstack_searchResults_button_cancel:
-			//TODO cancel download
+			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_QUERY_CANCEL);
+			showResults();
 			//fall through
 		}
 	};
@@ -493,6 +581,7 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		switch (buttonView.getId()) {
 		case R.id.careerstack_searchResults_check_allowRemote:
+			//TODO preferences
 			break;
 		case R.id.careerstack_searchResults_check_offerRelocation:
 			break;
@@ -515,6 +604,59 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener {
 					CareerItemFragment.class.getName(), 
 					true);
 		}
+	}
+	//TODO Rotatation handling; pause and resume model required.
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean handleMessage(Message msg) {
+		try {
+			if (DEBUG){
+				Log.d(LOGTAG, "Message: " +msg.what);
+			}
+			switch (msg.what) {
+			case CareersStackOverflowModel.NOTIFY_STARTING_QUERY:
+				showLoadingBlock();
+				return true;
+				
+			case CareersStackOverflowModel.NOTIFY_CANCELLED_QUERY:
+				showResults();
+				return true;
+				
+			case CareersStackOverflowModel.REPLY_RECORDS_RESULT:
+				if (msg.obj instanceof List<?>){
+					try {
+						careerList = (ArrayList<CareerItem>) msg.obj;
+						//cast check
+						if (careerList.size() > 0){
+							@SuppressWarnings("unused")
+							CareerItem item = careerList.get(0);
+						}
+						resultAdapter.setCareerItems(careerList);
+					} catch (ClassCastException e){
+						Log.e(LOGTAG, "Mismatched class? How irregular: " + e );
+					}
+				}
+				showResults();
+				return true;
+				
+			case CareersStackOverflowModel.ERROR_REQUEST_TIMEOUT:
+				showRetryBlock();
+				return true;
+			case CareersStackOverflowModel.ERROR_REQUEST_FAILED:
+				if (careerList.isEmpty()){
+					showRetryBlock();
+				} else {
+					showResults();
+				}
+				return true;
+			}
+		} catch (Exception e){
+			if (DEBUG){
+				Log.d(LOGTAG, "Seems we have a problem here: " + e );
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
 	
 }
