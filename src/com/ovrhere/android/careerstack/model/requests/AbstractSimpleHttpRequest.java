@@ -13,22 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.ovrhere.android.careerstack.model.listeners.requests;
+package com.ovrhere.android.careerstack.model.requests;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 import android.util.Log;
 
 /** Outlines the basics of a simple GET http request. The request is set in
  * {@link #preparedRequest} and executed in the {@link #run()}.
- * Only allows requests to run sequentially for one object.
+ * Only allows requests to run sequentially for one object. Do not forget to 
+ * call {@link #setOnRequestEventListener(OnRequestEventListener)}.
  * @author Jason J.
- * @version 0.1.0-20140914
+ * @version 0.2.0-20140920
  */
 public abstract class AbstractSimpleHttpRequest implements Runnable{
 	/** The logtag for debugging. */
@@ -43,14 +45,23 @@ public abstract class AbstractSimpleHttpRequest implements Runnable{
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Lock for {@link #run()} to synchronize on. */
+	final private Object reqLock = new Object();
+	
 	/** The request timeout period in milliseconds. */
 	private int requestTimeout = DEFAULT_TIMEOUT;
 	
-	/** The prepared request ready for execution. */
-	protected String preparedRequest = "";
+	/** The urlConntection used in #run(). */
+	private HttpURLConnection urlConnection = null;
+	/** The input stream used in #run(). */
+	private InputStream input = null;
+			
 	/** The required listener for the request. */
-	protected OnRequestEventListener mRequestEventListener = null;	
+	volatile protected OnRequestEventListener mRequestEventListener = null;	
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// End members
+	////////////////////////////////////////////////////////////////////////////////////////////////
 		
 	/** Sets a request event listener. 
 	 * @param onRequestEventListener The implementer of this interface	 */
@@ -59,7 +70,7 @@ public abstract class AbstractSimpleHttpRequest implements Runnable{
 		this.mRequestEventListener = onRequestEventListener;
 	}
 	/** Sets how long in milliseconds before the request gives up. Will not 
-	 * take effect during a request.
+	 * take effect during a request. This will cause a {@link SocketTimeoutException}.
 	 * @param requestTimeout The time in milliseconds	 */
 	public void setRequestTimeout(int requestTimeout) {
 		if (requestTimeout < 0){
@@ -67,24 +78,48 @@ public abstract class AbstractSimpleHttpRequest implements Runnable{
 		}
 		this.requestTimeout = requestTimeout;
 	}
+	
 	/** Returns the timeout period before giving up.
 	 * @return The timeout in milliseconds	 */
 	public long getRequestTimeout() {
 		return requestTimeout;
 	}
 	
+	/** Note this will cancel the entire thread, causing it to throw an
+	 * {@link InterruptedException}.
+	 *  Will <code>null</code> all {@link InputStream}s.*/
+	public void cancel(){
+		Thread t =Thread.currentThread();
+		synchronized (t) {
+			disconnect();
+			t.interrupt();
+		}
+	}
+	
+	/** Returns the prepared request to perform in {@link #run()}
+	 * @return A valid request to run.	 */
+	abstract protected String getPreparedRequest();
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Runnable
+	/// Over ridge methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@Override
+	public String toString() {
+		return super.toString()+
+				String.format("[request: %s]", getPreparedRequest());
+	}
+	
+	@Override
 	public void run() {
-		synchronized (preparedRequest) {
+		synchronized (reqLock) {
 			final int QUERY_TIMEOUT = requestTimeout;
+			final String preparedRequest = getPreparedRequest();
 			
-			HttpURLConnection urlConnection = null;
 			int responseCode = 0;
+			if (Thread.interrupted()){
+				return;
+			}
 			try {
 				URL url = new URL(preparedRequest);
 				urlConnection = (HttpURLConnection) url.openConnection();
@@ -96,35 +131,81 @@ public abstract class AbstractSimpleHttpRequest implements Runnable{
 				urlConnection.connect();
 				responseCode = urlConnection.getResponseCode();
 
-				InputStream in = 
-						new BufferedInputStream(urlConnection.getInputStream());
+				if (Thread.interrupted()){
+					return;
+				}
+				input = new BufferedInputStream(urlConnection.getInputStream());
 				
-				mRequestEventListener.onStart(in);
+				if (mRequestEventListener != null){
+					mRequestEventListener.onResponseCode(responseCode);
+					mRequestEventListener.onStart(input);
+				}
+				if (Thread.interrupted()){
+					return;
+				}
+								
+				if (mRequestEventListener != null){
+					mRequestEventListener.onComplete();	
+				}
+				/*
+				 * Exceptions begin here.
+				 */
 			} catch (MalformedURLException e){
 				if (DEBUG){
 					Log.e(LOGTAG, "Poorly formed request: "+e);
 				}
-				mRequestEventListener.onException(e);
-				return;
+				onException(responseCode, e);
+				
+			} catch (SocketTimeoutException e){
+				onException(responseCode, e);
+				
 			} catch(IOException e){
 				if (DEBUG){
 					Log.e(LOGTAG, 
 							"Cannot perform request (response code:"+
 							responseCode+"): "+e);
 				}
-				mRequestEventListener.onResponseCode(responseCode);
-				mRequestEventListener.onException(e);
-				return;				
+				onException(responseCode, e);
+				
 			}  catch (Exception e){
 				if (DEBUG){
 					Log.w(LOGTAG, "Unexpected error occurred: " + e);
 				}
-				mRequestEventListener.onException(e);
-				return;
+				if (mRequestEventListener != null){
+					mRequestEventListener.onException(e);
+				}
+				
+			} finally {
+				disconnect();
 			}
-			mRequestEventListener.onComplete();	
 		}
 		
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Helper methods
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** Processes the exception requests safely. */
+	private void onException(int responseCode, IOException e) {
+		if (mRequestEventListener != null){
+			mRequestEventListener.onResponseCode(responseCode);
+			mRequestEventListener.onException(e);
+		}
+	}
+	
+	/** Disconnect cleanup. */
+	private void disconnect() {
+		try {
+			if (urlConnection != null ){
+				urlConnection.disconnect();
+				urlConnection = null;
+			}
+			if (input != null){
+				input.close();
+				input = null;
+			}
+		} catch (IOException e) {}
 	}
 	
 	

@@ -23,15 +23,15 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import com.ovrhere.android.careerstack.model.careersstackoverflow.CareersStackOverflowRssXmlParser;
-
 import android.util.Log;
 
+import com.ovrhere.android.careerstack.model.careersstackoverflow.CareersStackOverflowRssXmlParser;
 
 
-/** The basic outline for an xml parser. 
+
+/** The basic outline for an xml parser. Note that this is thread blocking.
  * @author Jason J.
- * @version 0.1.0-20140913
+ * @version 0.2.0-20140921
  * @param R1 The return value to use for the methods <code>parseXmlStream</code>
  */
 abstract public class AbstractXmlParser <R1> {
@@ -45,6 +45,8 @@ abstract public class AbstractXmlParser <R1> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End contants
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** The boolean for determining if paused. */ 
+	volatile boolean paused = false;
 	
 	/** The {@link XmlPullParser} factory for this object. */
 	private XmlPullParserFactory factory = null;
@@ -63,6 +65,15 @@ abstract public class AbstractXmlParser <R1> {
 			throw e;
 		}
 	}	
+	
+	/** Pauses the thread based on value. */
+	public void pause() {
+		paused = true; 
+	}
+	/** Resumes the thread based on value. */
+	public void resume(){
+		paused = false;
+	}
 
 	
 	/** Parses the xml stream and returns it described return type.
@@ -80,6 +91,8 @@ abstract public class AbstractXmlParser <R1> {
 			Log.e(LOGTAG, "Parser failed to be created: "+e);
 			throw e;
 		}
+		checkPause();
+		
 		return parseXmlToReturnData();
 	}
 	
@@ -98,6 +111,7 @@ abstract public class AbstractXmlParser <R1> {
 			Log.e(LOGTAG, "Parser failed to be created: "+e);
 			throw e;
 		}
+		checkPause();
 		
 		return parseXmlToReturnData();
 	}
@@ -106,6 +120,8 @@ abstract public class AbstractXmlParser <R1> {
 	/// Abstract methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Parses the xml to a list using prepared PullParser  {@link #pullParser}.
+	 * Remember to use {@link #checkPause()} for proper thread control.
+	 * Additionally, consider the use of {@link Thread#yield()} for throttling.
 	 * @return The parsed group of values
 	 * @throws XmlPullParserException  re-thrown from next
 	 * @throws IOException  re-thrown from next */
@@ -115,6 +131,27 @@ abstract public class AbstractXmlParser <R1> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Helper methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Checks to see if to yield the thread based on
+	 * If so, it:
+	 * <ol><li>Sets priority to lowest</li>
+	 * <li>Sleeps for 50 milliseconds</li>
+	 * <li>Rechecks</li>
+	 * <li>Repeats step 2.</li></ul>
+	 * After exiting this loop it is restored to its former priority. */
+	protected void checkPause(){
+		final Thread t = Thread.currentThread();
+		final int priority = t.getPriority();
+		if (paused){
+			t.setPriority(Thread.MIN_PRIORITY);
+		}
+		while (paused){
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {}
+		}
+		t.setPriority(priority);
+	}
+	
 	/** Checks if #pullParser is <code>null</code>, if so throw.
 	 * @throws XmlPullParserException If the pull parser not previously initialized.	 */
 	final protected void parserNullCheck() throws XmlPullParserException {
