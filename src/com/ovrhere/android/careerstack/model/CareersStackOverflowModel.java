@@ -42,7 +42,7 @@ public class CareersStackOverflowModel extends AsyncModel
 	/** The log tag to use. */
 	final static private String LOGTAG = CLASS_NAME;
 	/** The boolean for debugging. */
-	final static private boolean DEBUG = true;
+	final static private boolean DEBUG = false;
 	/** The boolean for verbose debugging. */
 	final static private boolean VERBOSE = false;
 	

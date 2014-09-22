@@ -101,7 +101,7 @@ public class CareerItem implements Parcelable{
 	/**
 	 * The builder for career items.
 	 * @author Jason J.
-	 * @version 0.1.0-20140914
+	 * @version 0.1.1-20140922
 	 */
 	public static class Builder {
 		final static private String DETAILED_EXCEPTION_BUILDER_IS_NOT_PREPARED = 
@@ -133,9 +133,9 @@ public class CareerItem implements Parcelable{
 		public Builder setDetails(String title, String companyLocationEtc, 
 				String description, String url, Date publishDate){
 			validateJobData(title, description, url, publishDate);
-			careerItem.title = title;
-			careerItem.companyLocationEtc = companyLocationEtc;
-			careerItem.description = description;
+			careerItem.title = title.trim();
+			careerItem.companyLocationEtc = companyLocationEtc.trim();
+			careerItem.description = description.trim();
 			careerItem.url = url;
 			careerItem.publishDate = publishDate;
 			
