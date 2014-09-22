@@ -36,6 +36,7 @@
 		android:layout_alignParentTop="true"
 		android:text="Really long Job Title title"
 		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:textColor="?attr/careerstack_title_color"
 		tools:ignore="HardcodedText" />
 	    
 	    <TextView

@@ -14,23 +14,36 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<resources>
-
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    	  xmlns:tools="http://schemas.android.com/tools" >
+    
     <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+       Dark theme
     -->
     <style name="AppBaseDarkTheme" parent="Theme.AppCompat">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
+         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
+        
+        <item name="careerstack_title_color">@android:color/white</item>
+        
+        <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>
     </style>
+    
+    <!-- Light theme -->
+    <style name="AppBaseLightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        
+        <item name="android:windowBackground">@color/careerstack_offwhite_background</item>
+        
+        <item name="careerstack_title_color">@android:color/black</item>
+        
+        <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
+        
+        <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>
+    </style>
+
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseDarkTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
     </style>
 
 </resources>

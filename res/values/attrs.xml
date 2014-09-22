@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Icon used in light & dark themes -->
+    <attr name="ic_careerstack" format="reference"/>
+    <!-- Title color used in both dark & light themes -->
+    <attr name="careerstack_title_color" format="reference"/>
+</resources>

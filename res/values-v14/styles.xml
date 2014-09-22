@@ -24,5 +24,10 @@
     <style name="AppBaseDarkTheme" parent="Theme.AppCompat">
         <!-- API 14 theme customizations can go here. -->
     </style>
+    
+    <!-- Light theme -->
+    <style name="AppBaseLightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        
+    </style>
 
 </resources>

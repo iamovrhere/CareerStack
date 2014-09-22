@@ -15,15 +15,14 @@
    limitations under the License.
 -->
 <resources>
-    <!-- Based loosely on the colour for Android buttons; ~85% opacity grey. -->
-    <color name="careerstack_translucent_grey" >#dc909090</color>
-    
-    <!-- White color for text; ~90% opacity white. -->
-    <color name="careerstack_nearwhite_90" >#E5f0f0f0</color>
-    <!-- Black color for text; ~90% opacity black. -->
-    <color name="careerstack_nearblack_90" >#E5282828</color>
-    
-    
-    <!-- Colour straight from stackoverflow background -->
-    <color name="careerstack_offwhite_background">#F6F6F5</color>
+    <!-- Application theme set to night-->
+    <style name="AppTheme" parent="AppBaseDarkTheme">
+        
+        <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
+        
+        <item name="careerstack_title_color">@android:color/white</item>
+        
+        <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>
+    </style>
+
 </resources>

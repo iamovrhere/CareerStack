@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.UiModeManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -35,7 +37,7 @@ import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.3.0-20140922
+ * @version 0.3.1-20140922
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnFragmentRequestListener, OnBackStackChangedListener {
@@ -77,12 +79,15 @@ public class MainActivity extends ActionBarActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		
 		getSupportFragmentManager().addOnBackStackChangedListener(this);
 		
 		if (PreferenceUtils.isFirstRun(this)){
 			PreferenceUtils.setToDefault(this);
 		}
+		
+		setDayNightMode();
+		setContentView(R.layout.activity_main);
 		
 		if (savedInstanceState == null) {			
 			loadFragment( new MainFragment(), TAG_MAIN_FRAG, false);
@@ -101,6 +106,7 @@ public class MainActivity extends ActionBarActivity
 		}
 		
 	}
+	
 	
 
 	@Override
@@ -141,6 +147,20 @@ public class MainActivity extends ActionBarActivity
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Helper method
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Will read preferences and set the mode appropriately. 
+	 * Must be called before {@link #setContentView(int)} */
+	private void setDayNightMode(){
+		 UiModeManager uimode = (UiModeManager)
+				 getSystemService(Context.UI_MODE_SERVICE);
+		 //TODO switch between modes based on preference
+		 uimode.setNightMode(UiModeManager.MODE_NIGHT_YES);
+		 setTheme(R.style.AppBaseDarkTheme);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Fragment method
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** Reattaches the last fragment. And resets back button. */
 	private void reattachLastFragment() {
 		String currentTag = fragTagStack.peek();
