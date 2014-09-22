@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2014 Jason J.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:defaultValue="false" >
+    <!-- Default value = false, removes the padding for some reason. -->
+    
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_USE_MILES"
+        android:title="@string/careerstack_settings_useMetric_title"
+        android:summary="@string/careerstack_settings_useMetric_summary" 
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_USE_MILES"
+	/>
+    
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_KEEP_SEARCH_SETTINGS"
+        android:title="@string/careerstack_settings_keepSearchSettings_title"
+        android:summary="@string/careerstack_settings_keepSearchSettings_summary" 
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_KEEP_SEARCH_SETTINGS"
+	/>
+    
+    <Preference 
+        android:key="@string/careerstack_settings_KEY_CLEAR_SETTINGS"
+        android:title="@string/careerstack_settings_clearSettings_title" 
+        android:summary="@string/careerstack_settings_clearSettings_summary"
+        android:persistent="false"
+		/>
+    
+     <Preference 
+        android:key="@string/careerstack_settings_KEY_SOFTWARE_VERSION"
+        android:title="@string/careerstack_settings_softwareVersion_title" 
+        android:persistent="false"
+		/>
+    
+</PreferenceScreen>

@@ -100,5 +100,45 @@
         >Published: %1$s. \nLast updated: %2$s</string>
     <!-- Copied Link. -->
     <string name="careerstack_toast_copiedLink">Copied link to clipboard</string>
+    <!-- The string for "%1$s(job) at %2$s(place) -->
+    <string name="careerstack_formatString_jobAtPlace"
+        >%1$s at %2$s</string>
 
+	<!-- Ends career item  fragment strings -->
+    <eat-comment />
+    
+    <!-- Starts settings fragment strings -->
+    <eat-comment />
+    <!-- The setting title for distance units -->
+    <string name="careerstack_settings_useMetric_title">Miles</string>
+    <!-- The setting description for distance units -->
+    <string name="careerstack_settings_useMetric_summary"
+        >Use the imperial system for distance</string>
+    
+    <!-- The pref title for keeping settings for search -->
+    <string name="careerstack_settings_keepSearchSettings_title"
+        >Persistent search settings</string>
+    <!-- The pref description for keeping settings for search  -->
+    <string name="careerstack_settings_keepSearchSettings_summary"
+        >Restore search settings from previous session</string>
+        
+    <!-- The pref title for clearin settings -->
+    <string name="careerstack_settings_clearSettings_title"
+        >Reset all settings</string>
+    <!-- The pref description for clearing settings  -->
+    <string name="careerstack_settings_clearSettings_summary"
+        >Set all settings to default values</string>
+    <!-- The clearing settings confirmation message  -->
+    <string name="careerstack_settings_clearSettings_confirm"
+        >Are you sure you wish to reset ALL settings? 
+        This cannot be undone.</string>
+    
+    <!-- Toast for when settings are cleared. -->
+    <string name="careerstack_toast_clearedSettings"
+        >Settings reset</string>
+        
+    <!-- The pref title app version -->
+    <string name="careerstack_settings_softwareVersion_title"
+        >Application version</string>
+    
 </resources>
