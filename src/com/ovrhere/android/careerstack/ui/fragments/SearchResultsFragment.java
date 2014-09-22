@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,14 +28,16 @@ import android.widget.ListView;
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
 import com.ovrhere.android.careerstack.model.CareersStackOverflowModel;
+import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.ui.adapters.CareerItemFilterListAdapter;
 import com.ovrhere.android.careerstack.ui.fragments.dialogs.DistanceDialogFragment;
 import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
+import com.ovrhere.android.careerstack.utils.UnitCheck;
 
 /**
  * The fragment to perform searches and display cursory results.
  * @author Jason J.
- * @version 0.2.0-20140920
+ * @version 0.2.2-20140922
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
@@ -152,6 +155,9 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 	/** The args for previous query performed. Starts off as args. */ 
 	private Bundle prevQuery = null;
 	
+	/** The shared preferences to used. */
+	private SharedPreferences prefs = null;
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End members
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,7 +185,8 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		prefs = PreferenceUtils.getPreferences(getActivity());
+		
 		asyncModel = new CareersStackOverflowModel(getActivity());
 		asyncModel.addMessageHandler(new Handler(this));
 	}
@@ -241,6 +248,11 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 	
 	@Override
 	public void onDestroyView() {
+		Bundle state = new Bundle();
+		buildSaveState(state); //holds the state
+		mFragmentRequestListener.onRequestHoldSavedState(
+				TAG_BACKSTACK_STATE, state);	
+		
 		super.onDestroyView();
 		viewBuilt = false;
 	}
@@ -483,19 +495,17 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 	
 	/** Updates the distance button's text & value of currentDistanceValue. */
 	private void updateDistanceButton(int value){
-		// TODO units check here
 		btn_distance.setText(
-				String.format(
-						getString(R.string.careerstack_formatString_distanceValue_milesShort),
-						value
-						)
+				UnitCheck.unitsShort(prefs, getResources(), value)
 				);
 		btn_distance.setContentDescription(
-				String.format(
-						getString(R.string.careerstack_formatString_distanceValue_miles),
-						value
-						));
+				UnitCheck.units(prefs, getResources(), value)
+				);
 		currentDistanceValue = value;
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putInt(
+				getString(R.string.careerstack_pref_KEY_DISTANCE_VALUE), 
+				value).commit();
 	}
 	
 	
@@ -511,8 +521,9 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 			prevQuery = new Bundle();
 		}
 		prevQuery.putAll(args);
-		//TODO another units check here
-		prevQuery.putBoolean(CareersStackOverflowModel.KEY_USE_METRIC, false);
+		prevQuery.putBoolean(
+				CareersStackOverflowModel.KEY_USE_METRIC, 
+				UnitCheck.useMetric(prefs, getResources()) );
 		prevQuery.remove(KEY_IS_LOADING_RESULTS);
 		prevQuery.remove(KEY_CAREER_LIST);
 		asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RECORD_QUERY, prevQuery);
@@ -572,18 +583,28 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 			
 		case R.id.careerstack_searchResults_button_cancel:
 			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_QUERY_CANCEL);
-			showResults();
+			if (careerList.isEmpty()){
+				showRetryBlock();
+			} else {
+				showResults();
+			}
 			//fall through
 		}
 	};
 	
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		SharedPreferences.Editor edit = prefs.edit();
 		switch (buttonView.getId()) {
 		case R.id.careerstack_searchResults_check_allowRemote:
-			//TODO preferences
+			edit.putBoolean(
+					getString(R.string.careerstack_pref_KEY_REMOTE_ALLOWED), 
+					isChecked).commit();
 			break;
 		case R.id.careerstack_searchResults_check_offerRelocation:
+			edit.putBoolean(
+					getString(R.string.careerstack_pref_KEY_RELOCATION_OFFERED), 
+					isChecked).commit();
 			break;
 		}		
 	}
@@ -593,11 +614,6 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 			long id) {
 		CareerItem item = resultAdapter.getItem(position);
 		if (item != null){
-			Bundle state = new Bundle();
-			buildSaveState(state); //holds the state
-			mFragmentRequestListener.onRequestHoldSavedState(
-					TAG_BACKSTACK_STATE, state);	
-			
 			Fragment frag = CareerItemFragment.newInstance(item);
 			mFragmentRequestListener.onRequestNewFragment(
 					frag, 
@@ -605,7 +621,7 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 					true);
 		}
 	}
-	//TODO Rotatation handling; pause and resume model required.
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean handleMessage(Message msg) {

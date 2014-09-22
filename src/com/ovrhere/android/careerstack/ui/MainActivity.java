@@ -28,12 +28,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ovrhere.android.careerstack.R;
+import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.ui.fragments.MainFragment;
+import com.ovrhere.android.careerstack.ui.fragments.SettingsFragment;
 import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.2.0-20140918
+ * @version 0.3.0-20140922
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnFragmentRequestListener, OnBackStackChangedListener {
@@ -78,6 +80,10 @@ public class MainActivity extends ActionBarActivity
 		setContentView(R.layout.activity_main);
 		getSupportFragmentManager().addOnBackStackChangedListener(this);
 		
+		if (PreferenceUtils.isFirstRun(this)){
+			PreferenceUtils.setToDefault(this);
+		}
+		
 		if (savedInstanceState == null) {			
 			loadFragment( new MainFragment(), TAG_MAIN_FRAG, false);
 		} else {
@@ -111,6 +117,10 @@ public class MainActivity extends ActionBarActivity
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
 		case R.id.action_settings:
+			loadFragment(
+					new SettingsFragment(),
+					SettingsFragment.class.getName(), 
+					true);
 			return true;
 
 		default:

@@ -21,6 +21,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -31,13 +32,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
+import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.ui.wrappers.SeekBarWrapper;
+import com.ovrhere.android.careerstack.utils.UnitCheck;
 
 /** The dialog fragment for distance. Makes use of 
  * layout <code>viewstub_distance_seekbar.xml</code>. Requires the user use
  * <code>onActivityResult</code> and request codes to get result.
  * @author Jason J.
- * @version 0.1.0-20140917
+ * @version 0.1.1-20140922
  */
 public class DistanceDialogFragment extends DialogFragment 
 implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListener {	
@@ -49,10 +52,11 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	final static public String KEY_DISTANCE = 
 			CLASS_NAME + ".KEY_DISTANCE";
 	
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** The shared preferences. */
+	private SharedPreferences prefs = null;
 	
 	/** The wrapper for the seekbar. */
 	private SeekBarWrapper seekbarWrapper =  null;
@@ -84,6 +88,8 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true); //retain.
+		prefs = PreferenceUtils.getPreferences(getActivity());
+		
 		if (getArguments() != null){
 			currentDistanceValue = 
 					getArguments().getInt(KEY_DISTANCE, currentDistanceValue);
@@ -167,11 +173,8 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	@Override
 	public void onValueUpdate(int value) {
 		currentDistanceValue = value;
-		//TODO unit checking here
 		tv_distance.setText(
-				String.format(
-						getString(R.string.careerstack_formatString_distanceValue_miles), 
-						value)
+				UnitCheck.units(prefs, getResources(), value)
 				);
 	}
 	

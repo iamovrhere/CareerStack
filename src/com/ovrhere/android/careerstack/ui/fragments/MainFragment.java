@@ -16,6 +16,7 @@
 package com.ovrhere.android.careerstack.ui.fragments;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,8 +35,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
+import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 import com.ovrhere.android.careerstack.ui.wrappers.SeekBarWrapper;
+import com.ovrhere.android.careerstack.utils.UnitCheck;
 
 /**
  * The main starting fragment. Currently a splash screen + entry screen.
@@ -43,7 +46,7 @@ import com.ovrhere.android.careerstack.ui.wrappers.SeekBarWrapper;
  * {@link ClassCastException} otherwise.
  * 
  * @author Jason J.
- * @version 0.2.0-20140917
+ * @version 0.2.1-20140922
  */
 public class MainFragment extends Fragment 
 implements OnClickListener, OnCheckedChangeListener, 
@@ -107,6 +110,9 @@ implements OnClickListener, OnCheckedChangeListener,
 	 * views are visible. */
 	private boolean viewBuilt = false;
 	
+	/** The shared preference handle. */
+	private SharedPreferences prefs = null;
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End members
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +133,12 @@ implements OnClickListener, OnCheckedChangeListener,
 		
 		outState.putInt(KEY_DISTANCE, currentDistanceValue);
 	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		prefs = PreferenceUtils.getPreferences(getActivity());		
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -135,8 +147,10 @@ implements OnClickListener, OnCheckedChangeListener,
 				false);
 		currentDistanceValue = 
 				getResources().getInteger(R.integer.careerstack_seekBar_default);
-
+		
 		initInputs(rootView);
+		processPrefs();
+		
 		if (savedInstanceState != null){
 			processSavedState(rootView, savedInstanceState);
 		}
@@ -167,6 +181,7 @@ implements OnClickListener, OnCheckedChangeListener,
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Initialize helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** Initializes all the native input views on the fragment. */
 	private void initInputs(View rootView){
 		et_keywords = (EditText) 
@@ -208,14 +223,35 @@ implements OnClickListener, OnCheckedChangeListener,
 			et_location.setText(location);
 		}
 		cb_relocationOffered.setChecked(
-				savedState.getBoolean(KEY_RELOCATE_OFFER, false));
+				savedState.getBoolean(KEY_RELOCATE_OFFER));
 		cb_remoteAllowed.setChecked( 
-				savedState.getBoolean(KEY_REMOTE_ALLOWED, false));
+				savedState.getBoolean(KEY_REMOTE_ALLOWED));
 		
 		currentDistanceValue = 
 				savedState.getInt(KEY_DISTANCE, currentDistanceValue);
 	}
-	
+	/** Processes and applied preferences, if allowed. */
+	private void processPrefs(){
+		if (prefs.getBoolean(
+				getString(R.string.careerstack_pref_KEY_KEEP_SEARCH_SETTINGS), 
+				false) == false){
+			//if we are not suppose to keep settings, discard them.
+			return;
+		}
+		
+		int value = prefs.getInt(
+				getString(R.string.careerstack_pref_KEY_DISTANCE_VALUE), 
+				currentDistanceValue);
+		updateDistance(value);
+		cb_relocationOffered.setChecked(
+				prefs.getBoolean(
+						getString(R.string.careerstack_pref_KEY_RELOCATION_OFFERED), 
+						false));
+		cb_remoteAllowed.setChecked( 
+				prefs.getBoolean(
+						getString(R.string.careerstack_pref_KEY_REMOTE_ALLOWED), 
+						false));
+	}
 	
 	/** Not intented to be called in {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}
 	 * @return <code>true</code> if successfully initialized seekbar,
@@ -242,9 +278,11 @@ implements OnClickListener, OnCheckedChangeListener,
 			return false; //end early
 		}
 	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Misc. Helper methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** Shows or hides seekbar block based bool.
 	 * If being shown for the first time, the view is inflated and the stepper
 	 * initialized.
@@ -271,11 +309,8 @@ implements OnClickListener, OnCheckedChangeListener,
 	private void updateDistance(int value){
 		currentDistanceValue = value;
 		if (tv_distance != null){
-			//TODO metric unit checks
-			tv_distance.setText(
-					String.format(
-							getResources().getString(R.string.careerstack_formatString_distanceValue_miles), 
-							value)
+			tv_distance.setText( 
+						UnitCheck.units(prefs, getResources(), value)
 					);
 		}
 	}
@@ -348,8 +383,6 @@ implements OnClickListener, OnCheckedChangeListener,
 				Log.d(LOGTAG, "Relocation:"+cb_relocationOffered.isChecked());
 				Log.d(LOGTAG, "Distance:"+getDistance());
 			}
-
-			//TODO search action (i.e. launch intent/fragment)
 			
 			prepareAndRequestSearch();
 		}		
@@ -358,20 +391,29 @@ implements OnClickListener, OnCheckedChangeListener,
 	
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		SharedPreferences.Editor edit = prefs.edit();
 		switch (buttonView.getId()) {
 		case R.id.careerstack_main_check_allowRemote:
-			// TODO set preferences here
+			edit.putBoolean(
+					getString(R.string.careerstack_pref_KEY_REMOTE_ALLOWED), 
+					isChecked).commit();
 			break;
 		case R.id.careerstack_main_check_offerRelocation:
-			
-			//break;
+			edit.putBoolean(
+					getString(R.string.careerstack_pref_KEY_RELOCATION_OFFERED), 
+					isChecked).commit();
+			break;
 		default:
 			//break;
 		}			
 	}
 	
 	@Override
-	public void onValueUpdate(int progress) {
-		updateDistance(progress);		
+	public void onValueUpdate(int value) {
+		updateDistance(value);
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putInt(
+				getString(R.string.careerstack_pref_KEY_DISTANCE_VALUE), 
+				value).commit();
 	}
 }
