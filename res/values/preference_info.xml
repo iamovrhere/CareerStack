@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2014 Jason J.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<resources>
+    <!-- Version 0.1.0  -->
+    <eat-comment />
+    <!-- The string used as the preference file name. -->
+    <string name="careerstack_PREFERENCE_FILE_KEY" >
+        com_ovrhere_careerstack_PREFERENCE_FILE_KEY
+    </string>
+    
+    <!-- Preference keys:
+	BE WARY OF CHANGING KEY VALUES HERE.  -->
+	<eat-comment />
+	
+    <!-- Boolean key. Whether to use metric on the distance.  -->
+    <string name="careerstack_pref_KEY_USE_MILES" >
+        careerstack_pref_KEY_USE_MILES
+    </string>
+    <!-- Boolean key. Whether to keep search settings like 
+    distance, remote, offers relocation.  -->
+    <string name="careerstack_pref_KEY_KEEP_SEARCH_SETTINGS" >
+        careerstack_pref_KEY_KEEP_SEARCH_SETTINGS
+    </string>
+     <!-- Boolean key. Whether remote is offered  -->
+    <string name="careerstack_pref_KEY_REMOTE_ALLOWED" >
+        careerstack_pref_KEY_REMOTE_ALLOWED
+    </string>
+     <!-- Boolean key. Whether relocation is offered  -->
+    <string name="careerstack_pref_KEY_RELOCATION_OFFERED" >
+        careerstack_pref_KEY_RELOCATION_OFFERED
+    </string>
+    <!-- Int key. The distance input.  -->
+    <string name="careerstack_pref_KEY_DISTANCE_VALUE" >
+        careerstack_pref_KEY_DISTANCE_VALUE
+    </string>
+    
+    
+    <!-- Preference Default Values. These may change according to locale.  -->
+	<eat-comment />
+	<!-- Default Value to careerstack_pref_KEY_USE_MILES -->
+	<item name="careerstack_pref_DEF_VALUE_USE_MILES"
+	    type="bool">1</item>
+	<!-- Default Value to careerstack_pref_KEY_KEEP_SEARCH_SETTINGS -->
+	<item name="careerstack_pref_DEF_VALUE_KEEP_SEARCH_SETTINGS"
+	    type="bool">1</item>
+	<!-- Default Value to careerstack_pref_KEY_USE_METRIC -->
+	<item name="careerstack_pref_DEF_VALUE_REMOTE_ALLOWED"
+	    type="bool">0</item>
+	<!-- Default Value to careerstack_pref_KEY_USE_METRIC -->
+	<item name="careerstack_pref_DEF_VALUE_RELOCATION_OFFERED"
+	    type="bool">0</item>
+	<!-- Default Value to careerstack_pref_KEY_USE_METRIC -->
+	<item name="careerstack_pref_DEF_VALUE_DISTANCE_VALUE"
+	    type="integer">@integer/careerstack_seekBar_default</item>
+	
+</resources>
