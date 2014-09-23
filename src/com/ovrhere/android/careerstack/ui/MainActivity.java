@@ -19,13 +19,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.UiModeManager;
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -37,7 +41,7 @@ import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.3.1-20140922
+ * @version 0.4.0-20140922
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnFragmentRequestListener, OnBackStackChangedListener {
@@ -67,6 +71,12 @@ public class MainActivity extends ActionBarActivity
 	 * Key: fragment tag (String), Value: savedState (Bundle) */
 	final private HashMap<String, Bundle> fragSavedStates =
 			new HashMap<String, Bundle>();
+	
+	/** The current theme. Default is -1. */
+	private int currThemeId = -1;
+	
+	/** The current shared preference. */
+	private SharedPreferences prefs = null;
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -85,8 +95,9 @@ public class MainActivity extends ActionBarActivity
 		if (PreferenceUtils.isFirstRun(this)){
 			PreferenceUtils.setToDefault(this);
 		}
+		prefs = PreferenceUtils.getPreferences(this);
+		checkThemePref();
 		
-		setDayNightMode();
 		setContentView(R.layout.activity_main);
 		
 		if (savedInstanceState == null) {			
@@ -106,7 +117,6 @@ public class MainActivity extends ActionBarActivity
 		}
 		
 	}
-	
 	
 
 	@Override
@@ -128,7 +138,9 @@ public class MainActivity extends ActionBarActivity
 					SettingsFragment.class.getName(), 
 					true);
 			return true;
-
+		case R.id.action_toggleTheme:
+			toggleDayNightMode();
+			return true;
 		default:
 			break;
 		}
@@ -147,14 +159,57 @@ public class MainActivity extends ActionBarActivity
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Helper method
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	/** Will read preferences and set the mode appropriately. 
-	 * Must be called before {@link #setContentView(int)} */
-	private void setDayNightMode(){
-		 UiModeManager uimode = (UiModeManager)
-				 getSystemService(Context.UI_MODE_SERVICE);
-		 //TODO switch between modes based on preference
-		 uimode.setNightMode(UiModeManager.MODE_NIGHT_YES);
-		 setTheme(R.style.AppBaseDarkTheme);
+	
+	/** Checks theme preference and sets theme accordingly. 
+	 * Should be called before {@link #setContentView(int)} */
+	private void checkThemePref(){
+		final String dark = getString(R.string.careerstack_pref_VALUE_THEME_DARK);
+		//final String light = getString(R.string.careerstack_pref_VALUE_THEME_LIGHT);
+		final String currTheme = prefs.getString(
+				getString(R.string.careerstack_pref_KEY_THEME_PREF), 
+				dark);
+		
+		if (currTheme.equals(dark)){
+			currThemeId = R.style.AppBaseTheme_Dark;
+		} else {
+			//light
+			currThemeId = R.style.AppBaseTheme_Light;
+		}				
+		setTheme(currThemeId); 
+	}
+	
+	/** Toggles day and night mode pref and restarts.
+	 * Assumes {@link #checkThemePref()} is called in {@link #onCreate(Bundle)} */
+	@SuppressLint("NewApi")
+	private void toggleDayNightMode(){
+		final String key = getString(R.string.careerstack_pref_KEY_THEME_PREF);
+		final String dark = getString(R.string.careerstack_pref_VALUE_THEME_DARK);
+		final String light = getString(R.string.careerstack_pref_VALUE_THEME_LIGHT);
+		
+		if (currThemeId == R.style.AppBaseTheme_Dark) {
+			prefs.edit().putString(key, light).commit(); //toggle values
+        } else {
+        	prefs.edit().putString(key, dark).commit();
+        }
+        this.recreate();
+	}
+		
+	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public void recreate() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+			super.recreate();
+			//if the method exists in higher apis, use it. 
+		} else { //TODO test this on 2.3.3.3
+			//otherwise, we'll figure it out!
+			try{
+				Intent intent = getIntent();
+				finish();
+				startActivity(intent); //restart same intent
+			} catch (Exception e){
+				Log.e(CLASS_NAME, "Error restarting activity: " + e);
+			}
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////

@@ -15,7 +15,7 @@
    limitations under the License.
 -->
 <resources>
-    <!-- Version 0.1.0  -->
+    <!-- Version 0.2.0  -->
     <eat-comment />
     <!-- The string used as the preference file name. -->
     <string name="careerstack_PREFERENCE_FILE_KEY" >
@@ -47,9 +47,22 @@
     <string name="careerstack_pref_KEY_DISTANCE_VALUE" >
         careerstack_pref_KEY_DISTANCE_VALUE
     </string>
+     <!-- String key. The prefered theme; either 
+     careerstack_pref_VALUE_THEME_DARK or careerstack_pref_VALUE_THEME_LIGHT.  -->
+    <string name="careerstack_pref_KEY_THEME_PREF" >
+        careerstack_pref_KEY_THEME_PREF
+    </string>
     
+    <!-- Potential values. -->
+    <eat-comment />
+    <!-- Value to careerstack_pref_KEY_THEME_PREF -->
+	<string name="careerstack_pref_VALUE_THEME_DARK"
+	    >careerstack_pref_VALUE_THEME_DARK</string>
+	<!-- Default Value for careerstack_pref_KEY_THEME_PREF -->
+	<string name="careerstack_pref_VALUE_THEME_LIGHT"
+	    >careerstack_pref_VALUE_THEME_LIGHT</string>
     
-    <!-- Preference Default Values. These may change according to locale.  -->
+    <!-- Preference Default Values. Some of these may change according to locale.  -->
 	<eat-comment />
 	<!-- Default Value to careerstack_pref_KEY_USE_MILES -->
 	<item name="careerstack_pref_DEF_VALUE_USE_MILES"
@@ -66,5 +79,8 @@
 	<!-- Default Value to careerstack_pref_KEY_USE_METRIC -->
 	<item name="careerstack_pref_DEF_VALUE_DISTANCE_VALUE"
 	    type="integer">@integer/careerstack_seekBar_default</item>
+	<!-- Default value for careerstack_pref_KEY_THEME_PREF -->
+	<string name="careerstack_pref_DEF_VALUE_THEME_PREF"
+	    >@string/careerstack_pref_VALUE_THEME_DARK</string>
 	
 </resources>

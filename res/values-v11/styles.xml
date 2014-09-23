@@ -20,13 +20,17 @@
         Base application theme for API 11+. This theme completely replaces
         AppBaseTheme from res/values/styles.xml on API 11+ devices.
     -->
-    <style name="AppBaseDarkTheme" parent="Theme.AppCompat">
+    
+    <style name="AppBaseTheme.Dark" parent="Theme.AppCompat">
         <!-- API 11 theme customizations can go here. -->
+        <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
+        <item name="careerstack_title_color">@android:color/white</item>
     </style>
     
     <!-- Light theme -->
-    <style name="AppBaseLightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        
+    <style name="AppBaseTheme.Light" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>
+        <item name="careerstack_title_color">@android:color/black</item>
     </style>
 
 </resources>
