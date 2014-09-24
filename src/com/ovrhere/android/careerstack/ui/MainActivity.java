@@ -21,6 +21,7 @@ import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -37,14 +38,17 @@ import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.ui.fragments.MainFragment;
 import com.ovrhere.android.careerstack.ui.fragments.SettingsFragment;
+import com.ovrhere.android.careerstack.ui.fragments.dialogs.ConfirmationDialogFragment;
 import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.4.0-20140922
+ * @version 0.5.0-20140923
  */
 public class MainActivity extends ActionBarActivity 
-	implements OnFragmentRequestListener, OnBackStackChangedListener {
+	implements OnFragmentRequestListener, OnBackStackChangedListener,
+	DialogInterface.OnClickListener {
+	
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = MainActivity.class.getSimpleName();
 	
@@ -56,7 +60,15 @@ public class MainActivity extends ActionBarActivity
 	 *  Hashmap<String,Bundle>/Serializable. */
 	final static private String KEY_FRAG_SAVED_STATES = 
 			CLASS_NAME + ".KEY_FRAG_SAVED_STATES";
+	/** Bundle key. The actionbar title in #actionBarTitle. String. */
+	final static private String KEY_ACTIONBAR_TITLE =
+			CLASS_NAME + ".KEY_ACTIONBAR_SUBTITLE";
 	
+	
+	/** Extra Key. The theme intent value. Int. */
+	final static private String KEY_THEME_INTENT = 
+			CLASS_NAME + ".KEY_THEME_INTENT";
+		
 	/** The main fragment tag. */
 	final static private String TAG_MAIN_FRAG = 
 			MainFragment.FRAGTAG;
@@ -72,6 +84,9 @@ public class MainActivity extends ActionBarActivity
 	final private HashMap<String, Bundle> fragSavedStates =
 			new HashMap<String, Bundle>();
 	
+	/** The current actionbar subtitle. */
+	private String actionBarTitle = "";
+	
 	/** The current theme. Default is -1. */
 	private int currThemeId = -1;
 	
@@ -83,25 +98,28 @@ public class MainActivity extends ActionBarActivity
 		super.onSaveInstanceState(outState);
 		outState.putStringArrayList(KEY_FRAG_TAG_TACK, fragTagStack.getArrayList());
 		outState.putSerializable(KEY_FRAG_SAVED_STATES, fragSavedStates);
+		outState.putString(KEY_ACTIONBAR_TITLE, actionBarTitle);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setThemeByIntent();
 		super.onCreate(savedInstanceState);
-		
 		getSupportFragmentManager().addOnBackStackChangedListener(this);
 		
 		if (PreferenceUtils.isFirstRun(this)){
 			PreferenceUtils.setToDefault(this);
 		}
 		prefs = PreferenceUtils.getPreferences(this);
-		checkThemePref();
+		//checks and, if necessary, restarts activity for theme
+		checkThemePref(); 
 		
 		setContentView(R.layout.activity_main);
 		
 		if (savedInstanceState == null) {			
 			loadFragment( new MainFragment(), TAG_MAIN_FRAG, false);
+			actionBarTitle = getString(R.string.app_name);
 		} else {
 			if (savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK) != null){
 				fragTagStack.addAll(
@@ -113,10 +131,19 @@ public class MainActivity extends ActionBarActivity
 					savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES));
 				} catch (ClassCastException e){}
 			}
+			if (savedInstanceState.getString(KEY_ACTIONBAR_TITLE) != null){
+				actionBarTitle = 
+						savedInstanceState.getString(KEY_ACTIONBAR_TITLE);
+			}
+			
 			reattachLastFragment();
 		}
 		
+		getSupportActionBar().setTitle(actionBarTitle);
+		
 	}
+	
+	
 	
 
 	@Override
@@ -137,9 +164,10 @@ public class MainActivity extends ActionBarActivity
 					new SettingsFragment(),
 					SettingsFragment.class.getName(), 
 					true);
+			setActionBarTitle(getString(R.string.action_settings));
 			return true;
 		case R.id.action_toggleTheme:
-			toggleDayNightMode();
+			showChangeThemeDialog();
 			return true;
 		default:
 			break;
@@ -147,35 +175,67 @@ public class MainActivity extends ActionBarActivity
 		return super.onOptionsItemSelected(item);
 	}
 	
+	
 	@Override
 	public boolean onSupportNavigateUp() {
 	    //This method is called when the up button is pressed. Just the pop back stack.
+		setActionBarTitle(getString(R.string.app_name));
 	    getSupportFragmentManager().popBackStack();
 	    fragTagStack.pop();	    
 	    return true;
 	}
 	
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Helper method
+	/// Misc. Helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	/** Checks theme preference and sets theme accordingly. 
-	 * Should be called before {@link #setContentView(int)} */
+	/** Sets actionbar title in {@link #actionBarTitle} & sets title to it. */
+	private void setActionBarTitle(String title) {
+		actionBarTitle = title;
+		getSupportActionBar().setTitle(actionBarTitle);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Theme Helper methods
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	 /* Created to compensate for a bug. See: 
+	  * -https://code.google.com/p/android/issues/detail?id=3793#makechanges
+	  * -https://code.google.com/p/android/issues/detail?id=4394
+	  * -https://groups.google.com/forum/?fromgroups=#!topic/android-developers/vSZHsVWUCqk
+	  */
+	/** Sets theme before super.onCreate() via intent. */
+	private void setThemeByIntent() {
+		currThemeId = getIntent().getIntExtra(KEY_THEME_INTENT, -1);
+		if (currThemeId > 0){
+			setTheme(currThemeId);
+		}
+	}
+	
+	/** If #currThemeId is unset (-1) 
+	 * it checks theme preference, and restarts activity for application.
+	 * If #currThemeId  is set, it returns early.
+	 * <p>
+	 * Must be called before {@link #setContentView(int)} but 
+	 * after super.onCreate(). </p>*/
 	private void checkThemePref(){
+		if (currThemeId != -1){ //if it does not equal -1
+			return; //we must have our theme already set.
+		}
+		
 		final String dark = getString(R.string.careerstack_pref_VALUE_THEME_DARK);
 		//final String light = getString(R.string.careerstack_pref_VALUE_THEME_LIGHT);
 		final String currTheme = prefs.getString(
 				getString(R.string.careerstack_pref_KEY_THEME_PREF), 
-				dark);
+				dark);		
 		
 		if (currTheme.equals(dark)){
 			currThemeId = R.style.AppBaseTheme_Dark;
 		} else {
 			//light
 			currThemeId = R.style.AppBaseTheme_Light;
-		}				
-		setTheme(currThemeId); 
+		}
+		resetActivityForTheme(); //reset
 	}
 	
 	/** Toggles day and night mode pref and restarts.
@@ -187,23 +247,38 @@ public class MainActivity extends ActionBarActivity
 		final String light = getString(R.string.careerstack_pref_VALUE_THEME_LIGHT);
 		
 		if (currThemeId == R.style.AppBaseTheme_Dark) {
+			currThemeId = R.style.AppBaseTheme_Light;
 			prefs.edit().putString(key, light).commit(); //toggle values
         } else {
+        	currThemeId = R.style.AppBaseTheme_Dark;
         	prefs.edit().putString(key, dark).commit();
         }
-        this.recreate();
+		resetActivityForTheme();
 	}
 		
+	/** Restarts the activity with the theme set. */
+	private void resetActivityForTheme(){
+		try{
+			Intent intent = getIntent();
+			intent.putExtra(KEY_THEME_INTENT, currThemeId);
+			finish();
+			startActivity(intent); //restart same intent
+		} catch (Exception e){
+			Log.e(CLASS_NAME, "Error restarting activity: " + e);
+		}
+	}
 	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	@Deprecated 
 	public void recreate() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-			super.recreate();
+			super.recreate(); //good for fast switching (on supported devices) 
 			//if the method exists in higher apis, use it. 
-		} else { //TODO test this on 2.3.3.3
+		} else { 
 			//otherwise, we'll figure it out!
 			try{
 				Intent intent = getIntent();
+				intent.putExtra(KEY_THEME_INTENT, currThemeId);
 				finish();
 				startActivity(intent); //restart same intent
 			} catch (Exception e){
@@ -211,6 +286,23 @@ public class MainActivity extends ActionBarActivity
 			}
 		}
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Dialog helpers
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Builds dialog for activity and shows it. */
+	private void showChangeThemeDialog(){
+		new ConfirmationDialogFragment.Builder()
+			.setTitle(R.string.action_toggleTheme)
+			.setMessage(R.string.careerstack_theme_dialogMsg)
+			.setPositive(R.string.careerstack_theme_dialogMsg_confirm)
+			.setNegative(android.R.string.no)
+			.create()
+			.show(getSupportFragmentManager(), 
+					ConfirmationDialogFragment.class.getName() +
+					CLASS_NAME);
+	}
+	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Fragment method
@@ -337,6 +429,20 @@ public class MainActivity extends ActionBarActivity
 	@Override
 	public void onBackStackChanged() {
 		checkHomeButtonBack();
+	}
+	
+	@Override
+	public void onClick(DialogInterface dialog, int which) {
+		switch (which) {
+		case DialogInterface.BUTTON_POSITIVE:
+			dialog.dismiss(); //dismiss first for safety?
+			toggleDayNightMode();
+			break;
+
+		default:
+			break;
+		}
+		
 	}
 		
 	

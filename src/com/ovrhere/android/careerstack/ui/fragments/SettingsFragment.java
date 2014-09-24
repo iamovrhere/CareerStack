@@ -15,8 +15,9 @@
  */
 package com.ovrhere.android.careerstack.ui.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -25,6 +26,7 @@ import android.support.v4.preference.PreferenceFragment;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
+import com.ovrhere.android.careerstack.ui.fragments.dialogs.ConfirmationDialogFragment;
 import com.ovrhere.android.careerstack.utils.ToastManager;
 
 /** 
@@ -34,10 +36,10 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
  * <a href="https://github.com/kolavar/android-support-v4-preferencefragment" 
  * target="_blank">android-support-v4-preferencefragment</a>
  * @author Jason J.
- * @version 0.1.0-20140922
+ * @version 0.2.0-20140923
  */
 public class SettingsFragment extends PreferenceFragment 
- implements OnPreferenceClickListener, DialogInterface.OnClickListener {
+ implements OnPreferenceClickListener {
 	/** Class name for debugging purposes. */
 	@SuppressWarnings("unused")
 	final static private String CLASS_NAME = SettingsFragment.class
@@ -45,14 +47,15 @@ public class SettingsFragment extends PreferenceFragment
 	/** Basic debugging bool. */
 	final static private boolean DEBUG = true;
 	
+	/** Clear all request. */
+	final static private int REQUEST_CLEAR_ALL = 0x101;
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The toast manager for this frag. */
 	private ToastManager tm = null;
-	/** Reference kept to prevent leaking. */
-	private AlertDialog clearDialog = null;
 	
 	@Override
 	public void onCreate(Bundle paramBundle) {
@@ -70,13 +73,29 @@ public class SettingsFragment extends PreferenceFragment
 	@Override
 	public void onDestroyView() {	
 		super.onDestroyView();
-		clearDialog.dismiss();
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		switch (requestCode) {
+		case REQUEST_CLEAR_ALL:
+			if (resultCode == Activity.RESULT_OK){
+				resetSettings();
+			}
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Initialization helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** Initializes software version & reset settings. */
 	public void initNonSettings() {
 
@@ -91,6 +110,7 @@ public class SettingsFragment extends PreferenceFragment
 		softwareVersion.setSummary(softwareVersionName());
 		softwareVersion.setEnabled(false);
 	}
+	
 	/** Sets preference to null before attaching settings. */
 	public void refreshPreferences(){
 		setPreferenceScreen(null);
@@ -98,18 +118,45 @@ public class SettingsFragment extends PreferenceFragment
 		initNonSettings();
 	}
 	
+	/** Builds clear setting dialog. */
+	@Deprecated
+	private void initClearSettingsDialog(){
+		 new AlertDialog.Builder(getActivity())
+			.setTitle(R.string.careerstack_settings_clearSettings_title)
+			.setMessage(R.string.careerstack_settings_clearSettings_confirmMsg)
+			.setIcon(android.R.drawable.ic_dialog_alert)
+			//.setPositiveButton(android.R.string.ok, this)
+			//.setNegativeButton(android.R.string.cancel, this)
+			.create();
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Misc. Helper methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	/** Builds clear setting dialog. */
-	public void initClearSettingsDialog(){
-		clearDialog = new AlertDialog.Builder(getActivity())
+	
+	/** Resets all settings then toasts it. */
+	private void resetSettings() {
+		PreferenceUtils.getPreferences(getActivity())
+						.edit()
+						.clear()
+						.commit(); //empty all settings
+		PreferenceUtils.setToDefault(getActivity()); //reset
+		refreshPreferences();
+		tm.toastLong(getString(R.string.careerstack_toast_clearedSettings));
+	}
+	
+	/** Creates and shows dialog. */
+	private void showClearSettingsDialog(){
+		new ConfirmationDialogFragment.Builder()
+			.setTargetFragment(this, REQUEST_CLEAR_ALL)
 			.setTitle(R.string.careerstack_settings_clearSettings_title)
-			.setMessage(R.string.careerstack_settings_clearSettings_confirm)
-			.setIcon(android.R.drawable.ic_dialog_alert)
-			.setPositiveButton(android.R.string.ok, this)
-			.setNegativeButton(android.R.string.cancel, this)
-			.create();
+			.setMessage(R.string.careerstack_settings_clearSettings_confirmMsg)
+			.setPositive(android.R.string.ok)
+			.setNegative(android.R.string.cancel)
+			.create()
+			.show(getFragmentManager(), 
+				ConfirmationDialogFragment.class.getName()
+					+SettingsFragment.class.getSimpleName());
 	}
 	
 	/** Returns the software build version. */
@@ -145,27 +192,11 @@ public class SettingsFragment extends PreferenceFragment
 		String clearSettings = 
 				getString(R.string.careerstack_settings_KEY_CLEAR_SETTINGS);
 		if (clearSettings.equals(preference.getKey())){
-			clearDialog.show();
+			showClearSettingsDialog();
 		}
 		return false;
 	}
 	
-	@Override
-	public void onClick(DialogInterface dialog, int which) {
-		switch (which) {
-		case DialogInterface.BUTTON_POSITIVE:
-			PreferenceUtils.getPreferences(getActivity())
-							.edit()
-							.clear()
-							.commit(); //empty all settings
-			PreferenceUtils.setToDefault(getActivity()); //reset
-			refreshPreferences();
-			tm.toastLong(getString(R.string.careerstack_toast_clearedSettings));
-			break;
-		
-		default:
-			break;
-		}
-		
-	}
+
+	
 }

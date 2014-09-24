@@ -133,7 +133,7 @@
     <string name="careerstack_settings_clearSettings_summary"
         >Set all settings to default values</string>
     <!-- The clearing settings confirmation message  -->
-    <string name="careerstack_settings_clearSettings_confirm"
+    <string name="careerstack_settings_clearSettings_confirmMsg"
         >Are you sure you wish to reset ALL settings? 
         This cannot be undone.</string>
     
@@ -144,5 +144,17 @@
     <!-- The pref title app version -->
     <string name="careerstack_settings_softwareVersion_title"
         >Application version</string>
+    
+    <!-- Ends settings fragment strings -->
+    <eat-comment />
+    
+    <!-- Starts theme dialog fragment strings -->
+    <eat-comment />
+    <!-- The changing theme confirmation message  -->
+    <string name="careerstack_theme_dialogMsg"
+        >Changing the theme will restart the app. You will lose
+        any loaded searches. Are you sure?</string>
+        <string name="careerstack_theme_dialogMsg_confirm"
+        >Yes, restart</string>
     
 </resources>
