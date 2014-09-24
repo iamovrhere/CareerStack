@@ -54,7 +54,7 @@
 	    
 	    <Button
 		android:id="@+id/careerstack_careerItem_button_openLink"
-		style="?android:attr/buttonStyleSmall"
+		android:textSize="14sp"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
@@ -65,7 +65,7 @@
 
 	    <Button
 		android:id="@+id/careerstack_careerItem_button_copyUrl"
-		style="?android:attr/buttonStyleSmall"
+		android:textSize="14sp"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignBaseline="@+id/careerstack_careerItem_button_openLink"
@@ -75,7 +75,7 @@
 
 	    <Button
 		android:id="@+id/careerstack_careerItem_button_share"
-		style="?android:attr/buttonStyleSmall"
+		android:textSize="14sp"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignTop="@+id/careerstack_careerItem_button_copyUrl"

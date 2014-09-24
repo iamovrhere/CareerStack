@@ -22,9 +22,9 @@
     <!--
        Dark theme
     -->
-    <style name="AppBaseTheme.Dark" parent="Theme.AppCompat"
+    <style name="_AppBaseTheme.Dark" parent="Theme.AppCompat"
          >
-         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
+        <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         
         <item name="careerstack_title_color">@android:color/white</item>
         
@@ -32,9 +32,8 @@
     </style>
     
     <!-- Light theme -->
-    <style name="AppBaseTheme.Light" parent="Theme.AppCompat.Light.DarkActionBar"
+    <style name="_AppBaseTheme.Light" parent="Theme.AppCompat.Light.DarkActionBar"
         >
-        
         <item name="android:windowBackground">@color/careerstack_offwhite_background</item>
         
         <item name="careerstack_title_color">@android:color/black</item>
@@ -42,8 +41,13 @@
         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         
         <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>
+        
     </style>
-
+    
+    <!-- Dialog theme fix for 2.3.3 -->
+    <style name="DialogTheme" parent="@android:style/Theme.Dialog">
+        <item name="android:seekBarStyle">@style/SeekBarAppBaseTheme_Dark</item>
+	</style>
 
 
 </resources>
