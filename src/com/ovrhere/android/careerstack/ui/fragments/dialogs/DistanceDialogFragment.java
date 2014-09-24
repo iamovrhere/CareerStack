@@ -19,14 +19,16 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -40,7 +42,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * layout <code>viewstub_distance_seekbar.xml</code>. Requires the user use
  * <code>onActivityResult</code> and request codes to get result.
  * @author Jason J.
- * @version 0.1.1-20140922
+ * @version 0.1.2-20140923
  */
 public class DistanceDialogFragment extends DialogFragment 
 implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListener {	
@@ -109,18 +111,19 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	@SuppressLint("InflateParams")
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		Context ctx = getCompatContext();
 		AlertDialog dialog  = 
-		new AlertDialog.Builder(getActivity())
+		new AlertDialog.Builder(ctx)
 			.setTitle(getResources().getString(R.string.careerstack_dialog_distance_title))
 			.setPositiveButton(android.R.string.ok, this)
 			.setNegativeButton(android.R.string.cancel, this)
 			.create(); //create basic dialog
 				
-		LayoutInflater inflater = (LayoutInflater)
-				getActivity().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 		//insert custom views
-		View content = inflater.inflate(R.layout.viewstub_distance_seekbar, null);
+		View content = View.inflate(ctx, 
+				R.layout.viewstub_distance_seekbar, null);
 		initViews(content); //preload views
+		
 		Resources r = getResources();
 		content.setPadding(
 				r.getDimensionPixelSize(R.dimen.dialog_margins), 
@@ -137,6 +140,15 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Helper methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Gets the context and, by extension, the theme to use. */
+	private Context getCompatContext(){
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1){
+			return getActivity();
+		}
+		int themeId = R.style.DialogTheme;
+		return new ContextThemeWrapper(getActivity(), themeId);
+	}
+	
 	/** Initializes the views. */
 	private void initViews(View rootView){
 		tv_distance = (TextView)
