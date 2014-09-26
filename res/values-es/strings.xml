@@ -1,0 +1,130 @@
+<!--
+   Copyright 2014 Jason J.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+--><resources>
+
+    <!-- The application name -->
+    <string name="app_name">"CareerStack"</string>
+    <!-- The settings string -->
+    <string name="action_settings">"Configuración"</string>
+    <!-- The toggle day/night theme string -->    
+    <string name="action_toggleTheme">"Toggle Día / Noche Temática"</string>
+    
+    <string name="hello_blank_fragment">"Hola fragmento en blanco"</string>
+    
+    <!-- The title for the DistanceDialogFragment -->
+    <string name="careerstack_dialog_distance_title">"Establecer Distancia"</string>
+    
+    <!-- End titles -->
+    <eat-comment/>
+
+    <!-- Starts Main fragment strings -->
+    <eat-comment/>
+    
+    <!-- The content description to describe career-stack image -->
+    <string name="careerstack_img_careerstack_contentDescription">"Career Stack (Carrera Pila)"</string>
+    <!-- The content description to describe powered by image -->
+    <string name="careerstack_img_poweredBy_contentDescription">"Impulsado Por Careers 2.0, por Stack Over Flow"</string>
+
+    <!-- Hint value for keywords -->
+    <string name="careerstack_input_hint_keywords">"Palabras clave (por ejemplo, Android Java)"</string>
+    <!-- Hint value for location -->
+    <string name="careerstack_input_hint_location">"Ciudad, País o Código postal (por ejemplo, Madrid)"</string>
+
+    <!-- Label for the distance progress bar -->
+    <string name="careerstack_label_distance">"Distancia"</string>
+    <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
+    <string name="careerstack_formatString_distanceValue_miles">"%1$d milla"</string>
+    
+    
+    <!-- Work remotely check string for main. -->
+    <string name="careerstack_main_check_workRemotely">"Trabajar desde casa"</string>
+    <!-- Offers relocation check string for main. -->
+    <string name="careerstack_main_check_offersRelocation">"Soporta los gastos de mudanza"</string>
+    
+    <!-- End Main fragment strings -->
+    <eat-comment/>
+    
+    <!-- Starts Results fragment strings -->
+    <eat-comment/>
+    <!-- The go/search button for the search results page.  -->
+    <string name="careerstack_searchResults_button_searchGo">"Ir"</string>
+    
+    <!-- The retry label for the search results page. -->
+    <string name="careerstack_searchResults_label_retry">"No se puede establecer la conexión"</string>
+    <!-- The retry button for the search results page. -->
+    <string name="careerstack_searchResults_button_retry">"Reintentas"</string>
+    
+    <!-- Work remotely check string for main. -->
+    <string name="careerstack_searchResults_check_workRemotely">"Remota"</string>
+    <!-- Offers relocation check string for main. -->
+    <string name="careerstack_searchResults_check_offersRelocation">"Reubicaciones"</string>
+    
+    <!-- Simply no matching results statement. -->
+    <string name="careerstack_careerlist_noResults">"No hay resultados"</string>
+    
+    <!-- Ends Results fragment strings -->
+    <eat-comment/>
+    
+    <!-- Starts career item fragment strings -->
+    <eat-comment/>
+    <!-- The open career link button. -->
+    <string name="careerstack_careerItem_button_openLink">"Enlace abierto"</string>
+    <!-- The share this job button. -->
+    <string name="careerstack_careerItem_button_shareJob">"Comparte esta oferta de empleo"</string>
+    <!-- Published & last update string. Formatted: accepts 2 strigns. -->
+    <string name="careerstack_formatString_publishUpdateDate">"Publicado: %1$s \nÚltima actualización: %2$s"</string>
+    <!-- Copied Link. -->
+    <string name="careerstack_toast_copiedLink">"Enlace al portapapeles copiado"</string>
+    <!-- The string for "%1$s(job) at %2$s(place) -->
+    <string name="careerstack_formatString_jobAtPlace">"%1$s a %2$s"</string>
+
+	<!-- Ends career item  fragment strings -->
+    <eat-comment/>
+    
+    <!-- Starts settings fragment strings -->
+    <eat-comment/>
+    <!-- The setting title for distance units -->
+    <string name="careerstack_settings_useMetric_title">"Miles"</string>
+    <!-- The setting description for distance units -->
+    <string name="careerstack_settings_useMetric_summary">"Utilice el sistema imperial de distancia"</string>
+    
+    <!-- The pref title for keeping settings for search -->
+    <string name="careerstack_settings_keepSearchSettings_title">"Configuración de búsqueda persistentes"</string>
+    <!-- The pref description for keeping settings for search  -->
+    <string name="careerstack_settings_keepSearchSettings_summary">"Restaurar la configuración de búsqueda de la sesión anterior"</string>
+        
+    <!-- The pref title for clearin settings -->
+    <string name="careerstack_settings_clearSettings_title">"Restablece todos los ajustes"</string>
+    <!-- The pref description for clearing settings  -->
+    <string name="careerstack_settings_clearSettings_summary">"Establezca todos los ajustes a los valores predeterminados"</string>
+    <!-- The clearing settings confirmation message  -->
+    <string name="careerstack_settings_clearSettings_confirmMsg">"¿Está seguro de que desea restablecer TODOS los ajustes? Esto no se puede deshacer."</string>
+    
+    <!-- Toast for when settings are cleared. -->
+    <string name="careerstack_toast_clearedSettings">"Ajustes se han restablecido"</string>
+        
+    <!-- The pref title app version -->
+    <string name="careerstack_settings_softwareVersion_title">"Versión de la aplicación"</string>
+    
+    <!-- Ends settings fragment strings -->
+    <eat-comment/>
+    
+    <!-- Starts theme dialog fragment strings -->
+    <eat-comment/>
+    <!-- The changing theme confirmation message  -->
+    <string name="careerstack_theme_dialogMsg">"Cambio del tema se reiniciará la aplicación. Usted perderá cualquier búsqueda cargados. Estás seguro?"</string>
+        <string name="careerstack_theme_dialogMsg_confirm">"Sí, rearranque"</string>
+    
+</resources>

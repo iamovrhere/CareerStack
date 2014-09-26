@@ -1,0 +1,130 @@
+<!--
+   Copyright 2014 Jason J.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+--><resources>
+
+    <!-- The application name -->
+    <string name="app_name">"CareerStack"</string>
+    <!-- The settings string -->
+    <string name="action_settings">"Instellingen"</string>
+    <!-- The toggle day/night theme string -->    
+    <string name="action_toggleTheme">"Schakelen dag / nacht thema"</string>
+    
+    <string name="hello_blank_fragment">"Hallo leeg fragment"</string>
+    
+    <!-- The title for the DistanceDialogFragment -->
+    <string name="careerstack_dialog_distance_title">"Stel Afstand"</string>
+    
+    <!-- End titles -->
+    <eat-comment/>
+
+    <!-- Starts Main fragment strings -->
+    <eat-comment/>
+    
+    <!-- The content description to describe career-stack image -->
+    <string name="careerstack_img_careerstack_contentDescription">"Career Stack (Carrière Stack)"</string>
+    <!-- The content description to describe powered by image -->
+    <string name="careerstack_img_poweredBy_contentDescription">"Aangedreven door Careers 2.0, door Stack Over Flow"</string>
+
+    <!-- Hint value for keywords -->
+    <string name="careerstack_input_hint_keywords">"Trefwoorden (bijvoorbeeld Android Java)"</string>
+    <!-- Hint value for location -->
+    <string name="careerstack_input_hint_location">"Stad, Land of Zip (bijvoorbeeld Amsterdam)"</string>
+
+    <!-- Label for the distance progress bar -->
+    <string name="careerstack_label_distance">"Afstand"</string>
+    <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
+    <string name="careerstack_formatString_distanceValue_miles">"%1$d mijlen"</string>
+    
+
+    <!-- Work remotely check string for main. -->
+    <string name="careerstack_main_check_workRemotely">"Werken vanuit huis"</string>
+    <!-- Offers relocation check string for main. -->
+    <string name="careerstack_main_check_offersRelocation">"Biedt verhuizing "</string>
+    
+    <!-- End Main fragment strings -->
+    <eat-comment/>
+    
+    <!-- Starts Results fragment strings -->
+    <eat-comment/>
+    <!-- The go/search button for the search results page.  -->
+    <string name="careerstack_searchResults_button_searchGo">"Gaan"</string>
+    
+    <!-- The retry label for the search results page. -->
+    <string name="careerstack_searchResults_label_retry">"Kan geen verbinding tot stand"</string>
+    <!-- The retry button for the search results page. -->
+    <string name="careerstack_searchResults_button_retry">"Opnieuw proberen"</string>
+    
+    <!-- Work remotely check string for main. -->
+    <string name="careerstack_searchResults_check_workRemotely">"Op afstand"</string>
+    <!-- Offers relocation check string for main. -->
+    <string name="careerstack_searchResults_check_offersRelocation">"Verhuizing"</string>
+    
+    <!-- Simply no matching results statement. -->
+    <string name="careerstack_careerlist_noResults">"Geen overeenkomende resultaten"</string>
+    
+    <!-- Ends Results fragment strings -->
+    <eat-comment/>
+    
+    <!-- Starts career item fragment strings -->
+    <eat-comment/>
+    <!-- The open career link button. -->
+    <string name="careerstack_careerItem_button_openLink">"Koppeling openen"</string>
+    <!-- The share this job button. -->
+    <string name="careerstack_careerItem_button_shareJob">"Deel deze vacature"</string>
+    <!-- Published & last update string. Formatted: accepts 2 strigns. -->
+    <string name="careerstack_formatString_publishUpdateDate">"Gepubliceerd: %1$s \nlLaatst bijgewerkt op: %2$s"</string>
+    <!-- Copied Link. -->
+    <string name="careerstack_toast_copiedLink">"Gekopieerde link naar het klembord"</string>
+    <!-- The string for "%1$s(job) at %2$s(place) -->
+    <string name="careerstack_formatString_jobAtPlace">"%1$s op %2$s"</string>
+
+	<!-- Ends career item  fragment strings -->
+    <eat-comment/>
+    
+    <!-- Starts settings fragment strings -->
+    <eat-comment/>
+    <!-- The setting title for distance units -->
+    <string name="careerstack_settings_useMetric_title">"Mijl"</string>
+    <!-- The setting description for distance units -->
+    <string name="careerstack_settings_useMetric_summary">"Gebruik het imperiale stelsel voor afstand"</string>
+    
+    <!-- The pref title for keeping settings for search -->
+    <string name="careerstack_settings_keepSearchSettings_title">"Aanhoudende zoekinstellingen"</string>
+    <!-- The pref description for keeping settings for search  -->
+    <string name="careerstack_settings_keepSearchSettings_summary">"Herstellen zoekinstellingen van vorige sessie"</string>
+        
+    <!-- The pref title for clearin settings -->
+    <string name="careerstack_settings_clearSettings_title">"Reset alle instellingen"</string>
+    <!-- The pref description for clearing settings  -->
+    <string name="careerstack_settings_clearSettings_summary">"Zet alle instellingen terug naar de standaardwaarden"</string>
+    <!-- The clearing settings confirmation message  -->
+    <string name="careerstack_settings_clearSettings_confirmMsg">"Bent u zeker dat u alle instellingen? Dit kan niet ongedaan gemaakt worden."</string>
+    
+    <!-- Toast for when settings are cleared. -->
+    <string name="careerstack_toast_clearedSettings">"Instellingen zijn teruggezet op de standaardwaarden"</string>
+        
+    <!-- The pref title app version -->
+    <string name="careerstack_settings_softwareVersion_title">"Toepassing versie"</string>
+    
+    <!-- Ends settings fragment strings -->
+    <eat-comment/>
+    
+    <!-- Starts theme dialog fragment strings -->
+    <eat-comment/>
+    <!-- The changing theme confirmation message  -->
+    <string name="careerstack_theme_dialogMsg">"Het thema veranderen zal de app opnieuw te starten. U zult geen geladen zoekopdrachten verliezen. Weet je het zeker?"</string>
+        <string name="careerstack_theme_dialogMsg_confirm">"Ja, herstart"</string>
+    
+</resources>

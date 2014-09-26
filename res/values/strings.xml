@@ -101,7 +101,7 @@
     <string name="careerstack_careerItem_button_shareJob">Share this job</string>
     <!-- Published & last update string. Formatted: accepts 2 strigns. -->
     <string name="careerstack_formatString_publishUpdateDate"
-        >Published: %1$s. \nLast updated: %2$s</string>
+        >Published: %1$s \nLast updated: %2$s</string>
     <!-- Copied Link. -->
     <string name="careerstack_toast_copiedLink">Copied link to clipboard</string>
     <!-- The string for "%1$s(job) at %2$s(place) -->
