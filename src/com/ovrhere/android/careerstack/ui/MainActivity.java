@@ -43,7 +43,7 @@ import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.5.0-20140923
+ * @version 0.5.1-20140925
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnFragmentRequestListener, OnBackStackChangedListener,
@@ -72,6 +72,9 @@ public class MainActivity extends ActionBarActivity
 	/** The main fragment tag. */
 	final static private String TAG_MAIN_FRAG = 
 			MainFragment.FRAGTAG;
+	/** The settings tag. */
+	final static private String TAG_SETTINGS_FRAG = 
+			SettingsFragment.class.getName();
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
@@ -92,6 +95,10 @@ public class MainActivity extends ActionBarActivity
 	
 	/** The current shared preference. */
 	private SharedPreferences prefs = null;
+	
+	/** The current menu as built by activity.
+	 *  Initialized in {@link #onCreateOptionsMenu(Menu)} */
+	private Menu menu = null;
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -150,6 +157,8 @@ public class MainActivity extends ActionBarActivity
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		this.menu = menu;
+		checkSettings();
 		return true;
 	}
 
@@ -160,11 +169,15 @@ public class MainActivity extends ActionBarActivity
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
 		case R.id.action_settings:
-			loadFragment(
-					new SettingsFragment(),
-					SettingsFragment.class.getName(), 
-					true);
-			setActionBarTitle(getString(R.string.action_settings));
+			if (fragTagStack.peek().equals(TAG_SETTINGS_FRAG) == false){
+				loadFragment(
+						new SettingsFragment(),
+						TAG_SETTINGS_FRAG, 
+						true);
+				setActionBarTitle(getString(R.string.action_settings));
+			}
+			//hide settings when viewing settings
+			checkSettings();
 			return true;
 		case R.id.action_toggleTheme:
 			showChangeThemeDialog();
@@ -182,6 +195,9 @@ public class MainActivity extends ActionBarActivity
 		setActionBarTitle(getString(R.string.app_name));
 	    getSupportFragmentManager().popBackStack();
 	    fragTagStack.pop();	    
+	  
+	    //show settings when not viewing settings
+	    checkSettings();
 	    return true;
 	}
 	
@@ -319,6 +335,21 @@ public class MainActivity extends ActionBarActivity
 		}
 		
 		checkHomeButtonBack();
+	}
+	
+	/** Checks to see if the current fragment is the settings fragment.
+	 * If so deactivate menu, if not, re-enable it. Must be called after
+	 * {@link #onCreateOptionsMenu(Menu)} 
+	 */
+	private void checkSettings(){
+		if (menu == null){
+			return;
+		}
+		if (TAG_SETTINGS_FRAG.equals(fragTagStack.peek())){
+			menu.setGroupVisible(0, false);
+		} else {
+			menu.setGroupVisible(0, true);
+		}
 	}
 
 	/** Checks to see whether to enable the action bar back. */

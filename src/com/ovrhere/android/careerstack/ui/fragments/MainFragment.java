@@ -46,7 +46,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * {@link ClassCastException} otherwise.
  * 
  * @author Jason J.
- * @version 0.2.1-20140922
+ * @version 0.2.1-20140924
  */
 public class MainFragment extends Fragment 
 implements OnClickListener, OnCheckedChangeListener, 
@@ -60,7 +60,7 @@ implements OnClickListener, OnCheckedChangeListener,
 	/**Logtag for debugging purposes. */
 	final static private String LOGTAG = CLASS_NAME;
 	/** Whether or not to debug. */
-	final static private boolean DEBUG = true;
+	final static private boolean DEBUG = false;
 	
 	/** Bundle key. The value of keyword. String */
 	final static private String KEY_KEYWORD_TEXT = 
@@ -122,6 +122,8 @@ implements OnClickListener, OnCheckedChangeListener,
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		outState.putInt(KEY_DISTANCE, currentDistanceValue);
+		
 		if (viewBuilt == false){
 			return; //no view? don't bother.
 		}
@@ -130,9 +132,8 @@ implements OnClickListener, OnCheckedChangeListener,
 		
 		outState.putBoolean(KEY_RELOCATE_OFFER, cb_relocationOffered.isChecked());
 		outState.putBoolean(KEY_REMOTE_ALLOWED, cb_remoteAllowed.isChecked());
-		
-		outState.putInt(KEY_DISTANCE, currentDistanceValue);
 	}
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -145,6 +146,7 @@ implements OnClickListener, OnCheckedChangeListener,
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_main, container,
 				false);
+		distanceSeekBarWrapper = null; 
 		currentDistanceValue = 
 				getResources().getInteger(R.integer.careerstack_seekBar_default);
 		
@@ -162,6 +164,7 @@ implements OnClickListener, OnCheckedChangeListener,
 	public void onDestroyView() {
 		super.onDestroy();
 		viewBuilt = false;
+		distanceSeekBarWrapper = null; //view is destroyed; destroy refs
 	}
 	
 	
@@ -214,6 +217,9 @@ implements OnClickListener, OnCheckedChangeListener,
 	 * @see #initInputs(View)
 	 */
 	private void processSavedState(View rootView, Bundle savedState){
+		if (DEBUG){
+			Log.d(LOGTAG, "Process save state");
+		}
 		String keywords = savedState.getString(KEY_KEYWORD_TEXT);
 		if (keywords != null){
 			et_keywords.setText(keywords);
@@ -227,8 +233,9 @@ implements OnClickListener, OnCheckedChangeListener,
 		cb_remoteAllowed.setChecked( 
 				savedState.getBoolean(KEY_REMOTE_ALLOWED));
 		
-		currentDistanceValue = 
-				savedState.getInt(KEY_DISTANCE, currentDistanceValue);
+		locationTextWatcher.afterTextChanged(et_location.getEditableText());
+		int value = savedState.getInt(KEY_DISTANCE, currentDistanceValue);
+		updateDistance(value);
 	}
 	/** Processes and applied preferences, if allowed. */
 	private void processPrefs(){
@@ -238,7 +245,8 @@ implements OnClickListener, OnCheckedChangeListener,
 			//if we are not suppose to keep settings, discard them.
 			return;
 		}
-		
+		//TODO add save/restore for text 
+				
 		int value = prefs.getInt(
 				getString(R.string.careerstack_pref_KEY_DISTANCE_VALUE), 
 				currentDistanceValue);
@@ -263,6 +271,7 @@ implements OnClickListener, OnCheckedChangeListener,
 				view.findViewById(R.id.careerstack_distanceSeekbar_seekBar);
 		tv_distance = (TextView)
 			view.findViewById(R.id.careerstack_distanceSeekbar_text_value);
+		
 		if (sb_distanceSeek != null && tv_distance != null){
 			Resources r = getResources();
 			distanceSeekBarWrapper = new SeekBarWrapper(
@@ -278,6 +287,7 @@ implements OnClickListener, OnCheckedChangeListener,
 			return false; //end early
 		}
 	}
+	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Misc. Helper methods
@@ -296,7 +306,7 @@ implements OnClickListener, OnCheckedChangeListener,
 					Log.w(LOGTAG, 
 							"Failed to initialize seek bar (rootView not ready?");
 				}
-				return; //we failed, cannot update anything et.
+				return; //we failed, cannot update anything yet.
 			}
 		}
 		int progress = distanceSeekBarWrapper.getValue();

@@ -36,7 +36,7 @@ import com.ovrhere.android.careerstack.dao.CareerItem;
 /** The career item filter list adapter.
  * <p><b>Filtering will be done at a later date.</b></p>
  * @author Jason J.
- * @version 0.3.0-20140921
+ * @version 0.3.1-20140923
  */
 public class CareerItemFilterListAdapter extends BaseAdapter implements
 		Filterable {
@@ -126,6 +126,7 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 		if (careerItems.size() <= 0){
 			holder.jobTitle.setText(R.string.careerstack_careerlist_noResults);
 			holder.jobTitle.setGravity(Gravity.CENTER);
+			holder.companyLocationEtc_andDate.setText(""); // no text
 			return convertView;
 		} else {
 			holder.jobTitle.setGravity(Gravity.LEFT);

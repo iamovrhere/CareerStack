@@ -25,15 +25,15 @@
     android:id="@+id/careerstack_careerItem_scrollView"
     >
     
-    <RelativeLayout 
+    <LinearLayout 
         android:layout_width="match_parent"
-    	android:layout_height="wrap_content">	
+    	android:layout_height="wrap_content"
+    	android:orientation="vertical"
+    	>	
 	    <TextView
 		android:id="@+id/careerstack_careerItem_text_jobTitle"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentTop="true"
 		android:text="Really long Job Title title"
 		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:textColor="?attr/careerstack_title_color"
@@ -43,8 +43,6 @@
 		android:id="@+id/careerstack_careerItem_text_companyLocationEtc"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_below="@+id/careerstack_careerItem_text_jobTitle"
 		android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
 		android:text="Company Inc, At location!"
 		android:textAppearance="?android:attr/textAppearanceMedium" 
@@ -52,15 +50,18 @@
 		android:textColor="@color/careerstack_translucent_grey"
 		/>
 	    
+	    <LinearLayout
+	        android:layout_width="match_parent" 
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:gravity="top"
+	        >
 	    <Button
 		android:id="@+id/careerstack_careerItem_button_openLink"
 		android:textSize="14sp"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_below="@+id/careerstack_careerItem_text_companyLocationEtc"
-		android:layout_marginTop="@dimen/careerstack_careeritem_button_marginTop"
-		android:layout_marginBottom="@dimen/careerstack_careeritem_button_marginBottom"
+		android:layout_weight="1.0"
 		android:text="@string/careerstack_careerItem_button_openLink" />
 
 	    <Button
@@ -68,9 +69,7 @@
 		android:textSize="14sp"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignBaseline="@+id/careerstack_careerItem_button_openLink"
-		android:layout_alignBottom="@+id/careerstack_careerItem_button_openLink"
-		android:layout_toRightOf="@+id/careerstack_careerItem_button_openLink"
+		android:layout_weight="1.0"
 		android:text="@android:string/copyUrl" />
 
 	    <Button
@@ -78,16 +77,14 @@
 		android:textSize="14sp"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignTop="@+id/careerstack_careerItem_button_copyUrl"
-		android:layout_toRightOf="@+id/careerstack_careerItem_button_copyUrl"
+		android:layout_weight="1.0"
 		android:text="@string/careerstack_careerItem_button_shareJob" />
+	    </LinearLayout>
 		
 	    <TextView
 		android:id="@+id/careerstack_careerItem_text_updateDate"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_below="@+id/careerstack_careerItem_button_openLink"
 		android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
 		android:text="@string/careerstack_formatString_publishUpdateDate" 
 		android:textSize="14sp"
@@ -98,13 +95,11 @@
 		android:id="@+id/careerstack_careerItem_text_jobDescription"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_below="@+id/careerstack_careerItem_text_updateDate"
 		android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
 		android:text="Description: Willing to program in exchange for currency"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		tools:ignore="HardcodedText" />
 
 
-	</RelativeLayout>
+	</LinearLayout>
 </ScrollView>
