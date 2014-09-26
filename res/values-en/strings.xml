@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2014 Jason J.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<resources>
+
+    <!-- The application name -->
+    <string name="app_name">CareerStack</string>
+    <!-- The settings string -->
+    <string name="action_settings">Settings</string>
+    <!-- The toggle day/night theme string -->    
+    <string name="action_toggleTheme">Toggle Day/Night Theme</string>
+    
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+    <!-- The title for the DistanceDialogFragment -->
+    <string name="careerstack_dialog_distance_title">Set Distance</string>
+    
+    <!-- End titles -->
+    <eat-comment />
+
+    <!-- Starts Main fragment strings -->
+    <eat-comment />
+    
+    <!-- The content description to describe career-stack image -->
+    <string name="careerstack_img_careerstack_contentDescription"
+        >Career Stack</string>
+    <!-- The content description to describe powered by image -->
+    <string name="careerstack_img_poweredBy_contentDescription"
+        >Powered By Careers 2 point o, by Stack Over Flow</string>
+
+    <!-- Hint value for keywords -->
+    <string name="careerstack_input_hint_keywords"
+        >Keywords (e.g. Android Java)</string>
+    <!-- Hint value for location -->
+    <string name="careerstack_input_hint_location"
+        >City, Country or Zip (e.g. New York)</string>
+
+    <!-- Label for the distance progress bar -->
+    <string name="careerstack_label_distance">Distance</string>
+    <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
+    <string name="careerstack_formatString_distanceValue_miles"
+        >%1$d miles</string>
+    <!-- Miles short. Prepared string for formating via String.format(). Takes one integer. -->
+    <string name="careerstack_formatString_distanceValue_milesShort"
+        >%1$d mi.</string>
+    <!-- Kilometers. Prepared string for formating via String.format(). Takes one integer. -->
+    <string name="careerstack_formatString_distanceValue_km">%1$d km</string>
+
+    <!-- Work remotely check string for main. -->
+    <string name="careerstack_main_check_workRemotely">Work remotely</string>
+    <!-- Offers relocation check string for main. -->
+    <string name="careerstack_main_check_offersRelocation"
+        >Offers relocation</string>
+    
+    <!-- End Main fragment strings -->
+    <eat-comment />
+    
+    <!-- Starts Results fragment strings -->
+    <eat-comment />
+    <!-- The go/search button for the search results page.  -->
+    <string name="careerstack_searchResults_button_searchGo"
+        >Go</string>
+    
+    <!-- The retry label for the search results page. -->
+    <string name="careerstack_searchResults_label_retry"
+        >Cannot establish connection</string>
+    <!-- The retry button for the search results page. -->
+    <string name="careerstack_searchResults_button_retry"
+        >Retry</string>
+    
+    <!-- Work remotely check string for main. -->
+    <string name="careerstack_searchResults_check_workRemotely">Remote</string>
+    <!-- Offers relocation check string for main. -->
+    <string name="careerstack_searchResults_check_offersRelocation"
+        >Relocation</string>
+    
+    <!-- Simply no matching results statement. -->
+    <string name="careerstack_careerlist_noResults">No matching results</string>
+    
+    <!-- Ends Results fragment strings -->
+    <eat-comment />
+    
+    <!-- Starts career item fragment strings -->
+    <eat-comment />
+    <!-- The open career link button. -->
+    <string name="careerstack_careerItem_button_openLink">Open Link</string>
+    <!-- The share this job button. -->
+    <string name="careerstack_careerItem_button_shareJob">Share this job</string>
+    <!-- Published & last update string. Formatted: accepts 2 strigns. -->
+    <string name="careerstack_formatString_publishUpdateDate"
+        >Published: %1$s \nLast updated: %2$s</string>
+    <!-- Copied Link. -->
+    <string name="careerstack_toast_copiedLink">Copied link to clipboard</string>
+    <!-- The string for "%1$s(job) at %2$s(place) -->
+    <string name="careerstack_formatString_jobAtPlace"
+        >%1$s at %2$s</string>
+
+	<!-- Ends career item  fragment strings -->
+    <eat-comment />
+    
+    <!-- Starts settings fragment strings -->
+    <eat-comment />
+    <!-- The setting title for distance units -->
+    <string name="careerstack_settings_useMetric_title">Miles</string>
+    <!-- The setting description for distance units -->
+    <string name="careerstack_settings_useMetric_summary"
+        >Use the imperial system for distance</string>
+    
+    <!-- The pref title for keeping settings for search -->
+    <string name="careerstack_settings_keepSearchSettings_title"
+        >Persistent search settings</string>
+    <!-- The pref description for keeping settings for search  -->
+    <string name="careerstack_settings_keepSearchSettings_summary"
+        >Restore search settings from previous session</string>
+        
+    <!-- The pref title for clearin settings -->
+    <string name="careerstack_settings_clearSettings_title"
+        >Reset all settings</string>
+    <!-- The pref description for clearing settings  -->
+    <string name="careerstack_settings_clearSettings_summary"
+        >Set all settings to default values</string>
+    <!-- The clearing settings confirmation message  -->
+    <string name="careerstack_settings_clearSettings_confirmMsg"
+        >Are you sure you wish to reset ALL settings? 
+        This cannot be undone.</string>
+    
+    <!-- Toast for when settings are cleared. -->
+    <string name="careerstack_toast_clearedSettings"
+        >Settings reset</string>
+        
+    <!-- The pref title app version -->
+    <string name="careerstack_settings_softwareVersion_title"
+        >Application version</string>
+    
+    <!-- Ends settings fragment strings -->
+    <eat-comment />
+    
+    <!-- Starts theme dialog fragment strings -->
+    <eat-comment />
+    <!-- The changing theme confirmation message  -->
+    <string name="careerstack_theme_dialogMsg"
+        >Changing the theme will restart the app. You will lose
+        any loaded searches. Are you sure?</string>
+        <string name="careerstack_theme_dialogMsg_confirm"
+        >Yes, restart</string>
+    
+</resources>
