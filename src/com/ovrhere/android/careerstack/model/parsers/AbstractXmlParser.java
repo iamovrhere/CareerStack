@@ -25,18 +25,16 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.util.Log;
 
-import com.ovrhere.android.careerstack.model.careersstackoverflow.CareersStackOverflowRssXmlParser;
-
 
 
 /** The basic outline for an xml parser. Note that this is thread blocking.
  * @author Jason J.
- * @version 0.2.0-20140921
+ * @version 0.2.1-20140925
  * @param R1 The return value to use for the methods <code>parseXmlStream</code>
  */
 abstract public class AbstractXmlParser <R1> {
 	/** The tag for debugging purposes. */
-	final static private String LOGTAG = CareersStackOverflowRssXmlParser.class
+	final static private String LOGTAG = AbstractXmlParser.class
 			.getSimpleName();
 	/** The exception message to give when the factory is not found. */
 	final static private String DETAILED_EXCEPTION_PARSER_NOT_BUILT = 

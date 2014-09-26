@@ -218,7 +218,14 @@ public abstract class AbstractSimpleHttpRequest implements Runnable{
 	 *  @version 0.2.0-20140914	 */
 	public interface OnRequestEventListener {
 		/** Sends any exceptions encountered to the listener.
-		 * @param e The forwarded exception, if any.		 */
+		 * @param e The forwarded exception, if any.
+		 * Possible exceptions include:
+		 * <ul><li> {@link MalformedURLException} - Poorly formed request</li>
+		 * <li> {@link SocketTimeoutException} - Request timed out according
+		 * to value set</li>
+		 * <li> {@link IOException} - During exception an IO error occurred </li> 
+		 * <li> {@link Exception} - Unknown exception </li>
+		 * </ul>	 */
 		public void onException(Exception e);
 		/** Sends any response code received.
 		 * @param responseCode The HTTP response codes or 0.		 */
@@ -226,7 +233,7 @@ public abstract class AbstractSimpleHttpRequest implements Runnable{
 		/** Sent when the request starts
 		 * @param in The input stream being used		 */
 		public void onStart(InputStream in);
-		/** When the request run has been concluded. */
+		/** When the request run has been concluded successfully. */
 		public void onComplete();
 	}
 

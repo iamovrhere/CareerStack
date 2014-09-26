@@ -36,7 +36,7 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
  * <a href="https://github.com/kolavar/android-support-v4-preferencefragment" 
  * target="_blank">android-support-v4-preferencefragment</a>
  * @author Jason J.
- * @version 0.2.0-20140923
+ * @version 0.3.0-20140924
  */
 public class SettingsFragment extends PreferenceFragment 
  implements OnPreferenceClickListener {
@@ -97,7 +97,7 @@ public class SettingsFragment extends PreferenceFragment
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** Initializes software version & reset settings. */
-	public void initNonSettings() {
+	private void initNonSettings() {
 
 		getPreferenceManager().findPreference(
 				getString(R.string.careerstack_settings_KEY_CLEAR_SETTINGS)
@@ -108,11 +108,11 @@ public class SettingsFragment extends PreferenceFragment
 						getString(R.string.careerstack_settings_KEY_SOFTWARE_VERSION)
 						);
 		softwareVersion.setSummary(softwareVersionName());
-		softwareVersion.setEnabled(false);
+		//softwareVersion.setEnabled(false); //why bother disabling?
 	}
 	
 	/** Sets preference to null before attaching settings. */
-	public void refreshPreferences(){
+	private void refreshPreferences(){
 		setPreferenceScreen(null);
 		addPreferencesFromResource(R.xml.settings);
 		initNonSettings();
@@ -193,6 +193,7 @@ public class SettingsFragment extends PreferenceFragment
 				getString(R.string.careerstack_settings_KEY_CLEAR_SETTINGS);
 		if (clearSettings.equals(preference.getKey())){
 			showClearSettingsDialog();
+			return true;
 		}
 		return false;
 	}
