@@ -43,7 +43,7 @@ import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.5.1-20140925
+ * @version 0.5.2-20140929
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnFragmentRequestListener, OnBackStackChangedListener,
@@ -188,6 +188,15 @@ public class MainActivity extends ActionBarActivity
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
+	public void onBackPressed() {
+		if (canBack()){
+			//do what ever would be done for back actionbar
+			onSupportNavigateUp(); 
+		} else {
+			super.onBackPressed();
+		}
+	}
 	
 	@Override
 	public boolean onSupportNavigateUp() {
@@ -351,13 +360,20 @@ public class MainActivity extends ActionBarActivity
 			menu.setGroupVisible(0, true);
 		}
 	}
+	
+	/** Returns whether or not there is a backstack. */
+	private boolean canBack() {
+		return getSupportFragmentManager().getBackStackEntryCount() > 0;
+	}
 
 	/** Checks to see whether to enable the action bar back. */
 	private void checkHomeButtonBack() {
-		boolean canback = getSupportFragmentManager().getBackStackEntryCount() > 0;
+		boolean canback = canBack();
 		//boolean canback = fragTagStack.size() > 0;
 		getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
 	}
+	
+	
 	
 	/** Loads a fragment either by adding or replacing and then adds it to
 	 * the fragTagList.
