@@ -22,7 +22,7 @@
         android:key="@string/careerstack_pref_KEY_USE_MILES"
         android:title="@string/careerstack_settings_useMetric_title"
         android:summary="@string/careerstack_settings_useMetric_summary" 
-        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_USE_MILES"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_USE_MILES"        
 	/>
     
     <CheckBoxPreference 
@@ -30,6 +30,15 @@
         android:title="@string/careerstack_settings_keepSearchSettings_title"
         android:summary="@string/careerstack_settings_keepSearchSettings_summary" 
         android:defaultValue="@bool/careerstack_pref_DEF_VALUE_KEEP_SEARCH_SETTINGS"
+	/>
+    
+    
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_QUICK_THEME_SWITCH"
+        android:title="@string/careerstack_settings_quickSwitch_title"
+        android:summary="@string/careerstack_settings_quickSwitch_support" 
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_QUICK_THEME_SWITCH"
+        android:enabled="false"
 	/>
     
     <Preference 

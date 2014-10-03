@@ -36,24 +36,25 @@ import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
-import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 import com.ovrhere.android.careerstack.ui.wrappers.SeekBarWrapper;
 import com.ovrhere.android.careerstack.utils.UnitCheck;
 
 /**
  * The main starting fragment. Currently a splash screen + entry screen.
- * Expects Activity to implement {@link OnFragmentRequestListener}, will throw 
- * {@link ClassCastException} otherwise.
+ * Expects Activity to implement {@link OnFragmentInteractionListener} and 
+ * will throw {@link ClassCastException} otherwise.
  * 
  * @author Jason J.
- * @version 0.2.1-20140924
+ * @version 0.3.0-20141003
  */
 public class MainFragment extends Fragment 
-implements OnClickListener, OnCheckedChangeListener, 
-	SeekBarWrapper.OnValueChangedListener {
+	implements OnClickListener, OnCheckedChangeListener, 
+				SeekBarWrapper.OnValueChangedListener {
+	
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = 
 			MainFragment.class.getSimpleName();
+	
 	/** The suggested fragment tag. */
 	final static public String FRAGTAG = CLASS_NAME;
 	
@@ -62,25 +63,38 @@ implements OnClickListener, OnCheckedChangeListener,
 	/** Whether or not to debug. */
 	final static private boolean DEBUG = false;
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Start public keys
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** Bundle key. The value of keyword. String */
-	final static private String KEY_KEYWORD_TEXT = 
+	final static public String KEY_KEYWORD_TEXT = 
 			CLASS_NAME + ".KEY_KEYWORD_TEXT";
+	
 	/** Bundle key. The value of location. String. */
-	final static private String KEY_LOCATION_TEXT = 
+	final static public String KEY_LOCATION_TEXT = 
 			CLASS_NAME + ".KEY_LOCATION_TEXT";
+	
 	/** Bundle key. The whether the remote check is set. Boolean. */
-	final static private String KEY_REMOTE_ALLOWED = 
+	final static public String KEY_REMOTE_ALLOWED = 
 			CLASS_NAME + ".KEY_REMOTE_ALLOWED";
+	
 	/** Bundle key. The whether the relocation check is set. Boolean. */
-	final static private String KEY_RELOCATE_OFFER = 
+	final static public String KEY_RELOCATE_OFFER = 
 			CLASS_NAME + ".KEY_RELOCATE_OFFER";
+	
 	/** Bundle Key. The current distance in the seek bar. Int. */
-	final static private String KEY_DISTANCE = 
+	final static public String KEY_DISTANCE = 
 			CLASS_NAME + ".KEY_DISTANCE";
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// End constants
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Start views
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** The keyword input. */
 	private EditText et_keywords = null;
 	/** The location input. */
@@ -95,6 +109,9 @@ implements OnClickListener, OnCheckedChangeListener,
 	/** The text view to update. Can be <code>null</code>. */
 	private TextView tv_distance = null;
 	
+	/** The seekbar reference. */
+	private SeekBar sb_distanceSeek = null;
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End views
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +121,7 @@ implements OnClickListener, OnCheckedChangeListener,
 	/** The current distance. Used for saved states. */
 	private int currentDistanceValue = 0;
 	/** The fragment request listener from main. */
-	private OnFragmentRequestListener mFragmentRequestListener = null;
+	private OnFragmentInteractionListener mFragInteractionListener = null;
 	
 	/** Used in {@link #onSaveInstanceState(Bundle)} to determine if 
 	 * views are visible. */
@@ -151,11 +168,12 @@ implements OnClickListener, OnCheckedChangeListener,
 				getResources().getInteger(R.integer.careerstack_seekBar_default);
 		
 		initInputs(rootView);
-		processPrefs();
+		processPrefs(rootView);
 		
 		if (savedInstanceState != null){
 			processSavedState(rootView, savedInstanceState);
 		}
+		
 		viewBuilt = true;
 		return rootView;
 	}
@@ -172,11 +190,11 @@ implements OnClickListener, OnCheckedChangeListener,
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			this.mFragmentRequestListener = 
-					(OnFragmentRequestListener) activity;
+			this.mFragInteractionListener = 
+					(OnFragmentInteractionListener) activity;
 		} catch (ClassCastException e){
 			Log.e(LOGTAG, "Activity must implement :" +
-					OnFragmentRequestListener.class.getSimpleName());
+					OnFragmentInteractionListener.class.getSimpleName());
 			throw e;
 		}
 	}
@@ -237,20 +255,34 @@ implements OnClickListener, OnCheckedChangeListener,
 		int value = savedState.getInt(KEY_DISTANCE, currentDistanceValue);
 		updateDistance(value);
 	}
+	
 	/** Processes and applied preferences, if allowed. */
-	private void processPrefs(){
+	private void processPrefs(View rootView){
 		if (prefs.getBoolean(
 				getString(R.string.careerstack_pref_KEY_KEEP_SEARCH_SETTINGS), 
 				false) == false){
 			//if we are not suppose to keep settings, discard them.
 			return;
 		}
-		//TODO add save/restore for text 
-				
+		
+		et_keywords.setText(
+				prefs.getString(
+						getString(R.string.careerstack_pref_KEY_KEYWORDS_VALUE),
+						"")
+				);
+		String location = prefs.getString(
+				getString(R.string.careerstack_pref_KEY_LOCATION_VALUE),
+				"");
+		et_location.setText(location);
+		
 		int value = prefs.getInt(
 				getString(R.string.careerstack_pref_KEY_DISTANCE_VALUE), 
 				currentDistanceValue);
 		updateDistance(value);
+		
+		//if location is not empty; prep the seekbar
+		showSeekBar(rootView, location.isEmpty() == false);		
+		
 		cb_relocationOffered.setChecked(
 				prefs.getBoolean(
 						getString(R.string.careerstack_pref_KEY_RELOCATION_OFFERED), 
@@ -261,13 +293,13 @@ implements OnClickListener, OnCheckedChangeListener,
 						false));
 	}
 	
-	/** Not intented to be called in {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}
+	/** Not intended to be called in {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}
 	 * @return <code>true</code> if successfully initialized seekbar,
 	 * <code>false</code> if something went wrong.
 	 * @param view The view to initialize with.
 	 */
 	private boolean initSeekBar(View view){
-		SeekBar sb_distanceSeek = (SeekBar) 
+		sb_distanceSeek = (SeekBar) 
 				view.findViewById(R.id.careerstack_distanceSeekbar_seekBar);
 		tv_distance = (TextView)
 			view.findViewById(R.id.careerstack_distanceSeekbar_text_value);
@@ -296,12 +328,13 @@ implements OnClickListener, OnCheckedChangeListener,
 	/** Shows or hides seekbar block based bool.
 	 * If being shown for the first time, the view is inflated and the stepper
 	 * initialized.
+	 * @param view The view to inflate with  
 	 * @param visible <code>true</code> to show, <code>false</code> to hide.
 	 */
-	private void showSeekBar(boolean visible){
+	private void showSeekBar(View view, boolean visible){
 		distanceView.setVisibility(visible ? View.VISIBLE : View.GONE);
 		if (distanceSeekBarWrapper == null){
-			if (getView() == null || initSeekBar(getView()) == false){
+			if (view == null || initSeekBar(view) == false){
 				if (DEBUG){
 					Log.w(LOGTAG, 
 							"Failed to initialize seek bar (rootView not ready?");
@@ -311,6 +344,15 @@ implements OnClickListener, OnCheckedChangeListener,
 		}
 		int progress = distanceSeekBarWrapper.getValue();
 		updateDistance(progress);
+	} 
+	
+	/** Shows or hides seekbar block based bool.
+	 * If being shown for the first time, the view is inflated and the stepper
+	 * initialized. Same as {@link #showSeekBar(View, boolean)} with #getView()
+	 * @param visible <code>true</code> to show, <code>false</code> to hide.
+	 */
+	private void showSeekBar(boolean visible){
+		showSeekBar(getView(), visible);
 	}
 	
 	/** Updates distance to the value supplied.
@@ -318,10 +360,14 @@ implements OnClickListener, OnCheckedChangeListener,
 	 */
 	private void updateDistance(int value){
 		currentDistanceValue = value;
+		//get distance with units
+		String distance = UnitCheck.units(prefs, getResources(), value);
 		if (tv_distance != null){
-			tv_distance.setText( 
-						UnitCheck.units(prefs, getResources(), value)
-					);
+			tv_distance.setText(distance);
+		}
+		if (sb_distanceSeek != null){
+			//set accessibility string
+			sb_distanceSeek.setContentDescription(distance);
 		}
 	}
 	
@@ -338,29 +384,37 @@ implements OnClickListener, OnCheckedChangeListener,
 	/** Builds the bundle and sends the request off */
 	private void prepareAndRequestSearch() {
 		Bundle args = new Bundle();
-		args.putString(SearchResultsFragment.KEY_KEYWORD_TEXT, 
-				et_keywords.getText().toString());
-		args.putString(SearchResultsFragment.KEY_LOCATION_TEXT, 
-				et_location.getText().toString());
 		
-		args.putBoolean(SearchResultsFragment.KEY_RELOCATE_OFFER, 
-				cb_relocationOffered.isChecked());
-		args.putBoolean(SearchResultsFragment.KEY_REMOTE_ALLOWED, 
-				cb_remoteAllowed.isChecked());
+		String keywords = et_keywords.getText().toString();
+		String location = et_location.getText().toString();
+		//store prefs as we are sending
+		prefs.edit()
+			.putString(
+				getString(R.string.careerstack_pref_KEY_KEYWORDS_VALUE),
+				keywords)
+			.putString(
+				getString(R.string.careerstack_pref_KEY_LOCATION_VALUE),
+				location)
+			.commit();
+		
+		args.putString(KEY_KEYWORD_TEXT, keywords);
+		args.putString(KEY_LOCATION_TEXT, location);
+		
+		args.putBoolean(KEY_RELOCATE_OFFER, cb_relocationOffered.isChecked());
+		args.putBoolean(KEY_REMOTE_ALLOWED, cb_remoteAllowed.isChecked());
+		
 		if (getDistance() > 0){
-			args.putInt(SearchResultsFragment.KEY_DISTANCE, 
-					getDistance());
+			args.putInt(KEY_DISTANCE, getDistance());
 		}
 		
-		mFragmentRequestListener.onRequestNewFragment(
-				SearchResultsFragment.newInstance(args), 
-				SearchResultsFragment.class.getName(), 
-				false);
+		mFragInteractionListener.onSearchRequest(args);
 	}
+	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Implemented listeners
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** The text watcher for the location. */
 	private TextWatcher locationTextWatcher = new TextWatcher() {
 		@Override
@@ -421,9 +475,29 @@ implements OnClickListener, OnCheckedChangeListener,
 	@Override
 	public void onValueUpdate(int value) {
 		updateDistance(value);
-		SharedPreferences.Editor edit = prefs.edit();
-		edit.putInt(
+		prefs.edit()
+			.putInt(
 				getString(R.string.careerstack_pref_KEY_DISTANCE_VALUE), 
 				value).commit();
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Internal listeners
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	//Returning to the roots of simple design. We re-opt for this.
+	/**
+	 * The interaction listener that the activity must implement to handle the 
+	 * {@link MainFragment}'s requests. 
+	 * @author Jason J.
+	 * @version 0.1.0-20141003
+	 */
+	static public interface OnFragmentInteractionListener {		
+		/** Sends activity a search request to be handled.
+		 * @param bundle The bundle of search arguments given by the 
+		 * {@link MainFragment} keys.
+		 * @return <code>true</code> if the activity has honoured the request,
+		 * <code>false</code> if has been ignored.		 */
+		public boolean onSearchRequest(Bundle bundle);
 	}
 }

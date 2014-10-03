@@ -23,8 +23,9 @@ import android.support.v4.app.Fragment;
  * request to the {@link Activity}. Note that the activity will have final say 
  * in the matter. 
  * @author Jason J.
- * @version 0.2.0-20140918
+ * @version 0.3.0-20141003
  */
+@Deprecated
 public interface OnFragmentRequestListener {
 	
 	/** The request from the fragment to launch another fragment.

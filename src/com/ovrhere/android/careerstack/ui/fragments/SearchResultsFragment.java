@@ -31,13 +31,14 @@ import com.ovrhere.android.careerstack.model.CareersStackOverflowModel;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.ui.adapters.CareerItemFilterListAdapter;
 import com.ovrhere.android.careerstack.ui.fragments.dialogs.DistanceDialogFragment;
-import com.ovrhere.android.careerstack.ui.listeners.OnFragmentRequestListener;
 import com.ovrhere.android.careerstack.utils.UnitCheck;
 
 /**
  * The fragment to perform searches and display cursory results.
+ * Expects Activity to implement {@link OnFragmentInteractionListener} and 
+ * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.2.2-20140922
+ * @version 0.3.0-20141003
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
@@ -57,6 +58,7 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 	
 	/** Tag. The to use in
 	 *  {@link OnFragmentRequestListener#onRequestHoldSavedState(String, Bundle)}. */
+	@Deprecated
 	final static private String TAG_BACKSTACK_STATE = 
 			CLASS_NAME+".TAG_BACKSTACK_STATE";
 	
@@ -144,8 +146,8 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 	/** If the fragment failed during last load. */
 	private boolean resultsTimeout = false;
 		
-	/** The fragment request listener from main. */
-	private OnFragmentRequestListener mFragmentRequestListener = null;
+	/** The fragment request listener from activity. */
+	private OnFragmentInteractionListener mFragInteractionListener = null;
 	/** Used in {@link #onSaveInstanceState(Bundle)} to determine if 
 	 * views are visible. */
 	private boolean viewBuilt = false;
@@ -213,7 +215,7 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 		initInputs(rootView);
 		initOutputs(rootView);
 		Bundle backStackState = 
-				mFragmentRequestListener.onRequestPopSavedState(TAG_BACKSTACK_STATE);
+				mFragInteractionListener.onPopSavedStateRequest();
 		
 		//ensure the view is built first, as requests are still heavy
 		
@@ -250,8 +252,7 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 	public void onDestroyView() {
 		Bundle state = new Bundle();
 		buildSaveState(state); //holds the state
-		mFragmentRequestListener.onRequestHoldSavedState(
-				TAG_BACKSTACK_STATE, state);	
+		mFragInteractionListener.onHoldSavedStateRequest(state);
 		
 		super.onDestroyView();
 		viewBuilt = false;
@@ -261,11 +262,11 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			this.mFragmentRequestListener = 
-					(OnFragmentRequestListener) activity;
+			this.mFragInteractionListener = 
+					(OnFragmentInteractionListener) activity;
 		} catch (ClassCastException e){
 			Log.e(LOGTAG, "Activity must implement :" +
-					OnFragmentRequestListener.class.getSimpleName());
+					OnFragmentInteractionListener.class.getSimpleName());
 			throw e;
 		}
 	}
@@ -536,9 +537,12 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 		sendRequest(args);
 	}
 	
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Implemented listeners
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	//TODO move search functionality into dialog
 	
 	/** The text watcher for the location. */
 	private TextWatcher locationTextWatcher = new TextWatcher() {
@@ -614,11 +618,7 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 			long id) {
 		CareerItem item = resultAdapter.getItem(position);
 		if (item != null){
-			Fragment frag = CareerItemFragment.newInstance(item);
-			mFragmentRequestListener.onRequestNewFragment(
-					frag, 
-					CareerItemFragment.class.getName(), 
-					true);
+			mFragInteractionListener.onCareerItemRequest(item);
 		}
 	}
 	
@@ -673,6 +673,36 @@ implements OnClickListener, OnCheckedChangeListener, OnItemClickListener,
 			}
 		}
 		return false;
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Internal listeners
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * The interaction listener that the activity must implement to handle the 
+	 * {@link SearchResultsFragment}'s requests. 
+	 * @author Jason J.
+	 * @version 0.1.0-20141003
+	 */
+	static public interface OnFragmentInteractionListener {		
+		/** Sends activity a search request to be handled.
+		 * @param bundle The bundle of search arguments given by the 
+		 * {@link MainFragment} keys.
+		 * @return <code>true</code> if the activity has honoured the request,
+		 * <code>false</code> if has been ignored.		 */
+		public boolean onCareerItemRequest(CareerItem item);
+		
+		/** Requests the the activity return the fragments saved state. 
+		 * @return The saved state as built  by frag or <code>null</code>	 */
+		public Bundle onPopSavedStateRequest();
+		
+		/** Requests the activity hold its save state while it sits in the 
+		 * backstack (lazy solution)
+		 * @param savedState The fragment's saved state
+		 * @return <code>true</code> if the activity has honoured the request,
+		 * <code>false</code> if has been ignored.		 */
+		public boolean onHoldSavedStateRequest(Bundle savedState);
 	}
 	
 }
