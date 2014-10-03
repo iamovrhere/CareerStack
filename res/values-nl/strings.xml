@@ -125,6 +125,6 @@
     <eat-comment/>
     <!-- The changing theme confirmation message  -->
     <string name="careerstack_theme_dialogMsg">"Het thema veranderen zal de app opnieuw te starten. U zult geen geladen zoekopdrachten verliezen. Weet je het zeker?"</string>
-        <string name="careerstack_theme_dialogMsg_confirm">"Ja, herstart"</string>
+        <string name="careerstack_restart_dialogMsg_confirm">"Ja, herstart"</string>
     
 </resources>

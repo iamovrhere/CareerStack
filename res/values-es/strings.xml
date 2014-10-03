@@ -125,6 +125,6 @@
     <eat-comment/>
     <!-- The changing theme confirmation message  -->
     <string name="careerstack_theme_dialogMsg">"Cambio del tema se reiniciará la aplicación. Usted perderá cualquier búsqueda cargados. Estás seguro?"</string>
-        <string name="careerstack_theme_dialogMsg_confirm">"Sí, rearranque"</string>
+        <string name="careerstack_restart_dialogMsg_confirm">"Sí, rearranque"</string>
     
 </resources>

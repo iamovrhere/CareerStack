@@ -31,6 +31,10 @@
     <!-- End titles -->
     <eat-comment />
 
+    
+    
+    
+    
     <!-- Starts Main fragment strings -->
     <eat-comment />
     
@@ -68,6 +72,10 @@
     <!-- End Main fragment strings -->
     <eat-comment />
     
+    
+    
+    
+    
     <!-- Starts Results fragment strings -->
     <eat-comment />
     <!-- The go/search button for the search results page.  -->
@@ -93,6 +101,10 @@
     <!-- Ends Results fragment strings -->
     <eat-comment />
     
+    
+    
+    
+    
     <!-- Starts career item fragment strings -->
     <eat-comment />
     <!-- The open career link button. -->
@@ -111,6 +123,9 @@
 	<!-- Ends career item  fragment strings -->
     <eat-comment />
     
+    
+    
+    
     <!-- Starts settings fragment strings -->
     <eat-comment />
     <!-- The setting title for distance units -->
@@ -119,12 +134,32 @@
     <string name="careerstack_settings_useMetric_summary"
         >Use the imperial system for distance</string>
     
+        
     <!-- The pref title for keeping settings for search -->
     <string name="careerstack_settings_keepSearchSettings_title"
         >Persistent search settings</string>
     <!-- The pref description for keeping settings for search  -->
     <string name="careerstack_settings_keepSearchSettings_summary"
         >Restore search settings from previous session</string>
+    
+    
+    <!-- The pref title for quick switching themes TODO: Translate string-->
+    <string name="careerstack_settings_quickSwitch_title"
+        >Quick switch themes</string>
+    <!-- The pref description for quick switching themes TODO: Translate string -->
+    <string name="careerstack_settings_quickSwitch_summary"
+        >WARNING! EXPERIMENTAL!
+\nSwitch between themes without restarting. Limited support.</string>    
+    <!-- The pref support for quick switching themes TODO: Translate string -->
+    <string name="careerstack_settings_quickSwitch_support"
+        >Support for Android 3.0 and up</string>
+
+	<!-- The pref dialog mesage for quick switching themes TODO: Translate string -->
+    <string name="careerstack_settings_quickSwitch_confirmMsg"
+        >Quick switching themes is experimental 
+        and may not work on all devices. Try it anyway? 
+        \n\n(Requires restart to take effect.)</string>
+    
         
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title"
@@ -148,13 +183,19 @@
     <!-- Ends settings fragment strings -->
     <eat-comment />
     
+    
+    
     <!-- Starts theme dialog fragment strings -->
     <eat-comment />
     <!-- The changing theme confirmation message  -->
     <string name="careerstack_theme_dialogMsg"
         >Changing the theme will restart the app. You will lose
         any loaded searches. Are you sure?</string>
-        <string name="careerstack_theme_dialogMsg_confirm"
-        >Yes, restart</string>
     
+    <string name="careerstack_restart_dialogMsg_confirm"
+        >Yes, restart</string>
+        
+    <!-- Ends theme dialog strings -->
+    <eat-comment />
+        
 </resources>

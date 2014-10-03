@@ -125,6 +125,6 @@
     <eat-comment/>
     <!-- The changing theme confirmation message  -->
     <string name="careerstack_theme_dialogMsg">"Ändern des Themas wird die App neu starten. Sie erhalten keine geladen sucht verlieren. Sind Sie sicher?"</string>
-        <string name="careerstack_theme_dialogMsg_confirm">"Ja, Neustart"</string>
+        <string name="careerstack_restart_dialogMsg_confirm">"Ja, Neustart"</string>
     
 </resources>
