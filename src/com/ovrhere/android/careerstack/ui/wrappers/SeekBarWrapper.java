@@ -164,6 +164,7 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	 * @version 0.1.0-20140916	 */
 	public static interface OnValueChangedListener {
 		/** Updates the listener with the new (recalculated) value. 
+		 * It is advised you setContentDescription() here.
 		 * @param value		 */
 		public void onValueUpdate(int value);
 	}

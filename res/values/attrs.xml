@@ -15,10 +15,14 @@
    limitations under the License.
 -->
 <resources  >
-<declare-styleable name="AppBaseTheme">
-    <!-- Icon used in light & dark themes -->
-    <attr name="ic_careerstack" format="reference|integer"/>
-    <!-- Title color used in both dark & light themes -->
-    <attr name="careerstack_title_color" format="reference|integer"/>
-</declare-styleable>
+	<declare-styleable name="AppBaseTheme">
+	    <!-- Icon used in light & dark themes -->
+	    <attr name="ic_careerstack" format="reference|integer"/>
+	    <!-- Title color used in both dark & light themes -->
+	    <attr name="careerstack_title_color" format="reference|integer"/>
+	    
+	    <!-- The colour used by the seekbar distance display-->
+	    <attr name="careerstack_distance_color" format="integer|color"/>
+	</declare-styleable>
+	
 </resources>

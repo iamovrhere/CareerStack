@@ -42,7 +42,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * layout <code>viewstub_distance_seekbar.xml</code>. Requires the user use
  * <code>onActivityResult</code> and request codes to get result.
  * @author Jason J.
- * @version 0.1.2-20140923
+ * @version 0.2.0-20141003
  */
 public class DistanceDialogFragment extends DialogFragment 
 implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListener {	
@@ -62,8 +62,11 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	
 	/** The wrapper for the seekbar. */
 	private SeekBarWrapper seekbarWrapper =  null;
+	/** The seekbar reference. */
+	private SeekBar sb_seekbar = null;
 	/** The displayed distance. */
 	private TextView tv_distance = null;
+	
 	/** The current distance. */
 	private int currentDistanceValue = 0;
 	
@@ -105,6 +108,9 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	  if (getDialog() != null && getRetainInstance())
 	    getDialog().setOnDismissListener(null);
 	  super.onDestroyView();
+	  seekbarWrapper = null;
+	  sb_seekbar = null;
+	  tv_distance = null;
 	}
 	
 	
@@ -153,9 +159,9 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	private void initViews(View rootView){
 		tv_distance = (TextView)
 				rootView.findViewById(R.id.careerstack_distanceSeekbar_text_value);
-		SeekBar seekbar = (SeekBar)
+		sb_seekbar = (SeekBar)
 				rootView.findViewById(R.id.careerstack_distanceSeekbar_seekBar);
-		seekbarWrapper = new SeekBarWrapper(seekbar, 
+		seekbarWrapper = new SeekBarWrapper(sb_seekbar, 
 				getResources().getInteger(R.integer.careerstack_seekBar_min), 
 				getResources().getInteger(R.integer.careerstack_seekBar_max), 
 				getResources().getInteger(R.integer.careerstack_seekBar_step));
@@ -185,9 +191,9 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	@Override
 	public void onValueUpdate(int value) {
 		currentDistanceValue = value;
-		tv_distance.setText(
-				UnitCheck.units(prefs, getResources(), value)
-				);
+		String distance = UnitCheck.units(prefs, getResources(), value);
+		tv_distance.setText(distance);
+		sb_seekbar.setContentDescription(distance);
 	}
 	
 	@Override

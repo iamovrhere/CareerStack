@@ -28,7 +28,11 @@
         
         <item name="careerstack_title_color">@android:color/white</item>
         
+        <!-- Attribue drawable for the dark icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
+        
+        <!-- The colour of the x miles/km text -->
+   		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
     </style>
     
     <!-- Light theme -->
@@ -40,13 +44,18 @@
         
         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         
+        <!-- Attribue drawable for the light icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>
         
+        <!-- The colour of the x miles/km text -->
+   		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
     </style>
     
     <!-- Dialog theme fix for 2.3.3 -->
     <style name="DialogTheme" parent="@android:style/Theme.Dialog">
         <item name="android:seekBarStyle">@style/SeekBarAppBaseTheme_Dark</item>
+        <!-- The colour of the x miles/km text -->
+        <item  name="careerstack_distance_color" >@android:color/primary_text_dark</item>
 	</style>
 
 
