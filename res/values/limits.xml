@@ -25,4 +25,7 @@
     <item name="careerstack_seekBar_step" type="integer" >10</item>
     <!-- The default values for the seekbar -->
     <item name="careerstack_seekBar_default" type="integer">20</item>
+    
+    <!-- The speed of the search bar animation -->
+    <item name="careerstack_searchBar_speed" type="integer">220</item>
 </resources>

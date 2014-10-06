@@ -23,6 +23,11 @@
     <!-- The dialog margins -->
     <dimen name="dialog_margins">10dp</dimen>
     
+    <!-- The search bar margins -->
+    <dimen name="searchbar_horizontal_margin">12dp</dimen>
+    <!-- The search bar margins -->
+    <dimen name="searchbar_vertical_margin">16dp</dimen>
+    
     <!-- Search frag screen margins -->
     <dimen name="frag_search_horizontal_margin">9dp</dimen>
     

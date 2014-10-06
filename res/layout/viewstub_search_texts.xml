@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    
+  	android:gravity="center"
+  >   
+   <EditText
+        android:id="@+id/careerstack_searchBar_editin_keywords"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/careerstack_input_hint_keywords"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="none"
+        android:layout_marginBottom="3dp"
+         />
+
+    <EditText
+        android:id="@+id/careerstack_searchBar_editin_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/careerstack_input_hint_location"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="none"
+        android:layout_marginBottom="3dp"
+         /> 
+ </LinearLayout>             
