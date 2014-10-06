@@ -24,7 +24,7 @@ import android.os.Parcelable;
 
 /** Provides a data access object for individual career items.
  * @author Jason J.
- * @version 0.1.0-20140914
+ * @version 0.1.1-20141006
  */
 public class CareerItem implements Parcelable{
 	/** The job item's title. */
@@ -237,15 +237,19 @@ public class CareerItem implements Parcelable{
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
 		//writing strings
-		final int SIZE = 3 + categories.length;
+		final int OFFSET = 4;
+		final int SIZE = OFFSET + categories.length;
+		
 		String[] strings = new String[SIZE];
 		//add single strings
 		strings[0] = title;
-		strings[1] = description;
-		strings[2] = url;
+		strings[1] = companyLocationEtc;
+		strings[2] = description;
+		strings[3] = url;
+		
 		//fill categories
-		for(int index = 3; index < SIZE; index++){
-			strings[index] = categories[index - 3];
+		for(int index = OFFSET; index < SIZE; index++){
+			strings[index] = categories[index - OFFSET];
 		}
 		
 		out.writeStringArray(strings);
@@ -264,16 +268,20 @@ public class CareerItem implements Parcelable{
 		//unpack strings
 		String[] strings = in.createStringArray();
 		final int SIZE = strings.length;
+		final int OFFSET = 4;
+		
 		title = strings[0];
-		description = strings[1];
-		url = strings[2];		
-		categories = new String[SIZE - 3];
-		for (int index = 3; index < SIZE; index++) {
-			categories[index - 3 ] = strings[index];
+		companyLocationEtc = strings[1];
+		description = strings[2];
+		url = strings[3];		
+		
+		categories = new String[SIZE - OFFSET];
+		for (int index = OFFSET; index < SIZE; index++) {
+			categories[index - OFFSET ] = strings[index];
 		}
 		
 		//unpack dates/longs
-		long[] dates = new long[2];
+		long[] dates = in.createLongArray();
 		publishDate = new Date(dates[0]);
 		updateDate = new Date(dates[1]);
 	}
