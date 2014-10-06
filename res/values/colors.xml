@@ -26,4 +26,7 @@
     
     <!-- Colour straight from stackoverflow background -->
     <color name="careerstack_offwhite_background">#F6F6F5</color>
+    
+    <!-- The grey for the light actionbar -->
+    <color name="careerstack_actionBar_light">#333</color>
 </resources>

@@ -21,6 +21,9 @@
 	    <!-- Title color used in both dark & light themes -->
 	    <attr name="careerstack_title_color" format="reference|integer"/>
 	    
+	    <!-- Color used for search bar colour -->
+	    <attr name="careerstack_searchbar_color" format="reference|integer"/>
+	    
 	    <!-- The colour used by the seekbar distance display-->
 	    <attr name="careerstack_distance_color" format="integer|color"/>
 	</declare-styleable>

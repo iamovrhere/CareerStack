@@ -14,7 +14,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    	  xmlns:tools="http://schemas.android.com/tools">
 
     <!--
         Base application theme for API 11+. This theme completely replaces
@@ -27,6 +28,8 @@
         <item name="careerstack_title_color">@android:color/white</item>
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
+   		<!-- Assume black for dark theme -->
+        <item name="careerstack_searchbar_color">@android:color/black</item>
     </style>
     
     <!-- Light theme -->
@@ -35,6 +38,14 @@
         <item name="careerstack_title_color">@android:color/black</item>
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
+   		<!-- Assume grey for light theme -->
+        <item name="careerstack_searchbar_color">@color/careerstack_actionBar_light</item>
+        
+        
+   		<item name="android:actionBarStyle" tools:targetApi="11">@style/MyLightActionBar</item>
+		
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/MyLightActionBar</item>
     </style>
 
 </resources>
