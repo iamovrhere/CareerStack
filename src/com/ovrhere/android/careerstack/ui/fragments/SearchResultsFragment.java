@@ -156,11 +156,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		buildSaveState(outState);
 	}
 	
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onActivityCreated(savedInstanceState);
-	}
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -412,9 +408,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Implemented listeners
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	//TODO move search functionality into dialog
-	
+		
 	
 	@Override
 	public void onClick(View v) {
