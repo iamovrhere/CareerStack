@@ -20,6 +20,8 @@
     <string name="app_name">CareerStack</string>
     <!-- The settings string -->
     <string name="action_settings">Settings</string>
+    <!-- The refresh string TODO Translations for Refresh -->
+    <string name="action_refresh">Refresh</string>
     <!-- The toggle day/night theme string -->    
     <string name="action_toggleTheme">Toggle Day/Night Theme</string>
     
