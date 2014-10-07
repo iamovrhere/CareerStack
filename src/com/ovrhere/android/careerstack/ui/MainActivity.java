@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
@@ -42,19 +43,23 @@ import com.ovrhere.android.careerstack.ui.fragments.MainFragment;
 import com.ovrhere.android.careerstack.ui.fragments.SearchResultsFragment;
 import com.ovrhere.android.careerstack.ui.fragments.SettingsFragment;
 import com.ovrhere.android.careerstack.ui.fragments.dialogs.ConfirmationDialogFragment;
+import com.ovrhere.android.careerstack.ui.fragments.dialogs.SearchBarDialogFragment;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.6.0-20141003
+ * @version 0.7.0-20141006
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnBackStackChangedListener, DialogInterface.OnClickListener,
 	MainFragment.OnFragmentInteractionListener, 
 	SearchResultsFragment.OnFragmentInteractionListener,
-	SettingsFragment.OnFragmentInteractionListener {
+	SettingsFragment.OnFragmentInteractionListener,
+	SearchBarDialogFragment.OnDialogResultsListener{
 	
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = MainActivity.class.getSimpleName();
+	/** Whether or not to debug. */
+	final static private boolean DEBUG = true;
 	
 	/** Bundle key. The last fragment to be loaded (and so reloaded). 
 	 * Array<String> */
@@ -68,14 +73,31 @@ public class MainActivity extends ActionBarActivity
 	final static private String KEY_ACTIONBAR_TITLE =
 			CLASS_NAME + ".KEY_ACTIONBAR_SUBTITLE";
 	
+	/** Bundle key. The current search state for the searchbar. Bundle. */
+	final static private String KEY_CURRENT_SEARCH_BAR_STATE = 
+			CLASS_NAME + ".KEY_CURRENT_SEARCH";
+	
 	
 	/** Extra Key. The theme intent value. Int. */
 	final static private String KEY_THEME_INTENT = 
 			CLASS_NAME + ".KEY_THEME_INTENT";
 		
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Frag tags
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** The main fragment tag. */
 	final static private String TAG_MAIN_FRAG = 
 			MainFragment.FRAGTAG;
+	
+	/** The tag for the search resultsfrag. */
+	final static private String TAG_SEARCH_RESULTS_FRAG = 
+			SearchResultsFragment.class.getName();
+	
+	/** The tag for the career item frag. */
+	final static private String TAG_CAREER_ITEM_FRAG = 
+			CareerItem.class.getName();
+	
 	/** The settings tag. */
 	final static private String TAG_SETTINGS_FRAG = 
 			SettingsFragment.class.getName();
@@ -83,6 +105,7 @@ public class MainActivity extends ActionBarActivity
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** The list of all fragments in play. */
 	final private ArrayListStack<String> fragTagStack = 
 			new ArrayListStack<String>();
@@ -103,6 +126,11 @@ public class MainActivity extends ActionBarActivity
 	/** The current menu as built by activity.
 	 *  Initialized in {@link #onCreateOptionsMenu(Menu)} */
 	private Menu menu = null;
+	
+	/** The current search of the application set according to the keys of
+	 * {@link SearchBarDialogFragment}.
+	 * Set in {@link #onSearchRequest(Bundle)} & {@link #onSearch(DialogFragment, Bundle)} */ 
+	private Bundle currSearchBarState = new Bundle();
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -110,6 +138,8 @@ public class MainActivity extends ActionBarActivity
 		outState.putStringArrayList(KEY_FRAG_TAG_TACK, fragTagStack.getArrayList());
 		outState.putSerializable(KEY_FRAG_SAVED_STATES, fragSavedStates);
 		outState.putString(KEY_ACTIONBAR_TITLE, actionBarTitle);
+		
+		outState.putBundle(KEY_CURRENT_SEARCH_BAR_STATE, currSearchBarState);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -131,23 +161,36 @@ public class MainActivity extends ActionBarActivity
 		if (savedInstanceState == null) {			
 			loadFragment( new MainFragment(), TAG_MAIN_FRAG, false);
 			actionBarTitle = getString(R.string.app_name);
-		} else {
-			if (savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK) != null){
-				fragTagStack.addAll(
-						savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK));
-			}
-			if (savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES) != null){
-				try {
-			fragSavedStates.putAll((Map<? extends String, ? extends Bundle>) 
-					savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES));
-				} catch (ClassCastException e){}
-			}
-			if (savedInstanceState.getString(KEY_ACTIONBAR_TITLE) != null){
-				actionBarTitle = 
-						savedInstanceState.getString(KEY_ACTIONBAR_TITLE);
-			}
 			
-			reattachLastFragment();
+		} else {
+			try {
+				currSearchBarState = 
+						savedInstanceState.getBundle(KEY_CURRENT_SEARCH_BAR_STATE);
+				
+				if (savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK) != null){
+					fragTagStack.addAll(
+							savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK));
+				}
+				
+				if (savedInstanceState.getString(KEY_ACTIONBAR_TITLE) != null){
+					actionBarTitle = 
+							savedInstanceState.getString(KEY_ACTIONBAR_TITLE);
+				}
+				reattachLastFragment();
+				
+				if (savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES) != null){
+					try {
+				fragSavedStates.putAll((Map<? extends String, ? extends Bundle>) 
+						savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES));
+					} catch (ClassCastException e){}
+				}
+				
+			} catch (Exception e){
+				if (DEBUG){
+					Log.e(CLASS_NAME, "Should not be having an error here: " + e);
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		getSupportActionBar().setTitle(actionBarTitle);
@@ -162,7 +205,7 @@ public class MainActivity extends ActionBarActivity
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.menu = menu;
-		checkSettings();
+		checkMenus();
 		return true;
 	}
 
@@ -181,7 +224,7 @@ public class MainActivity extends ActionBarActivity
 				setActionBarTitle(getString(R.string.action_settings));
 			}
 			//hide settings when viewing settings
-			checkSettings();
+			checkMenus();
 			return true;
 			
 		case R.id.action_toggleTheme:
@@ -190,6 +233,14 @@ public class MainActivity extends ActionBarActivity
 			} else {
 				showChangeThemeDialog();
 			}
+			return true;
+		
+		case R.id.action_refresh:
+			refreshSearchRequest();
+			return true;
+			
+		case R.id.action_search:
+			showSearchBarDialog();
 			return true;
 			
 		default:
@@ -216,7 +267,7 @@ public class MainActivity extends ActionBarActivity
 	    fragTagStack.pop();	    
 	  
 	    //show settings when not viewing settings
-	    checkSettings();
+	    checkMenus();
 	    return true;
 	}
 	
@@ -358,10 +409,76 @@ public class MainActivity extends ActionBarActivity
 	}
 	
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Funtionality helpers
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** Sends the search request off the SearchResultsFragment;
+	 * if the fragment is at the front it sends it directly, otherwise, it 
+	 * clears the backstack and re-attaches.
+	 * @param args The argments to forward onto {@link SearchResultsFragment}
+	 */
+	private void sendSearchRequest(Bundle args) {
+		boolean requestSent = false;
+		//if we are already in the search frag
+		if (TAG_SEARCH_RESULTS_FRAG.equals(fragTagStack.peek())){
+			try {
+				//get fragment then send results.
+				SearchResultsFragment frag = (SearchResultsFragment)
+						getSupportFragmentManager()
+							.findFragmentByTag(TAG_SEARCH_RESULTS_FRAG);
+				
+				frag.sendRequest(args);
+				
+				requestSent = true;
+				
+			} catch (ClassCastException e){
+				Log.e(CLASS_NAME, "Something abnormal has occurred! : "+ e);
+				if (DEBUG){
+					throw e;
+				}
+			}			
+		} 
+		/* If the request has not been sent yet, either due to an error or
+		 * the frag the fragment is not in the stack yet. */
+		if (!requestSent) {
+			//launch fragment with no backstack
+			loadFragment(
+					SearchResultsFragment.newInstance(args), 
+					TAG_SEARCH_RESULTS_FRAG, 
+					false);
+		}
+	}
+	
+	/** Refreshes the search results page if available. If not
+	 * available nothing happens. 	 */
+	private void refreshSearchRequest(){
+		//if we are already in the search frag
+		if (TAG_SEARCH_RESULTS_FRAG.equals(fragTagStack.peek())){
+			try {
+				//get fragment then send results.
+				SearchResultsFragment frag = (SearchResultsFragment)
+						getSupportFragmentManager()
+							.findFragmentByTag(TAG_SEARCH_RESULTS_FRAG);
+				
+				frag.retryRequest();		
+				
+				
+			} catch (ClassCastException e){
+				Log.e(CLASS_NAME, "Something abnormal has occurred! : "+ e);
+				if (DEBUG){
+					throw e;
+				}
+			}			
+		} else if (DEBUG){
+			Log.d(CLASS_NAME, "Why are we refreshing without search results?");
+		}
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Dialog helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** Builds dialog for activity and shows it. */
 	private void showChangeThemeDialog(){
 		new ConfirmationDialogFragment.Builder()
@@ -373,6 +490,13 @@ public class MainActivity extends ActionBarActivity
 			.show(getSupportFragmentManager(), 
 					ConfirmationDialogFragment.class.getName() +
 					CLASS_NAME);
+	}
+	/** Initializes and shows the search bar dialog using the current
+	 * search state. 	 */
+	private void showSearchBarDialog(){
+		SearchBarDialogFragment.newInstance(currSearchBarState)
+			.show(	getSupportFragmentManager(),
+					SearchBarDialogFragment.class.getName());
 	}
 	
 	
@@ -397,15 +521,40 @@ public class MainActivity extends ActionBarActivity
 	 * If so deactivate menu, if not, re-enable it. Must be called after
 	 * {@link #onCreateOptionsMenu(Menu)} 
 	 */
-	private void checkSettings(){
+	private void checkMenus(){
 		if (menu == null){
 			return;
 		}
-		if (TAG_SETTINGS_FRAG.equals(fragTagStack.peek())){
+		final String currTag = fragTagStack.peek(); 
+		//if in settings frag
+		if (TAG_SETTINGS_FRAG.equals(currTag)){
 			menu.setGroupVisible(0, false);
 		} else {
 			menu.setGroupVisible(0, true);
 		}
+		
+		boolean showSearch = false;
+		boolean showRefresh = false;
+		
+		if (TAG_MAIN_FRAG.equals(currTag)){
+			showSearch = false;
+			showRefresh = false;
+		} else if (TAG_SEARCH_RESULTS_FRAG.equals(currTag)){
+			showSearch = true;
+			showRefresh = true;
+		} else if (TAG_CAREER_ITEM_FRAG.equals(currTag)){
+			 //FIXME the search results frag needs to "back search" before search can be enabled from items
+			showSearch = false;
+			showRefresh = false;
+		}
+
+		menu.findItem(R.id.action_search)
+			.setVisible(showSearch)
+			.setEnabled(showSearch);
+		menu.findItem(R.id.action_refresh)
+			.setVisible(showRefresh)
+			.setEnabled(showRefresh);
+				
 	}
 	
 	/** Returns whether or not there is a backstack. */
@@ -438,6 +587,7 @@ public class MainActivity extends ActionBarActivity
 				.addToBackStack(prevTag)
 				.replace(R.id.container, fragment, tag).commit();
 		} else {
+			//clear the entire backstack
 			fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			fragManager.beginTransaction()
 					.replace(R.id.container, fragment, tag)
@@ -445,8 +595,10 @@ public class MainActivity extends ActionBarActivity
 			fragTagStack.clear();
 			fragSavedStates.clear();
 		}
-		checkHomeButtonBack();
-		fragTagStack.push(tag);		
+		
+		fragTagStack.push(tag);
+		checkMenus();
+		checkHomeButtonBack();		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -503,25 +655,36 @@ public class MainActivity extends ActionBarActivity
 	@Override
 	public boolean onSearchRequest(Bundle bundle) {
 		Bundle args = new Bundle();
+		currSearchBarState = new Bundle();
+		
 		args.putString(SearchResultsFragment.KEY_KEYWORD_TEXT, 
 				bundle.getString(MainFragment.KEY_KEYWORD_TEXT));
+		currSearchBarState.putString(SearchBarDialogFragment.KEY_KEYWORD_TEXT, 
+				bundle.getString(MainFragment.KEY_KEYWORD_TEXT));
+		
 		args.putString(SearchResultsFragment.KEY_LOCATION_TEXT, 
+				bundle.getString(MainFragment.KEY_LOCATION_TEXT));
+		currSearchBarState.putString(SearchBarDialogFragment.KEY_LOCATION_TEXT, 
 				bundle.getString(MainFragment.KEY_LOCATION_TEXT));
 		
 		args.putBoolean(SearchResultsFragment.KEY_RELOCATE_OFFER, 
 				bundle.getBoolean(MainFragment.KEY_RELOCATE_OFFER));
+		currSearchBarState.putBoolean(SearchBarDialogFragment.KEY_RELOCATE_OFFER, 
+				bundle.getBoolean(MainFragment.KEY_RELOCATE_OFFER));
+		
 		args.putBoolean(SearchResultsFragment.KEY_REMOTE_ALLOWED, 
+				bundle.getBoolean(MainFragment.KEY_REMOTE_ALLOWED));
+		currSearchBarState.putBoolean(SearchBarDialogFragment.KEY_REMOTE_ALLOWED, 
 				bundle.getBoolean(MainFragment.KEY_REMOTE_ALLOWED));
 		
 		int distance = bundle.getInt(MainFragment.KEY_DISTANCE, -1);
 		if (distance > 0){
 			args.putInt(SearchResultsFragment.KEY_DISTANCE, distance);
+			currSearchBarState.putInt(SearchBarDialogFragment.KEY_DISTANCE, distance);
 		}
-		//launch fragment with no backstack
-		loadFragment(
-				SearchResultsFragment.newInstance(args), 
-				SearchResultsFragment.class.getName(), 
-				false);
+		
+		
+		sendSearchRequest(args);
 		return true;
 	}
 	
@@ -538,7 +701,7 @@ public class MainActivity extends ActionBarActivity
 		if (item != null){
 			loadFragment(
 					CareerItemFragment.newInstance(item), 
-					CareerItemFragment.class.getName(), 
+					TAG_CAREER_ITEM_FRAG, 
 					true);
 			return true;
 		}
@@ -550,8 +713,7 @@ public class MainActivity extends ActionBarActivity
 	 */
 	@Override
 	public boolean onHoldSavedStateRequest(Bundle savedState) {
-		final String tag = SearchResultsFragment.class.getName();
-		fragSavedStates.put(tag, savedState);
+		fragSavedStates.put(TAG_SEARCH_RESULTS_FRAG, savedState);
 		return true;
 	}
 	
@@ -560,8 +722,7 @@ public class MainActivity extends ActionBarActivity
 	 */
 	@Override
 	public Bundle onPopSavedStateRequest() {
-		final String tag = SearchResultsFragment.class.getName();
-		return fragSavedStates.remove(tag);
+		return fragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG);
 	}
 	
 	//end SearchResultsFragment listeners
@@ -581,6 +742,50 @@ public class MainActivity extends ActionBarActivity
 	}
 	
 	//end SettingsFragment
+	
+	
+	//start SearchBarDialogFragment
+	/* (non-Javadoc)
+	 * @see com.ovrhere.android.careerstack.ui.fragments.dialogs.SearchBarDialogFragment.OnDialogResultsListener#onSearch(android.support.v4.app.DialogFragment, android.os.Bundle)
+	 */
+	@Override
+	public void onSearch(DialogFragment dialog, Bundle searchParams) {
+		currSearchBarState = null;
+		currSearchBarState = searchParams; //replace search
+		//unpack request from dialog
+		Bundle args = new Bundle();
+		args.putString(SearchResultsFragment.KEY_KEYWORD_TEXT, 
+				searchParams.getString(SearchBarDialogFragment.KEY_KEYWORD_TEXT));
+		args.putString(SearchResultsFragment.KEY_LOCATION_TEXT, 
+				searchParams.getString(SearchBarDialogFragment.KEY_LOCATION_TEXT));
+		
+		args.putBoolean(SearchResultsFragment.KEY_RELOCATE_OFFER, 
+				searchParams.getBoolean(SearchBarDialogFragment.KEY_RELOCATE_OFFER));
+		args.putBoolean(SearchResultsFragment.KEY_REMOTE_ALLOWED, 
+				searchParams.getBoolean(SearchBarDialogFragment.KEY_REMOTE_ALLOWED));
+		
+		int distance = searchParams.getInt(SearchBarDialogFragment.KEY_DISTANCE, -1);
+		if (distance > 0){
+			args.putInt(SearchResultsFragment.KEY_DISTANCE, distance);
+		}
+		
+		//remove any previous states
+		fragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG); 
+		//launch request
+		sendSearchRequest(args);
+	}
+
+
+	
+	/* (non-Javadoc)
+	 * @see com.ovrhere.android.careerstack.ui.fragments.dialogs.SearchBarDialogFragment.OnDialogResultsListener#onCancel(android.support.v4.app.DialogFragment)
+	 */
+	@Override
+	public void onCancel(DialogFragment dialog) {
+		//do nothing		
+	}
+	
+	//end SearchBarDialogFragment
 	
 
 	@Override
