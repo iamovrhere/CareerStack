@@ -20,7 +20,7 @@
     <string name="app_name">CareerStack</string>
     <!-- The settings string -->
     <string name="action_settings">Settings</string>
-    <!-- The refresh string TODO Translations for Refresh -->
+    <!-- The refresh string -->
     <string name="action_refresh">Refresh</string>
     <!-- The toggle day/night theme string -->    
     <string name="action_toggleTheme">Toggle Day/Night Theme</string>
@@ -92,9 +92,9 @@
         >Retry</string>
     
     <!-- Work remotely check string for main. -->
-    <string name="careerstack_searchResults_check_workRemotely">Remote</string>
+    <string name="careerstack_searchBar_check_workRemotely">Remote</string>
     <!-- Offers relocation check string for main. -->
-    <string name="careerstack_searchResults_check_offersRelocation"
+    <string name="careerstack_searchBar_check_offersRelocation"
         >Relocation</string>
     
     <!-- Simply no matching results statement. -->
@@ -145,22 +145,22 @@
         >Restore search settings from previous session</string>
     
     
-    <!-- The pref title for quick switching themes TODO: Translate string-->
+    <!-- The pref title for quick switching themes -->
     <string name="careerstack_settings_quickSwitch_title"
         >Quick switch themes</string>
-    <!-- The pref description for quick switching themes TODO: Translate string -->
+    <!-- The pref description for quick switching themes -->
     <string name="careerstack_settings_quickSwitch_summary"
         >WARNING! EXPERIMENTAL!
 \nSwitch between themes without restarting. Limited support.</string>    
-    <!-- The pref support for quick switching themes TODO: Translate string -->
+    <!-- The pref support for quick switching themes  -->
     <string name="careerstack_settings_quickSwitch_support"
         >Support for Android 3.0 and up</string>
 
-	<!-- The pref dialog mesage for quick switching themes TODO: Translate string -->
+	<!-- The pref dialog mesage for quick switching themes -->
     <string name="careerstack_settings_quickSwitch_confirmMsg"
         >Quick switching themes is experimental 
         and may not work on all devices. Try it anyway? 
-        \n\n(Requires restart to take effect.)</string>
+\n\n(Requires app restart to take effect.)</string>
     
         
     <!-- The pref title for clearin settings -->

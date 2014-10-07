@@ -92,9 +92,9 @@
         >Retry</string>
     
     <!-- Work remotely check string for main. -->
-    <string name="careerstack_searchResults_check_workRemotely">Remote</string>
+    <string name="careerstack_searchBar_check_workRemotely">Remote</string>
     <!-- Offers relocation check string for main. -->
-    <string name="careerstack_searchResults_check_offersRelocation"
+    <string name="careerstack_searchBar_check_offersRelocation"
         >Relocation</string>
     
     <!-- Simply no matching results statement. -->

@@ -18,6 +18,8 @@
     <string name="app_name">"CareerStack"</string>
     <!-- The settings string -->
     <string name="action_settings">"Instellingen"</string>
+    
+    <string name="action_refresh">Vernieuwen</string>
     <!-- The toggle day/night theme string -->    
     <string name="action_toggleTheme">"Schakelen dag / nacht thema"</string>
     
@@ -67,9 +69,9 @@
     <string name="careerstack_searchResults_button_retry">"Opnieuw proberen"</string>
     
     <!-- Work remotely check string for main. -->
-    <string name="careerstack_searchResults_check_workRemotely">"Op afstand"</string>
+    <string name="careerstack_searchBar_check_workRemotely">"Op afstand"</string>
     <!-- Offers relocation check string for main. -->
-    <string name="careerstack_searchResults_check_offersRelocation">"Verhuizing"</string>
+    <string name="careerstack_searchBar_check_offersRelocation">"Verhuizing"</string>
     
     <!-- Simply no matching results statement. -->
     <string name="careerstack_careerlist_noResults">"Geen overeenkomende resultaten"</string>
@@ -105,6 +107,24 @@
     <!-- The pref description for keeping settings for search  -->
     <string name="careerstack_settings_keepSearchSettings_summary">"Herstellen zoekinstellingen van vorige sessie"</string>
         
+    
+    
+        <string name="careerstack_settings_quickSwitch_title"
+        >Snel schakelen thema</string>
+
+    <string name="careerstack_settings_quickSwitch_summary"
+        >WAARSCHUWING! EXPERIMENTELE! 
+\nSchakelen tussen thema\'s, zonder te herstarten. Beperkte ondersteuning.</string>
+
+    <string name="careerstack_settings_quickSwitch_support"
+        >Ondersteuning voor Android 3.0 en hoger</string> 
+
+    <string name="careerstack_settings_quickSwitch_confirmMsg"
+        >Snel schakelen thema is experimenteel en werkt mogelijk niet op alle apparaten. Probeer het toch? 
+\n\n(Hiervoor moet de app opnieuw starten door te voeren.)</string>
+    
+    
+    
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title">"Reset alle instellingen"</string>
     <!-- The pref description for clearing settings  -->

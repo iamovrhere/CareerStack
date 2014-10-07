@@ -18,6 +18,8 @@
     <string name="app_name">"CareerStack"</string>
     <!-- The settings string -->
     <string name="action_settings">"Einstellungen"</string>
+    
+    <string name="action_refresh">Erfrischen</string>
     <!-- The toggle day/night theme string -->    
     <string name="action_toggleTheme">"Toggle Tag / Nacht-Thema"</string>
     
@@ -67,9 +69,9 @@
     <string name="careerstack_searchResults_button_retry">"Nochmal"</string>
     
     <!-- Work remotely check string for main. -->
-    <string name="careerstack_searchResults_check_workRemotely">"Arbeit fern"</string>
+    <string name="careerstack_searchBar_check_workRemotely">"Arbeit fern"</string>
     <!-- Offers relocation check string for main. -->
-    <string name="careerstack_searchResults_check_offersRelocation">"Umzug"</string>
+    <string name="careerstack_searchBar_check_offersRelocation">"Umzug"</string>
     
     <!-- Simply no matching results statement. -->
     <string name="careerstack_careerlist_noResults">"Keine passenden Ergebnisse"</string>
@@ -105,6 +107,23 @@
     <!-- The pref description for keeping settings for search  -->
     <string name="careerstack_settings_keepSearchSettings_summary">"Wiederherstellung von Sucheinstellungen vorherigen Sitzung"</string>
         
+    
+        <string name="careerstack_settings_quickSwitch_title"
+        >Schnellschalt Thema</string>
+
+    <string name="careerstack_settings_quickSwitch_summary"
+        >WARNUNG! Experimenteller! 
+\nWechsel zwischen Themen ohne Neustart. Begrenzte Unterstützung.</string>
+
+    <string name="careerstack_settings_quickSwitch_support"
+        >Unterstützung für Android 3.0 oder höher</string>
+
+    <string name="careerstack_settings_quickSwitch_confirmMsg"
+        >Schnellschalt Themen ist experimentell und kann nicht auf allen Geräten funktionieren. Versuchen Sie es trotzdem? 
+\n\n(Erfordert die Anwendung neu starten zu übernehmen.)</string>
+    
+    
+    
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title">"Alle Einstellungen zurücksetzen"</string>
     <!-- The pref description for clearing settings  -->

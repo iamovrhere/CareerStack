@@ -18,6 +18,8 @@
     <string name="app_name">"CareerStack"</string>
     <!-- The settings string -->
     <string name="action_settings">"Paramètres"</string>
+    
+     <string name="action_refresh">Rafraîchir</string>
     <!-- The toggle day/night theme string -->    
     <string name="action_toggleTheme">"Bascule Jour / Nuit Thème"</string>
     
@@ -67,9 +69,9 @@
     <string name="careerstack_searchResults_button_retry">"Refaire"</string>
     
     <!-- Work remotely check string for main. -->
-    <string name="careerstack_searchResults_check_workRemotely">"Télétravail"</string>
+    <string name="careerstack_searchBar_check_workRemotely">"Télétravail"</string>
     <!-- Offers relocation check string for main. -->
-    <string name="careerstack_searchResults_check_offersRelocation">"Déménagement"</string>
+    <string name="careerstack_searchBar_check_offersRelocation">"Déménagement"</string>
     
     <!-- Simply no matching results statement. -->
     <string name="careerstack_careerlist_noResults">"Pas de résultats correspondants"</string>
@@ -105,6 +107,24 @@
     <!-- The pref description for keeping settings for search  -->
     <string name="careerstack_settings_keepSearchSettings_summary">"Restaurer les paramètres de la session précédente de la recherche"</string>
         
+    
+    
+    <string name="careerstack_settings_quickSwitch_title"
+        >Thèmes de commutation rapide</string>
+
+    <string name="careerstack_settings_quickSwitch_summary"
+        >ATTENTION! EXPERIMENTAL! 
+\nBasculer entre les thèmes sans avoir à redémarrer. Prise en charge limitée.</string>
+
+    <string name="careerstack_settings_quickSwitch_support"
+        >Support pour Android 3.0 et jusqu\'à</string>
+
+    <string name="careerstack_settings_quickSwitch_confirmMsg"
+        >Thèmes de commutation rapide est expérimentale, et peuvent ne pas fonctionner sur tous les appareils. Essayez quand même? 
+\n\n(Nécessite le redémarrage de l\'app pour prendre effet.)</string>
+    
+    
+    
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title">"Réinitialiser tous les réglages"</string>
     <!-- The pref description for clearing settings  -->
