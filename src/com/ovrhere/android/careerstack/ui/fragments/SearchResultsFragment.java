@@ -31,7 +31,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.4.0-20141006
+ * @version 0.4.1-20141008
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -399,11 +399,23 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		retryContainer.setVisibility(View.GONE);
 		progressContainer.setVisibility(View.GONE);
 		lv_resultsView.setVisibility(View.VISIBLE);
-		isLoadingResults = false;
-		resultsTimeout = false;
 		
+		isLoadingResults = false;
+		resultsTimeout = false;		
 	}
 	
+	/** Resets the list position to top. */
+	private void resetListPosition(){
+		//ensure we are at the top. 
+		lv_resultsView.setSelectionFromTop(0, 0);
+		lv_resultsView.postDelayed(new Runnable() {@Override
+			public void run() {
+				try{ //catch as we are delaying
+					lv_resultsView.setSelectionFromTop(0, 0);
+				}catch(Exception e){}
+			}
+		}, 50);
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Implemented listeners
@@ -471,6 +483,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 					}
 				}
 				showResults();
+				resetListPosition();
 				return true;
 				
 			case CareersStackOverflowModel.ERROR_REQUEST_TIMEOUT:
