@@ -19,14 +19,6 @@
     xmlns:careerstack="http://schemas.android.com/apk/res-auto" >
 
     <item 
-        android:id="@+id/action_search"
-        android:orderInCategory="99"
-        android:title="@android:string/search_go"
-        android:icon="@drawable/abc_ic_search"
-        careerstack:showAsAction="ifRoom|collapseActionView"
-        />
-    
-    <item 
         android:id="@+id/action_refresh"
         android:orderInCategory="100"
         android:title="@string/action_refresh"
@@ -34,9 +26,17 @@
         careerstack:showAsAction="ifRoom|collapseActionView"
         />
     
+    <item 
+        android:id="@+id/action_search"
+        android:orderInCategory="101"
+        android:title="@android:string/search_go"
+        android:icon="@drawable/abc_ic_search"
+        careerstack:showAsAction="ifRoom|collapseActionView"
+        />
+    
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="101"
+        android:orderInCategory="102"
         android:title="@string/action_settings"
         careerstack:showAsAction="collapseActionView"
         />   
@@ -44,7 +44,7 @@
     
     <item
         android:id="@+id/action_toggleTheme"
-        android:orderInCategory="102"
+        android:orderInCategory="103"
         android:title="@string/action_toggleTheme"
         careerstack:showAsAction="collapseActionView"
         />

@@ -24,16 +24,25 @@
     -->
     <style name="_AppBaseTheme.Dark" parent="Theme.AppCompat"
          >
-        <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
+         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         <item name="careerstack_title_color">@android:color/white</item>
         <!-- Attribue drawable for the dark icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
         
-        <!-- Assume black for dark theme -->
-        <item name="careerstack_searchbar_color">@android:color/black</item>
-        
+    
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
+   		
+   		<!-- Assume black for dark theme -->
+        <item name="careerstack_searchbar_color">@android:color/black</item>
+        <!-- Orange -->
+   		<item name="careerstack_searchbar_border">@drawable/careerstack_ab_transparent_strip</item>
+   		
+   		<!-- Set actionbar -->
+   		<item name="android:actionBarStyle" tools:targetApi="11">@style/MyDarkActionBar</item>
+		
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/MyDarkActionBar</item>
     </style>
     
     <!-- Light theme -->
@@ -49,6 +58,8 @@
         <!-- Assume grey for light theme -->
         <item name="careerstack_searchbar_color">@color/careerstack_actionBar_light</item>
         
+        <item name="careerstack_searchbar_border">@null</item>
+        
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		
@@ -59,6 +70,16 @@
         <item name="actionBarStyle">@style/MyLightActionBar</item>
     </style>
     
+    
+     <!-- General styles for the dark action bar -->
+    <style name="MyDarkActionBar"
+           parent="@style/Widget.AppCompat.ActionBar">
+        <!-- The orange strip -->
+        <item name="android:background">@drawable/careerstack_ab_transparent_strip</item>
+ 		
+        <!-- Support library compatibility -->
+        <item name="background">@drawable/careerstack_ab_transparent_strip</item>
+    </style>
     
     <!-- General styles for the light action bar -->
     <style name="MyLightActionBar"
@@ -75,7 +96,9 @@
 	    <item name="android:windowNoTitle">true</item>
 	    <item name="android:windowFullscreen">true</item>
 	    <item name="android:windowIsFloating">true</item>
+	    
 	</style>
+	
 	
     <!-- Search box style for dark;  ensures it always matches the actionbar -->
     <style name="SearchBarDialogStyle.Dark" parent="Theme.AppCompat" >
@@ -92,6 +115,7 @@
 	    
 	    <!--  Ensure the background is the correct colour -->
 	    <item name="android:windowBackground">?attr/careerstack_searchbar_color</item>
+	    
 
 	    <!--  Hide actionbar completely in dialog WHILE showing the copy/paste
 	    action bar menu, pushing down when needed. It is nice. -->
