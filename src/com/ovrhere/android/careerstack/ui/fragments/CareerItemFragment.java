@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.TextView.BufferType;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
@@ -29,7 +28,7 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
 /**
  * The listing of a job item. Provides ability to open, copy or share link.
  * @author Jason J.
- * @version 0.3.0-20140822
+ * @version 0.4.0-20141008
  */
 public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Class name for debugging purposes. */
@@ -187,18 +186,26 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		TextView jobTitle = (TextView)
 				rootView.findViewById(R.id.careerstack_careerItem_text_jobTitle);
 		jobTitle.setText(careerItem.getTitle());
+				
+		TextView companyEtc = (TextView)
+				rootView.findViewById(R.id.careerstack_careerItem_text_companyLocationEtc);
+		companyEtc.setText(careerItem.getCompanyLocationEtc());	
+		
+		
+		/* How tired was I when I wrote this? 
+		 * Job description needs parsing not company! */
 		
 		TextView jobDescription = (TextView)
 				rootView.findViewById(R.id.careerstack_careerItem_text_jobDescription);
-		jobDescription.setText(careerItem.getDescription());
 		
-		TextView companyEtc = (TextView)
-				rootView.findViewById(R.id.careerstack_careerItem_text_companyLocationEtc);
-		companyEtc.setText( /* Be warned: This will keep html styling; 
-								toString() will remove it. */
-					Html.fromHtml(careerItem.getCompanyLocationEtc()),  
-					BufferType.SPANNABLE
-				);	
+		jobDescription.setText(
+				/* Be warned: This will keep html styling; 
+				toString() will remove it. */
+					Html.fromHtml(
+								careerItem.getDescription()		
+							)
+					);
+		
 		
 		TextView updateDate = (TextView)
 				rootView.findViewById(R.id.careerstack_careerItem_text_updateDate);
@@ -307,7 +314,6 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.careerstack_careerItem_button_openLink:
 			launchUrl();

@@ -27,7 +27,6 @@ import java.util.TimeZone;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.text.Html;
 import android.util.Log;
 
 import com.ovrhere.android.careerstack.dao.CareerItem;
@@ -38,7 +37,7 @@ import com.ovrhere.android.careerstack.model.parsers.AbstractXmlParser;
  * <p>Remember that this is thread blocking; sleeping during {@link #pause()}
  * and yielding every {@value #YIELD_TAG_THROTTLE} tags (for throttling). </p>
  * @author Jason J.
- * @version 0.1.2-20140921
+ * @version 0.1.3-20141008
  * @see CareerStackOverflowRssRequest */
 public class CareersStackOverflowRssXmlParser 
 	extends AbstractXmlParser<List<CareerItem>> {	
@@ -161,7 +160,7 @@ public class CareersStackOverflowRssXmlParser
 				title = readText();	
 			} else if (name.equalsIgnoreCase(TAG_CAREER_DESCRIPTION)){
 				//we need to remove the &gt; and &lt; to < and >
-				description = Html.fromHtml(readText()).toString(); 	
+				description = readText(); 	
 			} else if (name.equalsIgnoreCase(TAG_CAREER_URL)){
 				url = readText();	
 			} else if (name.equalsIgnoreCase(TAG_CAREER_CATEGORY)){
