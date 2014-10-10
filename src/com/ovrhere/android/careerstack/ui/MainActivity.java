@@ -47,7 +47,7 @@ import com.ovrhere.android.careerstack.ui.fragments.dialogs.SearchBarDialogFragm
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.7.0-20141006
+ * @version 0.7.1-20141010
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnBackStackChangedListener, DialogInterface.OnClickListener,
@@ -797,7 +797,6 @@ public class MainActivity extends ActionBarActivity
 	public void onClick(DialogInterface dialog, int which) {
 		switch (which) {
 		case DialogInterface.BUTTON_POSITIVE:
-			dialog.dismiss(); //dismiss first for safety?
 			toggleDayNightMode();
 			break;
 
