@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,12 +17,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
+import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.utils.CompatClipboard;
 import com.ovrhere.android.careerstack.utils.ShareIntentUtil;
 import com.ovrhere.android.careerstack.utils.ToastManager;
@@ -28,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
 /**
  * The listing of a job item. Provides ability to open, copy or share link.
  * @author Jason J.
- * @version 0.4.0-20141008
+ * @version 0.4.1-20141009
  */
 public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Class name for debugging purposes. */
@@ -48,8 +53,27 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	final static private String KEY_SCROLL_POSITION_RATIO =
 			CLASS_NAME +".KEY_SCROLL_POSITION_RATIO";
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// End keys
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** The output date format string to use. */
 	final static private String DATE_FORMAT = "yyyy-MM-dd HH:mm";
+	
+	/** The dark theme css to use with {@link #HTML_WRAPPER}. */
+	final static private String CSS_DARK = "careeritem_darktheme";
+	/** The dark theme css to use with {@link #HTML_WRAPPER}. */
+	final static private String CSS_LIGHT = "careeritem_lighttheme";
+	
+	/** The wrapper for the content description html. Takes two strings:
+	 * <ul><ol>The css file name (Either #CSS_DARK or #CSS_LIGHT)</ol>
+	 * <ol>The html to render</ol></li>
+	 */
+	final static private String HTML_WRAPPER = "<!DOCTYPE html><html><head>"+
+			"<link rel='stylesheet' href='./careeritem_styling.css' type='text/css' media='screen'>" +
+			"<link rel='stylesheet' href='./%s.css' type='text/css' media='screen'>" +
+			"<!--This line refer the css file--></head>" +
+			"<body> %s </body></html>";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Start share constants
@@ -87,6 +111,8 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** The webview reference for proper destruction. */
+	private WebView wv_jobDescription = null; 
 	
 	/** The local instance of career item to display. */
 	private CareerItem careerItem = null;
@@ -154,6 +180,15 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		if (wv_jobDescription != null){
+			wv_jobDescription.post(new Runnable() {@Override
+				public void run() {
+					/* destroying is required or we get a:
+					 * java.lang.IllegalArgumentException:  bitmap exceeds 32 bits exception */
+					wv_jobDescription.destroy(); 
+				}
+			});
+		}
 		viewBuilt = false;
 	}
 	
@@ -191,21 +226,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 				rootView.findViewById(R.id.careerstack_careerItem_text_companyLocationEtc);
 		companyEtc.setText(careerItem.getCompanyLocationEtc());	
 		
-		
-		/* How tired was I when I wrote this? 
-		 * Job description needs parsing not company! */
-		
-		TextView jobDescription = (TextView)
-				rootView.findViewById(R.id.careerstack_careerItem_text_jobDescription);
-		
-		jobDescription.setText(
-				/* Be warned: This will keep html styling; 
-				toString() will remove it. */
-					Html.fromHtml(
-								careerItem.getDescription()		
-							)
-					);
-		
+		initJobDescription(rootView);
 		
 		TextView updateDate = (TextView)
 				rootView.findViewById(R.id.careerstack_careerItem_text_updateDate);
@@ -213,6 +234,35 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 				String.format(getString(R.string.careerstack_formatString_publishUpdateDate),
 						processDate(careerItem.getPublishDate()),
 						processDate(careerItem.getUpdateDate()))
+				);
+	}
+
+	/** Sets up the job description, including styling. */
+	@SuppressLint({ "InlinedApi", "NewApi" })
+	private void initJobDescription(View rootView) {
+		wv_jobDescription = (WebView)
+				rootView.findViewById(R.id.careerstack_careerItem_webview_jobDescription);
+		wv_jobDescription.setScrollContainer(false);
+		wv_jobDescription.setBackgroundColor(0x00000000);
+		
+		WebSettings webSettings = wv_jobDescription.getSettings();
+		//webSettings.setUseWideViewPort(true);
+		webSettings.setDefaultFontSize(14); //TODO abstract
+		webSettings.setSupportZoom(false);
+		
+		
+		/* Tried: wv_jobDescription.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		 * but to no avail
+		 */
+		
+		String htmlData = wrapDescription(careerItem.getDescription());
+		
+		wv_jobDescription.loadDataWithBaseURL( "file:///android_asset/", 
+				htmlData, "text/html", "UTF-8", null);		
+
+		wv_jobDescription.setContentDescription(
+				//strip html
+				Html.fromHtml(careerItem.getDescription()).toString()
 				);
 	}
 	
@@ -233,8 +283,32 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Utility section
+	/// Helper/Utility section
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	/** Uses the preference to determine whether to apply the dark or light theme. 
+	 * @param description The description to wrap and theme. */
+	private String wrapDescription(String description){
+		SharedPreferences prefs = PreferenceUtils.getPreferences(getActivity());
+		final String theme = prefs.getString(
+				getString(R.string.careerstack_pref_KEY_THEME_PREF), 
+				"");
+		String cssTheme = "";
+		if (theme.equals(getString(R.string.careerstack_pref_VALUE_THEME_LIGHT))){
+			//light theme
+			cssTheme = CSS_LIGHT; 
+					
+		} else {
+			//implied is dark theme or:
+			//if (theme.equals(getString(R.string.careerstack_pref_VALUE_THEME_DARK)))
+			cssTheme = CSS_DARK;
+		}
+		
+		return String.format(HTML_WRAPPER, cssTheme, description);
+		
+	}
+	
 	/** Launches internal url. */
 	private void launchUrl(){
 		String url = careerItem.getUrl();
@@ -246,6 +320,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 			Log.e(LOGTAG, "Unexpected error: "+ e);
 		}
 	}
+	
 	/** Copies url. */
 	private void copyUrl(){
 		String url = careerItem.getUrl();
@@ -307,6 +382,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		dateFormat.setTimeZone(TimeZone.getDefault());
 		return dateFormat.format(date);
 	}
+
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Implements listeners

@@ -91,15 +91,16 @@
 		android:textColor="@color/careerstack_translucent_grey"
 		/>
 
-	    <TextView
-		android:id="@+id/careerstack_careerItem_text_jobDescription"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
-		android:text="Description: Willing to program in exchange for currency"
-		android:textAppearance="?android:attr/textAppearanceMedium"
-		tools:ignore="HardcodedText" />
-
+	    <WebView
+	        android:id="@+id/careerstack_careerItem_webview_jobDescription"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
+	        
+	        android:text="Description: Willing to program in exchange for currency"
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        	        
+	        tools:ignore="HardcodedText,WebViewLayout" />
 
 	</LinearLayout>
 </ScrollView>

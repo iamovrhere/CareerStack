@@ -1,0 +1,29 @@
+@CHARSET "UTF-8";
+/**
+ * Defines styles for all types of career items.
+ */
+ 
+ 
+ /** Default size and color. */
+   body {
+   	background: rgba(0, 0, 0, 0);
+	font-size: 14pt;
+	color: red;
+  }
+ 
+ /**
+  * Defines the font color strong text
+  */
+  strong {
+	/** An orange with some transparency. */
+	/* color: #E07614; + arbitrary transparency */ 
+	color: rgba(224, 118, 20, 200);
+  }
+
+
+/**
+  * Defines the size for paragraph strong text. 
+  */
+  p strong {
+  	font-size: 16pt;
+  }

@@ -1,0 +1,10 @@
+@CHARSET "UTF-8";
+/**
+ * Defines styles for all light theme career items.
+ */
+  
+ /** Change font color. */
+   body {
+   /** Equivalent to #EFEFEF with 90% opacity or E5  */
+	color: rgba(239, 239, 239, 229);
+  }
