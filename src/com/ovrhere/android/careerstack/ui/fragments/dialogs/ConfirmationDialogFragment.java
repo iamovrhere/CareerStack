@@ -27,13 +27,14 @@ import android.util.Log;
 /** Simple confirmation dialog that retains it's instance.
  * Give a title, message, positive, negative buttons.
  * Requires either activity to implement 
- * DialogInterface.OnClickListener or 
- * call {@link Builder#setTargetFragment(Fragment, int)}
+ * {@link DialogInterface#OnClickListener} or 
+ * call {@link Builder#setTargetFragment(Fragment, int)}. 
+ * Note that upon a given button press, the dialog dismisses itself.
  * @author Jason J.
- * @version 0.1.0-20140923
+ * @version 0.2.0-20141010
  */
 public class ConfirmationDialogFragment extends DialogFragment 
-	implements DialogInterface.OnClickListener {
+	implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = ConfirmationDialogFragment.class
 			.getSimpleName();
@@ -62,7 +63,7 @@ public class ConfirmationDialogFragment extends DialogFragment
 	
 	/** The optional listener that is sometimes activity. Can be null. */
 	private DialogInterface.OnClickListener mListener = null;
-	
+		
 	protected ConfirmationDialogFragment() {}
 	
 	@Override
@@ -102,6 +103,7 @@ public class ConfirmationDialogFragment extends DialogFragment
 					.setIcon(android.R.drawable.ic_dialog_alert)
 					.setPositiveButton(positiveResource, this)
 					.setNegativeButton(negativeResource, this)
+					.setOnCancelListener(this)
 					.create();
 	}
 	
@@ -110,8 +112,9 @@ public class ConfirmationDialogFragment extends DialogFragment
 	 */
 	@Override
 	public void onDestroyView() {
-	  if (getDialog() != null && getRetainInstance())
+	  if (getDialog() != null && getRetainInstance()){
 	    getDialog().setOnDismissListener(null);
+	  }
 	  super.onDestroyView();
 	}
 	
@@ -184,23 +187,29 @@ public class ConfirmationDialogFragment extends DialogFragment
 	
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
+		dialog.dismiss();
 		if (mListener != null && getTargetFragment() == null){
 			//only if we have a listener and target fragment.
-			mListener.onClick(dialog, which);
+			mListener.onClick(dialog, which);			
 			return;
 		}
 		switch (which) {
 		case DialogInterface.BUTTON_POSITIVE:
 			getTargetFragment().onActivityResult(getTargetRequestCode(), 
-					Activity.RESULT_OK, null);
-			dialog.dismiss();
+					Activity.RESULT_OK, null);			
 			break;
 		case DialogInterface.BUTTON_NEGATIVE:
 			getTargetFragment().onActivityResult(getTargetRequestCode(), 
 					Activity.RESULT_CANCELED, null);
-			dialog.dismiss();
 			break;
 		}		
+	}
+	
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		super.onCancel(dialog);
+		//if cancelled, send negative click
+		onClick(getDialog(), DialogInterface.BUTTON_NEGATIVE);
 	}
 	
 }
