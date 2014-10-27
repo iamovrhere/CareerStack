@@ -28,4 +28,12 @@
     
     <!-- The speed of the search bar animation -->
     <item name="careerstack_searchBar_speed" type="integer">220</item>
+    
+    
+    <!-- The minimum size required before showing ads -->
+    <item name="careerstack_listview_ad_minSize" type="integer">5</item>
+    <!-- Zero-indexed row where the first ad will be shown in list view. -->
+    <item name="careerstack_listview_ad_start" type="integer">3</item>
+    <!-- Frequency of ads in list view. -->
+    <item name="careerstack_listview_ad_frequency" type="integer">25</item>
 </resources>

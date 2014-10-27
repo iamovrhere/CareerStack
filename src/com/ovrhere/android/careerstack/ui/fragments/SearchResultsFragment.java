@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -23,6 +24,7 @@ import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
 import com.ovrhere.android.careerstack.model.CareersStackOverflowModel;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
+import com.ovrhere.android.careerstack.ui.adapters.AdViewListAdapter;
 import com.ovrhere.android.careerstack.ui.adapters.CareerItemFilterListAdapter;
 import com.ovrhere.android.careerstack.utils.UnitCheck;
 
@@ -31,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.4.1-20141008
+ * @version 0.5.0-20141027
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -109,6 +111,9 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	private ArrayList<CareerItem> careerList = new ArrayList<CareerItem>();	
 	/** The adapter for the results. */
 	private CareerItemFilterListAdapter resultAdapter = null;
+	/** The adapter that is applied. 
+	 * May either be {@link #resultAdapter} directly or an {@link AdViewListAdapter}. */
+	private BaseAdapter appliedAdapter = null;
 	
 	
 	/** If the fragment is currently loading results. */
@@ -278,9 +283,14 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/** Initializes the output views. */
 	private void initOutputs(View rootView){
 		resultAdapter = new CareerItemFilterListAdapter(getActivity());
+		
+		//TODO add check for ads
+		appliedAdapter = new AdViewListAdapter(getActivity(), resultAdapter);
+		//TODO handle offset
+		
 		lv_resultsView = (ListView)
 				rootView.findViewById(R.id.careerstack_searchResults_list_searchResults);
-		lv_resultsView.setAdapter(resultAdapter);
+		lv_resultsView.setAdapter(appliedAdapter);
 		lv_resultsView.setOnItemClickListener(this);
 		
 		retryContainer =
@@ -446,10 +456,12 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		CareerItem item = resultAdapter.getItem(position);
-		if (item != null){
-			mFragInteractionListener.onCareerItemRequest(item);
-		}
+		try{
+			CareerItem item = (CareerItem) appliedAdapter.getItem(position);
+			if (item != null){
+				mFragInteractionListener.onCareerItemRequest(item);
+			}
+		} catch (ClassCastException e){}
 	}
 	
 	@SuppressWarnings("unchecked")
