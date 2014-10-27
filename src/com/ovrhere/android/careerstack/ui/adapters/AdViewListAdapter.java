@@ -28,14 +28,10 @@ import com.ovrhere.android.careerstack.R;
 /** Uses decorator pattern to present the list results wrapped with ads dispersed 
  * between.
  * @author Jason J.
- * @version 0.1.0-20141027
+ * @version 0.1.1-20141027
  */
 public class AdViewListAdapter extends BaseAdapter {
-	/** Whether or not debugging. */
-	final static private boolean DEBUG = true;
-	
-
-	/** The activity used for building ads. */
+		/** The activity used for building ads. */
 	final private Activity activity;
 	/** The actual list being shown. */
 	final private BaseAdapter delegate;
@@ -46,6 +42,9 @@ public class AdViewListAdapter extends BaseAdapter {
 	final private int firstAdPosition;
 	/** The position of ads throughout. */
 	final private int adFrequency;
+	
+	/** Whether or not the list is currently debugging. */
+	private boolean debugging = false;
 	
 	/** Builds list view wrapper for showing ads. 
 	 * @param activity The activity to build ads with
@@ -72,11 +71,14 @@ public class AdViewListAdapter extends BaseAdapter {
 		this.adFrequency = activity.getResources()
 				.getInteger(R.integer.careerstack_listview_ad_frequency);
 		
+		this.debugging = activity.getResources()
+				.getBoolean(R.bool.careerstack_listview_ad_debugging);
+		
 		if (minimumSize <= 0 || firstAdPosition <= 0 || adFrequency <= 0){
 			throw new IllegalArgumentException("Cannot have resource integers <=0");
 		}
 	}
-	
+		
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Overridden methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +113,7 @@ public class AdViewListAdapter extends BaseAdapter {
 			//else, create ads
 			
 			AdView adview = null;
-			if (DEBUG){ //when debugging, provide debugging. 
+			if (debugging){ //when debugging, provide debugging. 
 				adview = AdViewUtil.createTestAdView(activity);
 			} else {
 				adview = AdViewUtil.createAdView(activity);

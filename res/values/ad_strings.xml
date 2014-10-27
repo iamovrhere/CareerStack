@@ -25,4 +25,7 @@
     
     <!-- The test devices ids used -->
     <string name="careerstack_test_devices">TEST_EMULATOR</string>
+    
+    <!-- The current debugging mode -->
+    <item name="careerstack_listview_ad_debugging" type="bool">1</item>
 </resources>
