@@ -33,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.5.0-20141027
+ * @version 0.5.1-20141027
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -284,10 +284,14 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	private void initOutputs(View rootView){
 		resultAdapter = new CareerItemFilterListAdapter(getActivity());
 		
-		//TODO add check for ads
-		appliedAdapter = new AdViewListAdapter(getActivity(), resultAdapter);
-		//TODO handle offset
-		
+		if (prefs.getBoolean(
+				getString(R.string.careerstack_pref_KEY_ADS_AND_FEATURES), false)){
+			//set ads
+			appliedAdapter = new AdViewListAdapter(getActivity(), resultAdapter);
+		} else {
+			appliedAdapter = resultAdapter; //turn off ads
+		}
+				
 		lv_resultsView = (ListView)
 				rootView.findViewById(R.id.careerstack_searchResults_list_searchResults);
 		lv_resultsView.setAdapter(appliedAdapter);

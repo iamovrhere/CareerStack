@@ -33,6 +33,13 @@
 	/>
     
     
+    
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_ADS_AND_FEATURES"
+        android:title="@string/careerstack_settings_adsAndFeatures_title"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_ADS_AND_FEATURES"
+	/>
+    
     <CheckBoxPreference 
         android:key="@string/careerstack_pref_KEY_QUICK_THEME_SWITCH"
         android:title="@string/careerstack_settings_quickSwitch_title"

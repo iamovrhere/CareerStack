@@ -25,7 +25,7 @@ import com.ovrhere.android.careerstack.R;
  * Preference Utility for handling the preferences and the preference container.
  * Has ability to set defaults. Requires <code>preference_info.xml</code>
  * @author Jason J.
- * @version 0.4.0-20141003
+ * @version 0.5.0-20141027
  */
 public class PreferenceUtils {
 	/* The class name. */
@@ -111,6 +111,11 @@ public class PreferenceUtils {
 		prefEdit.putString(
 				r.getString(R.string.careerstack_pref_KEY_THEME_PREF),
 			r.getString(R.string.careerstack_pref_DEF_VALUE_THEME_PREF)
+		);
+		
+		prefEdit.putBoolean(
+				r.getString(R.string.careerstack_pref_KEY_ADS_AND_FEATURES),
+			r.getBoolean(R.bool.careerstack_pref_DEF_VALUE_ADS_AND_FEATURES)
 		);
 		
 		//first run has completed.

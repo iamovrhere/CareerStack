@@ -15,7 +15,7 @@
    limitations under the License.
 -->
 <resources>
-    <!-- Version 0.4.0  -->
+    <!-- Version 0.5.0  -->
     <eat-comment />
     <!-- The string used as the preference file name. -->
     <string name="careerstack_PREFERENCE_FILE_KEY" >
@@ -52,15 +52,18 @@
     <string name="careerstack_pref_KEY_RELOCATION_OFFERED" >
         careerstack_pref_KEY_RELOCATION_OFFERED
     </string>
+    
     <!-- Int key. The distance input.  -->
     <string name="careerstack_pref_KEY_DISTANCE_VALUE" >
         careerstack_pref_KEY_DISTANCE_VALUE
     </string>
+    
      <!-- String key. The prefered theme; either 
      careerstack_pref_VALUE_THEME_DARK or careerstack_pref_VALUE_THEME_LIGHT.  -->
     <string name="careerstack_pref_KEY_THEME_PREF" >
         careerstack_pref_KEY_THEME_PREF
     </string>
+    
      <!-- String key. The last keywords entered.  -->
     <string name="careerstack_pref_KEY_KEYWORDS_VALUE" >
         careerstack_pref_KEY_KEYWORDS_VALUE
@@ -69,6 +72,15 @@
     <string name="careerstack_pref_KEY_LOCATION_VALUE" >
         careerstack_pref_KEY_LOCATION_VALUE
     </string>
+    
+     <!-- Boolean key. Whehter or not to allows ads + additional features.  -->
+    <string name="careerstack_pref_KEY_ADS_AND_FEATURES" >
+        careerstack_pref_KEY_ADS_AND_FEATURES
+    </string>    
+    
+    
+    
+    
     
     <!-- Potential values. -->
     <eat-comment />
@@ -79,6 +91,9 @@
 	<string name="careerstack_pref_VALUE_THEME_LIGHT"
 	    >careerstack_pref_VALUE_THEME_LIGHT</string>
     
+	
+	
+	
     <!-- Preference Default Values. Some of these may change according to locale.  -->
 	<eat-comment />
 	<!-- Default Value to careerstack_pref_KEY_USE_MILES -->
@@ -106,5 +121,10 @@
 	<!-- Default value for careerstack_pref_KEY_THEME_PREF -->
 	<string name="careerstack_pref_DEF_VALUE_THEME_PREF"
 	    >@string/careerstack_pref_VALUE_THEME_DARK</string>
+	
+	
+	 <!-- Default value for careerstack_pref_KEY_ADS_AND_FEATURES -->
+    <item name="careerstack_pref_DEF_VALUE_ADS_AND_FEATURES" 
+         type="bool">1</item>  
 	
 </resources>
