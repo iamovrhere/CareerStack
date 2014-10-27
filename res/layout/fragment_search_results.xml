@@ -20,8 +20,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     
-    android:paddingLeft="@dimen/frag_search_horizontal_margin"
-    android:paddingRight="@dimen/frag_search_horizontal_margin"
+    
      >
 
 
@@ -33,6 +32,9 @@
         android:layout_weight="1.0"
         android:gravity="center"
         android:visibility="gone"
+        
+        android:paddingLeft="@dimen/frag_search_horizontal_margin"
+    	android:paddingRight="@dimen/frag_search_horizontal_margin"
          >
 	     <ProgressBar
 	        style="?android:attr/progressBarStyleLarge"
@@ -58,6 +60,9 @@
         android:layout_weight="1.0"
         android:gravity="center"
         android:visibility="gone"
+        
+        android:paddingLeft="@dimen/frag_search_horizontal_margin"
+    	android:paddingRight="@dimen/frag_search_horizontal_margin"
          >
 	    	<TextView 
 	    	    android:layout_width="wrap_content"

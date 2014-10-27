@@ -31,6 +31,10 @@
     <!-- Search frag screen margins -->
     <dimen name="frag_search_horizontal_margin">9dp</dimen>
     
+    <!-- Search frag screen margins -->
+    <dimen name="row_list_horizontal_padding">12dp</dimen>
+    
+    
     <!-- Sizes for main frag -->
     <eat-comment />
     <!-- The maximum allowed width for the text input.  This will allow 
