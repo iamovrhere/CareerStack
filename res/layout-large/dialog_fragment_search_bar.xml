@@ -54,14 +54,12 @@
         android:id="@+id/careerstack_searchBar_container_checks"
         android:layout_below="@+id/careerstack_searchBar_container_edits"
         android:layout_alignRight="@+id/careerstack_searchBar_container_edits"
-        android:layout_alignLeft="@+id/careerstack_searchBar_imgbutton_cancel"
+        android:layout_alignLeft="@+id/careerstack_searchBar_container_edits"
         
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical|center_horizontal"
-        
-        android:paddingLeft="@dimen/searchbar_horizontal_margin"
         >
 			
          <Button
@@ -97,10 +95,8 @@
 	        android:maxLines="1"
 	        android:ellipsize="end"
 	        />
-
-    </LinearLayout>
-
-     <Button
+	    
+	    <Button
          android:id="@+id/careerstack_searchBar_button_search"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
@@ -109,5 +105,7 @@
          android:contentDescription="@android:string/search_go"
          android:gravity="center"
          android:text="@android:string/search_go" />
+
+    </LinearLayout>     
     
 </RelativeLayout>
