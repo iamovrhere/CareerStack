@@ -97,8 +97,23 @@
     <string name="careerstack_searchBar_check_offersRelocation"
         >Relocation</string>
     
-    <!-- Simply no matching results statement. -->
-    <string name="careerstack_careerlist_noResults">No matching results</string>
+    <!-- Simply No matching results statement.-->
+    <string name="careerstack_careerlist_noResults" 
+        >No matching results</string>
+    
+    <!-- No matching results statement, takes one term. TODO translate -->
+    <string name="careerstack_careerlist_noResults_stub" 
+        >No matching results for \"%1$s\"</string>
+    
+    <!-- Matching results statement, takes one term. TODO translate -->
+    <string name="careerstack_careerlist_matchingResults_stub" 
+        >Matching results for \"%1$s\"</string>
+    
+    <!-- Simply "Matching results" statement. TODO translate -->
+    <string name="careerstack_careerlist_matchingResults">Matching results</string>
+    
+    <!-- Results near statement, takes 1 statment. TODO translate -->
+    <string name="careerstack_careerlist_resultsNear">\u0020near %1$s</string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment />

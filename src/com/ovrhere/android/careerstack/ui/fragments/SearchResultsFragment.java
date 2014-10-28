@@ -33,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.5.1-20141027
+ * @version 0.6.0-20141028
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -341,6 +341,11 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 						Log.e(LOGTAG, "Career list mistmatched class?" + e);
 					}
 			}
+			if (prevQuery == null){
+				prevQuery = getArguments();
+			}
+			setSearchTerms();
+			
 		} catch (Exception e){
 			if (DEBUG){
 				Log.e(LOGTAG, "This should not be happening: " + e);
@@ -374,6 +379,18 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			}
 			Log.d(LOGTAG, "careerList size: " + careerList.size());
 		}
+	}
+	
+	/** Sets the search terms for the adapter. */
+	private void setSearchTerms(){
+		if (prevQuery == null){
+			prevQuery = new Bundle();
+		}
+		resultAdapter.setSearchTerms(
+				prevQuery.getString(KEY_KEYWORD_TEXT), 
+				prevQuery.getString(KEY_LOCATION_TEXT), 
+				prevQuery.getBoolean(KEY_REMOTE_ALLOWED, false), 
+				prevQuery.getBoolean(KEY_RELOCATE_OFFER, false));		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -493,7 +510,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 							@SuppressWarnings("unused")
 							CareerItem item = careerList.get(0);
 						}
+						
 						resultAdapter.setCareerItems(careerList);
+						setSearchTerms();
+						
 					} catch (ClassCastException e){
 						Log.e(LOGTAG, "Mismatched class? How irregular: " + e );
 					}

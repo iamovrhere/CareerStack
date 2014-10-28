@@ -36,7 +36,7 @@ import com.ovrhere.android.careerstack.dao.CareerItem;
 /** The career item filter list adapter.
  * <p><b>Filtering will be done at a later date.</b></p>
  * @author Jason J.
- * @version 0.3.1-20140923
+ * @version 0.4.0-20141028
  */
 public class CareerItemFilterListAdapter extends BaseAdapter implements
 		Filterable {
@@ -49,6 +49,8 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** The current inflater in use. */
 	private LayoutInflater inflater = null;
+	/** The local context. */
+	private Context mContext = null;
 	
 	/** The list of all career items. */
 	private List<CareerItem> careerItems = new ArrayList<CareerItem>();
@@ -56,14 +58,25 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 	 * <code>android.R.layout.simple_list_item_2</code> */
 	private int layoutResource = R.layout.row_my_simple_list_item; 
 	
+	/** The first row message. */
+	private String firstRowMessage = "";	
+	/** The empty message. */
+	private String emptyMessage = "";
+	/** The sub text message. */
+	private String subTitleMessage = "";
+	
 	/** Builds the adapter using the layout:
 	 * <code>android.R.layout.simple_list_item_2</code>
 	 * @param context The current context. 	 */
 	public CareerItemFilterListAdapter(Context context) {
 		this.inflater = (LayoutInflater) 
 				context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.mContext = context;
+		this.emptyMessage = 
+				mContext.getString(R.string.careerstack_careerlist_noResults);
 		
 	}
+	
 	/** Resets the career items to be new set. 
 	 * @param careerItems The career items to reset to.
 	 */
@@ -71,6 +84,53 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 		this.careerItems.clear();
 		this.careerItems.addAll(careerItems);
 		notifyDataSetChanged();
+	}
+	
+	/** Sets the search terms to give in the first row	 */
+	public void setSearchTerms(String keyword, String location, 
+			boolean remote, boolean relocation) {
+		emptyMessage = "";
+		firstRowMessage = "";
+		subTitleMessage = "";
+		
+		//set keyword
+		if (keyword.isEmpty()){
+			emptyMessage = 
+					mContext.getString(R.string.careerstack_careerlist_noResults);
+			firstRowMessage = 
+					mContext.getString(R.string.careerstack_careerlist_matchingResults);
+		} else {
+			emptyMessage = 
+					mContext.getString(R.string.careerstack_careerlist_noResults_stub,
+							keyword);
+			firstRowMessage = 
+					mContext.getString(R.string.careerstack_careerlist_matchingResults_stub,
+							keyword);
+		}
+		
+		String nearLocation = "";
+		//set location		
+		if (!location.isEmpty()){			
+			nearLocation = mContext.getString(R.string.careerstack_careerlist_resultsNear,
+					location);
+		}
+		emptyMessage += nearLocation;
+		firstRowMessage += nearLocation;
+		
+		
+		//set subtitle
+		if (remote){
+			subTitleMessage = 
+					mContext.getString(R.string.careerstack_main_check_workRemotely);
+		}
+		if (relocation){
+			if (!subTitleMessage.isEmpty()) {
+				subTitleMessage += " + ";
+			}
+			subTitleMessage += 
+					mContext.getString(R.string.careerstack_main_check_offersRelocation);
+		}
+		subTitleMessage = "( "+subTitleMessage+" )";
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,12 +144,12 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 		
 	/**
 	 * {@inheritDoc}
-	 * @return The count of items or 1 when empty
+	 * @return The count of items + 1 (empty is 1).
 	 * @see #isEmpty()
 	 */
 	@Override
 	public int getCount() {
-		return careerItems.size() > 0 ? careerItems.size()  : 1 ;
+		return careerItems.size() + 1;
 	}
 
 	/** 
@@ -98,7 +158,7 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 	 */
 	@Override
 	public CareerItem getItem(int position) {
-		return careerItems.size() > 0 ? careerItems.get(position) : null;
+		return position > 0 ? careerItems.get(position - 1) : null;
 	}
 
 	@Override
@@ -124,12 +184,22 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 		}
 		//if no results, return no results message.
 		if (careerItems.size() <= 0){
-			holder.jobTitle.setText(R.string.careerstack_careerlist_noResults);
+			holder.jobTitle.setText(emptyMessage);
 			holder.jobTitle.setGravity(Gravity.CENTER);
-			holder.companyLocationEtc_andDate.setText(""); // no text
+			holder.companyLocationEtc_andDate.setText(subTitleMessage);
+			holder.companyLocationEtc_andDate.setGravity(Gravity.CENTER);
+			return convertView;
+		} else if (position == 0){
+			//give top row message
+			holder.jobTitle.setText(firstRowMessage);
+			holder.jobTitle.setGravity(Gravity.CENTER);
+			holder.companyLocationEtc_andDate.setText(subTitleMessage); 
+			holder.companyLocationEtc_andDate.setGravity(Gravity.CENTER);
 			return convertView;
 		} else {
+			position--; //reduce index to match
 			holder.jobTitle.setGravity(Gravity.LEFT);
+			holder.companyLocationEtc_andDate.setGravity(Gravity.LEFT);
 		}
 		
 		CareerItem item = careerItems.get(position);
