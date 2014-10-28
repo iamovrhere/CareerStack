@@ -49,6 +49,15 @@
 		    android:contentDescription="@string/careerstack_img_poweredBy_contentDescription"
 		    android:src="@drawable/ic_powered_by_stackoverflow" />
         
+		
+		<View 
+	        android:id="@+id/careerstack_main_edit_widthDummy"
+	        android:visibility="invisible"
+	        android:layout_centerHorizontal="true"
+	        android:layout_height="1dp"
+	        style="@style/careerstack_main_editin_width"
+	        />
+		
 	    <EditText
 	        android:id="@+id/careerstack_main_editin_keywords"
 	        android:layout_height="wrap_content"
@@ -56,6 +65,8 @@
 	        style="@style/careerstack_main_text_width"
 	        	        
 	        android:layout_below="@+id/careerstack_main_img_poweredBy"
+	        android:layout_alignLeft="@+id/careerstack_main_edit_widthDummy"
+	        android:layout_alignRight="@+id/careerstack_main_edit_widthDummy"
 	        android:layout_centerHorizontal="true"
 	        android:layout_marginTop="@dimen/careerstack_main_poweredBy_marginBottom"
 	        android:ems="10"
@@ -71,6 +82,8 @@
 	        style="@style/careerstack_main_text_width"
 	        android:layout_height="wrap_content"
 	        android:layout_below="@+id/careerstack_main_editin_keywords"
+	        android:layout_alignLeft="@+id/careerstack_main_edit_widthDummy"
+	        android:layout_alignRight="@+id/careerstack_main_edit_widthDummy"
 	        android:layout_centerHorizontal="true"
 	        android:layout_marginTop="@dimen/careerstack_main_text_marginTop"
 	        android:ems="10"
@@ -101,15 +114,28 @@
 	        android:layout_height="wrap_content"
 	        android:layout_below="@+id/careerstack_main_viewStub_distance"
 	        android:layout_alignLeft="@+id/careerstack_main_editin_keywords"
+	        android:layout_alignRight="@+id/careerstack_main_check_centerDummy"
 	        android:layout_marginTop="@dimen/careerstack_main_interView_marginTop" 
 	        android:layout_marginLeft="@dimen/careerstack_main_allowRemote_marginLeft"
 	        android:text="@string/careerstack_main_check_workRemotely" />
 	
+	    <!-- Used to mimic layout weight in relative -->
+	    <View 
+	        android:id="@+id/careerstack_main_check_centerDummy"
+	        android:layout_height="1dp"
+	        android:layout_width="1dp"
+	        android:visibility="invisible"
+	        android:layout_centerHorizontal="true"
+	        />
+	    
 	    <CheckBox
 	        android:id="@+id/careerstack_main_check_offerRelocation"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_below="@+id/careerstack_main_viewStub_distance"
+	        android:layout_alignLeft="@+id/careerstack_main_check_centerDummy"
+	        android:layout_alignRight="@+id/careerstack_main_viewStub_distance"
+	        
 	        android:layout_toRightOf="@+id/careerstack_main_check_allowRemote"
 	        android:layout_marginTop="@dimen/careerstack_main_interView_marginTop" 	        
 	        android:layout_marginLeft="@dimen/careerstack_main_relocate_marginLeft"

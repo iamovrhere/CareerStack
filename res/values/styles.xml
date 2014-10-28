@@ -141,6 +141,12 @@
         <!-- The colour of the x miles/km text -->
         <item  name="careerstack_distance_color" >@android:color/primary_text_dark</item>
 	</style>
+	
+    
+    <!-- Sets the width of a dummy value -->
+    <style name="careerstack_main_editin_width">
+        <item name="android:layout_width">match_parent</item>
+    </style>
 
 
 </resources>
