@@ -15,10 +15,10 @@
    limitations under the License.
 -->
 <resources>
-    <!-- Version 0.5.0  -->
+    <!-- Version 0.6.0  -->
     <eat-comment />
     <!-- The string used as the preference file name. -->
-    <string name="careerstack_PREFERENCE_FILE_KEY" >
+    <string name="preferenceutil_PREFERENCE_FILE_KEY" >
         com_ovrhere_careerstack_PREFERENCE_FILE_KEY
     </string>
     
@@ -73,10 +73,16 @@
         careerstack_pref_KEY_LOCATION_VALUE
     </string>
     
-     <!-- Boolean key. Whehter or not to allows ads + additional features.  -->
+     <!-- Boolean key. Whether or not to allows ads + additional features.  -->
     <string name="careerstack_pref_KEY_ADS_AND_FEATURES" >
         careerstack_pref_KEY_ADS_AND_FEATURES
-    </string>    
+    </string>   
+    
+     <!-- Boolean key. Whether or not to use tablet layout; 
+     dependant on careerstack_pref_KEY_ADS_AND_FEATURES.  -->
+    <string name="careerstack_pref_KEY_USE_TABLET_LAYOUT" >
+        careerstack_pref_KEY_USE_TABLET_LAYOUT
+    </string> 
     
     
     
@@ -92,7 +98,7 @@
 	    >careerstack_pref_VALUE_THEME_LIGHT</string>
     
 	
-	
+		
 	
     <!-- Preference Default Values. Some of these may change according to locale.  -->
 	<eat-comment />
@@ -126,5 +132,9 @@
 	 <!-- Default value for careerstack_pref_KEY_ADS_AND_FEATURES -->
     <item name="careerstack_pref_DEF_VALUE_ADS_AND_FEATURES" 
          type="bool">1</item>  
+         
+    <!-- Default value for  careerstack_pref_KEY_USE_TABLET_LAYOUT-->
+    <item name="careerstack_pref_DEF_VALUE_USE_TABLET_LAYOUT" 
+        type="bool">@bool/careerstack_has_tablet_mode</item>   
 	
 </resources>

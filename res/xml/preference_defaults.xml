@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Copyright 2014 Jason J.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_USE_MILES"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_USE_MILES"        
+	/>
+    
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_KEEP_SEARCH_SETTINGS" 
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_KEEP_SEARCH_SETTINGS"
+	/>
+    
+     <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_QUICK_THEME_SWITCH"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_QUICK_THEME_SWITCH"
+	/>
+    
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_ADS_AND_FEATURES"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_ADS_AND_FEATURES"
+	/> 
+	
+     <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_USE_TABLET_LAYOUT"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_USE_TABLET_LAYOUT"
+	/> 
+    
+    <Preference 
+        android:key="@string/careerstack_pref_KEY_DISTANCE_VALUE" 
+        android:defaultValue="@integer/careerstack_pref_DEF_VALUE_DISTANCE_VALUE"/>
+    
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_REMOTE_ALLOWED"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_REMOTE_ALLOWED"
+	/> 
+	
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_RELOCATION_OFFERED"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_RELOCATION_OFFERED"
+	/> 
+	
+    <Preference 
+        android:key="@string/careerstack_pref_KEY_THEME_PREF"
+        android:defaultValue="@string/careerstack_pref_DEF_VALUE_THEME_PREF" 
+    />
+    
+</PreferenceScreen>
+

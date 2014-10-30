@@ -17,7 +17,7 @@ package com.ovrhere.android.careerstack.prefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
+import android.preference.PreferenceManager;
 
 import com.ovrhere.android.careerstack.R;
 
@@ -25,7 +25,7 @@ import com.ovrhere.android.careerstack.R;
  * Preference Utility for handling the preferences and the preference container.
  * Has ability to set defaults. Requires <code>preference_info.xml</code>
  * @author Jason J.
- * @version 0.5.0-20141027
+ * @version 0.6.0-20141030
  */
 public class PreferenceUtils {
 	/* The class name. */
@@ -43,6 +43,9 @@ public class PreferenceUtils {
 	 */
 	static public boolean isFirstRun(Context context){
 		SharedPreferences prefs = getPreferences(context);
+		//set any missing preferences if not set, ignores the rest
+		_setDefaults(context); 
+		
 		//if the default value not set, then true.
 		return (prefs.getBoolean(KEY_PREFERENCES_SET, !VALUE_PREFERENCES_SET) 
 				== !VALUE_PREFERENCES_SET);
@@ -54,71 +57,40 @@ public class PreferenceUtils {
 		/* This is safe as SharedPreferences is a shared instance for the application
 		 * and thus will not leak.		 */
 		context = context.getApplicationContext();
+		
 		return context.getSharedPreferences(
-				context.getResources().getString(R.string.careerstack_PREFERENCE_FILE_KEY), 
+				context.getResources().getString(R.string.preferenceutil_PREFERENCE_FILE_KEY), 
 				Context.MODE_PRIVATE); 
 	}
 	
-	/** Sets the application's preferences using the default values. 
+	/** Resets application's preferences to the default values. 
 	 * @param context The current context to be used. 
 	 * @see res/values/preferences_info.xml */
 	static public void setToDefault(Context context){
 		SharedPreferences.Editor prefs = getPreferences(context).edit();
-		Resources r = context.getResources();		
-		_setDefaults(r, prefs);		
-		prefs.commit();
+		prefs.clear().commit();	
+		_setDefaults(context.getApplicationContext());
+		
+		//first run has completed.
+		prefs	.putBoolean(KEY_PREFERENCES_SET, VALUE_PREFERENCES_SET)
+				.commit();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Utility functions
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	/** Sets defaults. Does not commit.
-	 * @param r The {@link Resources} manager to use getting strings from 
-	 * res/values/preferences_info.xml
-	 * @param prefEdit The {@link SharedPreferences} editor to use to commit. */
-	static private void _setDefaults(Resources r, SharedPreferences.Editor prefEdit){
-		//Thought: Consider using parallel arrays in res to respect open-close?
-		prefEdit.putBoolean(
-				r.getString(R.string.careerstack_pref_KEY_USE_MILES),
-			r.getBoolean(R.bool.careerstack_pref_DEF_VALUE_USE_MILES)
-		);
-		
-		prefEdit.putBoolean(
-				r.getString(R.string.careerstack_pref_KEY_KEEP_SEARCH_SETTINGS),
-			r.getBoolean(R.bool.careerstack_pref_DEF_VALUE_KEEP_SEARCH_SETTINGS)
-		);
-		
-		prefEdit.putBoolean(
-				r.getString(R.string.careerstack_pref_KEY_QUICK_THEME_SWITCH),
-			r.getBoolean(R.bool.careerstack_pref_DEF_VALUE_QUICK_THEME_SWITCH)
-		);
-		
-		
-		prefEdit.putBoolean(
-				r.getString(R.string.careerstack_pref_KEY_REMOTE_ALLOWED),
-			r.getBoolean(R.bool.careerstack_pref_DEF_VALUE_REMOTE_ALLOWED)
-		);		
-		prefEdit.putBoolean(
-				r.getString(R.string.careerstack_pref_KEY_RELOCATION_OFFERED),
-			r.getBoolean(R.bool.careerstack_pref_DEF_VALUE_RELOCATION_OFFERED)
-		);
-		
-		prefEdit.putInt(
-				r.getString(R.string.careerstack_pref_KEY_DISTANCE_VALUE),
-			r.getInteger(R.integer.careerstack_pref_DEF_VALUE_DISTANCE_VALUE)
-		);
-		
-		prefEdit.putString(
-				r.getString(R.string.careerstack_pref_KEY_THEME_PREF),
-			r.getString(R.string.careerstack_pref_DEF_VALUE_THEME_PREF)
-		);
-		
-		prefEdit.putBoolean(
-				r.getString(R.string.careerstack_pref_KEY_ADS_AND_FEATURES),
-			r.getBoolean(R.bool.careerstack_pref_DEF_VALUE_ADS_AND_FEATURES)
-		);
-		
-		//first run has completed.
-		prefEdit.putBoolean(KEY_PREFERENCES_SET, VALUE_PREFERENCES_SET);
-	}		
+	
+	/** Sets defaults. Requires  R.xml.preference_defaults xml file 
+	 * Note: does not overwrite them; must be cleared first.
+	 * @param context The current context */
+	static private void _setDefaults(Context context){
+		PreferenceManager.setDefaultValues(
+				context,
+				context.getResources().getString(
+						R.string.preferenceutil_PREFERENCE_FILE_KEY),
+				Context.MODE_PRIVATE,
+				R.xml.preference_defaults, 
+				true);
+	}
+
 }

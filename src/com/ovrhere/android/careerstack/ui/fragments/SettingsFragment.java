@@ -73,7 +73,7 @@ public class SettingsFragment extends PreferenceFragment
 	public void onCreate(Bundle paramBundle) {
 		super.onCreate(paramBundle);
 		getPreferenceManager().setSharedPreferencesName(
-				getString(R.string.careerstack_PREFERENCE_FILE_KEY));
+				getString(R.string.preferenceutil_PREFERENCE_FILE_KEY));
 		
 		tm = new ToastManager(getActivity());
 		
