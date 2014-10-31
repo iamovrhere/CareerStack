@@ -20,7 +20,7 @@
     <string name="app_name">CareerStack</string>
     <!-- The settings string -->
     <string name="action_settings">Settings</string>
-    <!-- The refresh string TODO Translations for Refresh -->
+    <!-- The refresh string  -->
     <string name="action_refresh">Refresh</string>
     <!-- The toggle day/night theme string -->    
     <string name="action_toggleTheme">Toggle Day/Night Theme</string>
@@ -35,6 +35,9 @@
 
     
     
+    <!-- The message for when no job description is selected TODO translate -->
+    <string name="careerstack_text_noJobDescriptionSelected"
+        >Select a job item&#8230;</string>
     
     
     <!-- Starts Main fragment strings -->
@@ -160,18 +163,18 @@
         >Restore search settings from previous session</string>
     
     
-    <!-- The pref title for quick switching themes TODO: Translate string-->
+    <!-- The pref title for quick switching themes -->
     <string name="careerstack_settings_quickSwitch_title"
         >Quick switch themes</string>
-    <!-- The pref description for quick switching themes TODO: Translate string -->
+    <!-- The pref description for quick switching themes  -->
     <string name="careerstack_settings_quickSwitch_summary"
         >WARNING! EXPERIMENTAL!
 \nSwitch between themes without restarting. Limited support.</string>    
-    <!-- The pref support for quick switching themes TODO: Translate string -->
+    <!-- The pref support for quick switching themes  -->
     <string name="careerstack_settings_quickSwitch_support"
         >Support for Android 3.0 and up</string>
 
-	<!-- The pref dialog mesage for quick switching themes TODO: Translate string -->
+	<!-- The pref dialog mesage for quick switching themes  -->
     <string name="careerstack_settings_quickSwitch_confirmMsg"
         >Quick switching themes is experimental 
         and may not work on all devices. Try it anyway? 
@@ -181,6 +184,14 @@
     <!-- The pref title for ads and additonal features. TODO translation -->
     <string name="careerstack_settings_adsAndFeatures_title"
         >Ads &amp; pro features</string>
+    
+    
+    <!-- The pref title for tablet mode TODO translate -->
+    <string name="careerstack_settings_tabletMode_title"
+        >Use tablet dual pane mode</string>
+    <!-- The pref description for tablet mode  TODO translate -->
+    <string name="careerstack_settings_tabletMode_summary"
+        >Requires Ads. View results in dual pane mode, when available</string>
         
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title"

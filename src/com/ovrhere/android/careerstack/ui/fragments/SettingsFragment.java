@@ -40,7 +40,7 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
  * 
  * Requires {@link OnFragmentInteractionListener} to be implemented by Activity.
  * @author Jason J.
- * @version 0.4.0-20141003
+ * @version 0.5.0-20141031
  */
 public class SettingsFragment extends PreferenceFragment 
  implements OnPreferenceClickListener {
@@ -152,12 +152,13 @@ public class SettingsFragment extends PreferenceFragment
 		addPreferencesFromResource(R.xml.settings);
 		
 		prepareQuickSwitch();
+		prepareTabletMode();
 		
 		initNonSettings();
 	}
 
 	/** Prepares quick switch; enabling or hiding based on version support. */
-	public void prepareQuickSwitch() {
+	private void prepareQuickSwitch() {
 		final String key = getString(R.string.careerstack_pref_KEY_QUICK_THEME_SWITCH);
 		prefQuickSwitching = (CheckBoxPreference) 
 				getPreferenceManager().findPreference(key);
@@ -172,6 +173,19 @@ public class SettingsFragment extends PreferenceFragment
 		}
 	}
 	
+	/** Prepares tablet mode; enabling or hiding based on size support. */
+	private void prepareTabletMode(){
+		final String key = getString(R.string.careerstack_pref_KEY_USE_TABLET_LAYOUT);
+		final boolean hasTabletMode = 
+				getResources().getBoolean(R.bool.careerstack_has_tablet_mode);
+		
+		if (!hasTabletMode){
+			//if not supported, remove preference.
+			Preference prefTabletMode = getPreferenceManager().findPreference(key);
+			prefTabletMode.setEnabled(false);
+			getPreferenceScreen().removePreference(prefTabletMode);
+		} 
+	}
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////

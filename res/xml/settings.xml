@@ -33,6 +33,14 @@
 	/>
     
     
+    <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_QUICK_THEME_SWITCH"
+        android:title="@string/careerstack_settings_quickSwitch_title"
+        android:summary="@string/careerstack_settings_quickSwitch_support" 
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_QUICK_THEME_SWITCH"
+        android:enabled="false"
+	/>
+    
     
     <CheckBoxPreference 
         android:key="@string/careerstack_pref_KEY_ADS_AND_FEATURES"
@@ -41,12 +49,13 @@
 	/>
     
     <CheckBoxPreference 
-        android:key="@string/careerstack_pref_KEY_QUICK_THEME_SWITCH"
-        android:title="@string/careerstack_settings_quickSwitch_title"
-        android:summary="@string/careerstack_settings_quickSwitch_support" 
-        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_QUICK_THEME_SWITCH"
-        android:enabled="false"
+        android:key="@string/careerstack_pref_KEY_USE_TABLET_LAYOUT"
+        android:title="@string/careerstack_settings_tabletMode_title"
+        android:summary="@string/careerstack_settings_tabletMode_summary"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_USE_TABLET_LAYOUT"
+        android:dependency="@string/careerstack_pref_KEY_ADS_AND_FEATURES"
 	/>
+    
     
     <Preference 
         android:key="@string/careerstack_settings_KEY_CLEAR_SETTINGS"
