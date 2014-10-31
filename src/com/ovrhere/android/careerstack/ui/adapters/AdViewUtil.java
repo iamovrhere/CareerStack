@@ -22,10 +22,12 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ovrhere.android.careerstack.R;
+import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
+import com.ovrhere.android.careerstack.utils.TabletUtil;
 
 /** Creates ad views for the list. 
  * @author Jason J.
- * @version 0.1.0-20141027
+ * @version 0.1.1-20141031
  */
 class AdViewUtil {
 	
@@ -57,17 +59,16 @@ class AdViewUtil {
 		AdView adView = new AdView(activity);
 		
 		//cannot use smart banner for varying widths
-		adView.setAdSize(AdSize.SMART_BANNER);  
 		adView.setAdUnitId(activity.getResources()
 				.getString(R.string.careerstack_ad_unit_id));
 		
-		//resize ad view to fit
-		/*float density = activity.getResources().getDisplayMetrics().density;
-        int height = Math.round(AdSize.BANNER.getHeight() * density);
-        AbsListView.LayoutParams params = new AbsListView.LayoutParams(
-            AbsListView.LayoutParams.MATCH_PARENT,
-            height);
-        adView.setLayoutParams(params);*/
+		final boolean inTabletMode = TabletUtil.inTabletMode(
+				activity.getResources(), 
+				PreferenceUtils.getPreferences(activity));
+		
+		//use smart banner when possible, otherwise use BANNER
+		//NOTE: will only work if there's 320dp to display ad in
+		adView.setAdSize(inTabletMode ? AdSize.BANNER : AdSize.SMART_BANNER);  
 		return adView;
 	}
 	
