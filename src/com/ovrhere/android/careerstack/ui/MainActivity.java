@@ -34,6 +34,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
@@ -44,10 +46,11 @@ import com.ovrhere.android.careerstack.ui.fragments.SearchResultsFragment;
 import com.ovrhere.android.careerstack.ui.fragments.SettingsFragment;
 import com.ovrhere.android.careerstack.ui.fragments.dialogs.ConfirmationDialogFragment;
 import com.ovrhere.android.careerstack.ui.fragments.dialogs.SearchBarDialogFragment;
+import com.ovrhere.android.careerstack.utils.TabletUtil;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.7.1-20141010
+ * @version 0.8.0-20141031
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnBackStackChangedListener, DialogInterface.OnClickListener,
@@ -98,6 +101,7 @@ public class MainActivity extends ActionBarActivity
 	final static private String TAG_CAREER_ITEM_FRAG = 
 			CareerItem.class.getName();
 	
+	
 	/** The settings tag. */
 	final static private String TAG_SETTINGS_FRAG = 
 			SettingsFragment.class.getName();
@@ -108,7 +112,8 @@ public class MainActivity extends ActionBarActivity
 	
 	/** The list of all fragments in play. */
 	final private ArrayListStack<String> fragTagStack = 
-			new ArrayListStack<String>();
+			new ArrayListStack<String>();	
+	
 	/** A map of all back stack fragment states. 
 	 * Key: fragment tag (String), Value: savedState (Bundle) */
 	final private HashMap<String, Bundle> fragSavedStates =
@@ -126,6 +131,10 @@ public class MainActivity extends ActionBarActivity
 	/** The current menu as built by activity.
 	 *  Initialized in {@link #onCreateOptionsMenu(Menu)} */
 	private Menu menu = null;
+	
+	/** The tablet container message for tablet mode. */
+	private TextView tabletMessage = null;
+	
 	
 	/** The current search of the application set according to the keys of
 	 * {@link SearchBarDialogFragment}.
@@ -157,6 +166,8 @@ public class MainActivity extends ActionBarActivity
 		checkThemePref(); 
 		
 		setContentView(R.layout.activity_main);
+		
+		tabletMessage = (TextView) findViewById(R.id.careerstack_main_text_job_description_message);
 		
 		if (savedInstanceState == null) {			
 			loadFragment( new MainFragment(), TAG_MAIN_FRAG, false);
@@ -265,9 +276,16 @@ public class MainActivity extends ActionBarActivity
 		setActionBarTitle(getString(R.string.app_name));
 	    getSupportFragmentManager().popBackStack();
 	    fragTagStack.pop();	    
+	    
+	    if (TAG_CAREER_ITEM_FRAG.equals(fragTagStack.peek()) && inTabletMode()){
+	    	//if we popped back to have the career item & tablet mode
+	    	reattachLastFragment(); 
+	    	return true;
+	    }
 	  
 	    //show settings when not viewing settings
 	    checkMenus();
+	    checkTabletFrag();
 	    return true;
 	}
 	
@@ -410,8 +428,16 @@ public class MainActivity extends ActionBarActivity
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Funtionality helpers
+	/// Functionality helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** Checks that the device is currently in tablet mode based on:
+	 * <ol><li>Screen size</li><li>Ads enabled</li><li>Tablet mode enabled</li></ol>
+	 * @return <code>true</code> if currently in tablet mode, <code>false</code>
+	 * otherwise.	 */
+	private boolean inTabletMode(){
+		return TabletUtil.inTabletMode(getResources(), prefs);		
+	}
 	
 	/** Sends the search request off the SearchResultsFragment;
 	 * if the fragment is at the front it sends it directly, otherwise, it 
@@ -420,25 +446,32 @@ public class MainActivity extends ActionBarActivity
 	 */
 	private void sendSearchRequest(Bundle args) {
 		boolean requestSent = false;
-		//if we are already in the search frag
-		if (TAG_SEARCH_RESULTS_FRAG.equals(fragTagStack.peek())){
-			try {
-				//get fragment then send results.
-				SearchResultsFragment frag = (SearchResultsFragment)
-						getSupportFragmentManager()
-							.findFragmentByTag(TAG_SEARCH_RESULTS_FRAG);
-				
-				frag.sendRequest(args);
-				
+		
+		resetTabletContainerMessage();
+		
+		try {
+			//get fragment then send results.
+			Fragment frag = getSupportFragmentManager()
+						.findFragmentByTag(TAG_SEARCH_RESULTS_FRAG);
+			
+			//check to see if we are already in the search frag
+			if (frag != null){
+				((SearchResultsFragment) frag).sendRequest(args);
 				requestSent = true;
 				
-			} catch (ClassCastException e){
-				Log.e(CLASS_NAME, "Something abnormal has occurred! : "+ e);
-				if (DEBUG){
-					throw e;
-				}
-			}			
-		} 
+				//if not at front, clear stack and re-add
+				if (!TAG_SEARCH_RESULTS_FRAG.equals(fragTagStack.peek())){
+					loadFragment(frag, TAG_SEARCH_RESULTS_FRAG, false);	
+				}				
+			}
+			
+		} catch (ClassCastException e){
+			Log.e(CLASS_NAME, "Something abnormal has occurred! : "+ e);
+			if (DEBUG){
+				throw e;
+			}
+		}
+		
 		/* If the request has not been sent yet, either due to an error or
 		 * the frag the fragment is not in the stack yet. */
 		if (!requestSent) {
@@ -449,6 +482,8 @@ public class MainActivity extends ActionBarActivity
 					false);
 		}
 	}
+	
+
 	
 	/** Refreshes the search results page if available. If not
 	 * available nothing happens. 	 */
@@ -501,17 +536,71 @@ public class MainActivity extends ActionBarActivity
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Fragment method
+	/// Fragment methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/*
+	 * Tablet mode explanation:
+	 * 
+	 * 1. Whenever NOT in tablet mode OR in tablet mode viewing Settings
+	 * or Main Frags, set R.id.tablet_container as view GONE.
+	 * 
+	 * 2. Whenever shifting TO tablet mode, CareerItemFragment is re-attached
+	 * to tablet_container and popped, so that R.id.container is SearchResultsFragment.  
+	 * 
+	 * 3. Whenever shifting FROM tablet mode, CareerItemFragment is re-attached
+	 * to R.id.container and tablet_container is HIDDEN. 
+	 * 
+	 * 4. Whenever attaching a new CareerItemFragment, tabletmode is checked.
+	 * In tablet mode, it is attached to tablet_container, in regular R.id.container.
+	 * 
+	 * 5. Whenever searching, if in tablet mode, the message is reset in the tablet_container.
+	 * 
+	 */
 	
 	/** Re-attaches the last fragment. And resets back button. */
 	private void reattachLastFragment() {
+		//first, always check tablet fragment.
+		checkTabletFrag();
+		
 		String currentTag = fragTagStack.peek();
+		FragmentManager fm = getSupportFragmentManager();
+		Log.d("Main", "currentTag: "+ currentTag);
+		
 		if (currentTag != null){
-			Fragment frag = getSupportFragmentManager()
-					.findFragmentByTag(currentTag);
-			getSupportFragmentManager().beginTransaction()
-					.attach(frag).commit();
+			if (inTabletMode()){
+				//TODO re-arrange fragments accordingly
+				
+				Fragment careerItem = fm.findFragmentByTag(TAG_CAREER_ITEM_FRAG);
+				//if the regular mode item is a career item
+				if (TAG_CAREER_ITEM_FRAG.equals(currentTag)){
+					
+					fm.beginTransaction().remove(careerItem).commit();
+					
+					//pop to search result fragment
+					onSupportNavigateUp();
+					fm.executePendingTransactions();
+					loadTabletFragment(careerItem, TAG_CAREER_ITEM_FRAG);
+					
+				} else if (careerItem == null){
+					resetTabletContainerMessage();
+				}
+				
+			} else if (TAG_SEARCH_RESULTS_FRAG.equals(currentTag)){ 
+				//if we are in search mode, the we may have a lingering careeritem
+				
+				//TODO re-arrange fragments accordingly
+				Fragment careerItem = fm.findFragmentByTag(TAG_CAREER_ITEM_FRAG);
+				//re-attach careeritem
+				if (careerItem != null){
+					fm.beginTransaction().remove(careerItem).commit();
+					fm.executePendingTransactions();
+					loadFragment(careerItem, TAG_CAREER_ITEM_FRAG, true);
+				}
+			} else {
+				Fragment frag = fm.findFragmentByTag(currentTag);
+				fm.beginTransaction().attach(frag).commit();
+			}
 		}
 		
 		checkHomeButtonBack();
@@ -569,6 +658,21 @@ public class MainActivity extends ActionBarActivity
 		getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
 	}
 	
+
+	/** Shows and hides visibility based. */
+	private void checkTabletFrag(){
+		boolean show = false;
+		if (inTabletMode()){
+			final String tag = fragTagStack.peek();
+			if (!(TAG_MAIN_FRAG.equals(tag) || TAG_SETTINGS_FRAG.equals(tag))){
+				//if neither in main nor settings, do not show tablet container.
+				show = true;
+				getSupportFragmentManager().executePendingTransactions();
+			}
+		}
+		findViewById(R.id.tablet_container)
+			.setVisibility(show ? View.VISIBLE : View.GONE);
+	}
 	
 	
 	/** Loads a fragment either by adding or replacing and then adds it to
@@ -580,7 +684,9 @@ public class MainActivity extends ActionBarActivity
 	 */
 	private void loadFragment(Fragment fragment, String tag, 
 			boolean backStack){
+		
 		FragmentManager fragManager = getSupportFragmentManager();
+		
 		if (backStack){
 			String prevTag = fragTagStack.peek();
 			fragManager.beginTransaction()
@@ -597,13 +703,40 @@ public class MainActivity extends ActionBarActivity
 		}
 		
 		fragTagStack.push(tag);
+		
+		checkTabletFrag();
 		checkMenus();
 		checkHomeButtonBack();		
+	}
+	
+	/** Loads fragment into tablet container. 
+	 * @param fragment The fragment to add
+	 * @param tag The tag to give the fragment */
+	private void loadTabletFragment(Fragment fragment, String tag){
+		FragmentManager fragManager = getSupportFragmentManager();
+		checkTabletFrag();
+		
+		tabletMessage.setVisibility(View.GONE);
+		fragManager.beginTransaction()
+				.replace(R.id.tablet_container, fragment, tag)
+				.commit();				
+	}
+	
+	/** Resets the tablet container message by clearing it and inflating view stub. */
+	private void resetTabletContainerMessage(){
+		tabletMessage.setVisibility(View.VISIBLE);
+		Fragment frag = getSupportFragmentManager()
+				.findFragmentByTag(TAG_CAREER_ITEM_FRAG);
+		if (frag != null){
+			getSupportFragmentManager().beginTransaction()
+				.remove(frag).commit();
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Internal classes
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** Simple wrapper to manage array list as a stack. */
 	@SuppressWarnings("unused")
 	private static class ArrayListStack <Obj>{
@@ -699,10 +832,16 @@ public class MainActivity extends ActionBarActivity
 	@Override
 	public boolean onCareerItemRequest(CareerItem item) {
 		if (item != null){
-			loadFragment(
-					CareerItemFragment.newInstance(item), 
-					TAG_CAREER_ITEM_FRAG, 
-					true);
+			if (inTabletMode()){
+				loadTabletFragment(
+						CareerItemFragment.newInstance(item), 
+						TAG_CAREER_ITEM_FRAG);
+			} else {
+				loadFragment(
+						CareerItemFragment.newInstance(item), 
+						TAG_CAREER_ITEM_FRAG, 
+						true);
+			}
 			return true;
 		}
 		return false;

@@ -29,4 +29,7 @@
     
     <!-- The grey for the light actionbar -->
     <color name="careerstack_actionBar_light">#333</color>
+    
+    <!-- Very transparent text color -->
+    <color name="careerstack_verytranslucent_grey" >#99909090</color>
 </resources>

@@ -34,6 +34,11 @@
     <!-- Search frag screen margins -->
     <dimen name="row_list_horizontal_padding">12dp</dimen>
     
+    <!-- The weight of the main container -->
+    <item type="integer" name="careerstack_container_weight">1.0</item>
+    <!-- The weight of the tablet container -->
+    <item type="integer" name="careerstack_tablet_container_weight">1.0</item>
+    
     
     <!-- Sizes for main frag -->
     <eat-comment />
