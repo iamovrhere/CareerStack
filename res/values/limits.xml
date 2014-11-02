@@ -35,5 +35,5 @@
     <!-- Zero-indexed row where the first ad will be shown in list view. -->
     <item name="careerstack_listview_ad_start" type="integer">3</item>
     <!-- Frequency of ads in list view. -->
-    <item name="careerstack_listview_ad_frequency" type="integer">25</item>
+    <item name="careerstack_listview_ad_frequency" type="integer">20</item>
 </resources>

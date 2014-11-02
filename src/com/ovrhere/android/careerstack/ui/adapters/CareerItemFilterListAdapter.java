@@ -36,7 +36,7 @@ import com.ovrhere.android.careerstack.dao.CareerItem;
 /** The career item filter list adapter.
  * <p><b>Filtering will be done at a later date.</b></p>
  * @author Jason J.
- * @version 0.4.0-20141028
+ * @version 0.4.1-20141031
  */
 public class CareerItemFilterListAdapter extends BaseAdapter implements
 		Filterable {
@@ -130,11 +130,13 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 			subTitleMessage += 
 					mContext.getString(R.string.careerstack_main_check_offersRelocation);
 		}
-		subTitleMessage = "( "+subTitleMessage+" )";
+		if (subTitleMessage.isEmpty() == false){
+			subTitleMessage = "( "+subTitleMessage+" )";
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Overriden functions
+	/// Overridden functions
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@Override
