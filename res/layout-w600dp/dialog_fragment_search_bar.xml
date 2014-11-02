@@ -70,7 +70,7 @@
 		    android:gravity="center"
 		    android:text="@string/careerstack_formatString_distanceValue_milesShort"
 		    android:contentDescription="@string/careerstack_formatString_distanceValue_miles"
-		    android:textSize="13sp"
+		    
 		    android:layout_weight="1.0"
 		    />
          
@@ -79,7 +79,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/careerstack_searchBar_check_workRemotely"
-	        android:textSize="13sp"
+	        
 	        android:layout_weight="1.0"
 	        android:maxLines="1"
 	        android:ellipsize="end"
@@ -90,7 +90,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/careerstack_searchBar_check_offersRelocation"
-	        android:textSize="13sp"
+	        
 	        android:layout_weight="1.0"
 	        android:maxLines="1"
 	        android:ellipsize="end"
@@ -103,6 +103,7 @@
          android:layout_centerHorizontal="true"
          android:layout_below="@+id/careerstack_searchBar_container_checks"
          android:contentDescription="@android:string/search_go"
+         android:layout_weight="1.0"
          android:gravity="center"
          android:text="@android:string/search_go" />
 
