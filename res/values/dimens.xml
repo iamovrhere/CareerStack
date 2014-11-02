@@ -63,6 +63,9 @@
     <!-- Search Margin top margin -->
     <dimen name="careerstack_main_searchButton_marginTop">30dp</dimen>
     
+    <!-- Bottom search padding (used for large res) -->
+    <dimen name="careerstack_main_offset_marginBottom">20dp</dimen>
+    
     <!-- Sizes for Career Item frag -->
     <eat-comment />
     <!-- Inter-Text top margin -->
