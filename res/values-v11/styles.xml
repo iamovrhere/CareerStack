@@ -24,13 +24,16 @@
     
     <style name="_AppBaseTheme.Dark" parent="Theme.AppCompat">
         <!-- API 11 theme customizations can go here. -->
+        
+        <item name="android:windowBackground">@color/careerstack_nearblack_background</item>
+        
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
         <item name="careerstack_title_color">@android:color/white</item>
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		<!-- Assume black for dark theme -->
         <item name="careerstack_searchbar_color">@android:color/black</item>
-        <item name="careerstack_searchbar_border">@drawable/careerstack_ab_transparent_strip</item>
+        <item name="careerstack_searchbar_border">@drawable/ab_dark_background_strip</item>
         
         <!-- Set actionbar -->
    		<item name="android:actionBarStyle" tools:targetApi="11">@style/MyDarkActionBar</item>

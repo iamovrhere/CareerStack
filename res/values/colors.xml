@@ -26,10 +26,13 @@
     
     <!-- Colour straight from stackoverflow background -->
     <color name="careerstack_offwhite_background">#F6F6F5</color>
+    <!-- Colour near to black but not quite -->
+    <color name="careerstack_nearblack_background">#080808</color>
     
     <!-- The grey for the light actionbar -->
     <color name="careerstack_actionBar_light">#333</color>
     
     <!-- Very transparent text color -->
-    <color name="careerstack_verytranslucent_grey" >#99909090</color>
+    <color name="careerstack_verytranslucent_grey" >#55909090</color>
+    
 </resources>

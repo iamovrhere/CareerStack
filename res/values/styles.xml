@@ -24,6 +24,8 @@
     -->
     <style name="_AppBaseTheme.Dark" parent="Theme.AppCompat"
          >
+         <item name="android:windowBackground">@color/careerstack_nearblack_background</item>
+         
          <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         <item name="careerstack_title_color">@android:color/white</item>
         <!-- Attribue drawable for the dark icon -->
@@ -36,7 +38,7 @@
    		<!-- Assume black for dark theme -->
         <item name="careerstack_searchbar_color">@android:color/black</item>
         <!-- Orange -->
-   		<item name="careerstack_searchbar_border">@drawable/careerstack_ab_transparent_strip</item>
+   		<item name="careerstack_searchbar_border">@drawable/ab_dark_background_strip</item>
    		
    		<!-- Set actionbar -->
    		<item name="android:actionBarStyle" tools:targetApi="11">@style/MyDarkActionBar</item>
@@ -74,6 +76,8 @@
      <!-- General styles for the dark action bar -->
     <style name="MyDarkActionBar"
            parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:windowBackground">@color/careerstack_nearblack_background</item>
+        
         <!-- The orange strip -->
         <item name="android:background">@drawable/careerstack_ab_transparent_strip</item>
  		
