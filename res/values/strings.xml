@@ -22,7 +22,7 @@
     <string name="action_settings">Settings</string>
     <!-- The refresh string  -->
     <string name="action_refresh">Refresh</string>
-    <!-- The toggle dark/light theme string TODO Translate -->    
+    <!-- The toggle dark/light theme string -->    
     <string name="action_toggleTheme">Toggle Dark/Light Theme</string>
     
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -35,7 +35,7 @@
 
     
     
-    <!-- The message for when no job description is selected TODO translate -->
+    <!-- The message for when no job description is selected -->
     <string name="careerstack_text_noJobDescriptionSelected"
         >Select a job item&#8230;</string>
     
@@ -104,18 +104,18 @@
     <string name="careerstack_careerlist_noResults" 
         >No matching results</string>
     
-    <!-- No matching results statement, takes one term. TODO translate -->
+    <!-- No matching results statement, takes one term. -->
     <string name="careerstack_careerlist_noResults_stub" 
         >No matching results for \"%1$s\"</string>
     
-    <!-- Matching results statement, takes one term. TODO translate -->
+    <!-- Matching results statement, takes one term. -->
     <string name="careerstack_careerlist_matchingResults_stub" 
         >Matching results for \"%1$s\"</string>
     
-    <!-- Simply "Matching results" statement. TODO translate -->
+    <!-- Simply "Matching results" statement. -->
     <string name="careerstack_careerlist_matchingResults">Matching results</string>
     
-    <!-- Results near statement, takes 1 statment. TODO translate -->
+    <!-- Results near statement, takes 1 statment. -->
     <string name="careerstack_careerlist_resultsNear">\u0020near %1$s</string>
     
     <!-- Ends Results fragment strings -->
@@ -181,15 +181,15 @@
         \n\n(Requires restart to take effect.)</string>
     
     
-    <!-- The pref title for ads and additonal features. TODO translation -->
+    <!-- The pref title for ads and additonal features. -->
     <string name="careerstack_settings_adsAndFeatures_title"
         >Ads &amp; pro features</string>
     
     
-    <!-- The pref title for tablet mode TODO translate -->
+    <!-- The pref title for tablet mode -->
     <string name="careerstack_settings_tabletMode_title"
-        >Use tablet dual pane mode</string>
-    <!-- The pref description for tablet mode  TODO translate -->
+        >Use tablet/dual pane mode</string>
+    <!-- The pref description for tablet mode  -->
     <string name="careerstack_settings_tabletMode_summary"
         >Requires Ads. View results in dual pane mode, when available</string>
         

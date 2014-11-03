@@ -20,8 +20,8 @@
     <string name="action_settings">"Paramètres"</string>
     
      <string name="action_refresh">Rafraîchir</string>
-    <!-- The toggle day/night theme string -->    
-    <string name="action_toggleTheme">"Bascule Jour / Nuit Thème"</string>
+    
+    <string name="action_toggleTheme">" Bascule Foncé / Clair Thème"</string>
     
     <string name="hello_blank_fragment">"Bonjour fragment blanc"</string>
     
@@ -30,6 +30,10 @@
     
     <!-- End titles -->
     <eat-comment/>
+    
+    
+    <string name = "careerstack_text_noJobDescriptionSelected"
+         > Sélectionnez un élément de travail&#8230;</string>
 
     <!-- Starts Main fragment strings -->
     <eat-comment/>
@@ -61,7 +65,7 @@
     <!-- Starts Results fragment strings -->
     <eat-comment/>
     <!-- The go/search button for the search results page.  -->
-    <string name="careerstack_searchResults_button_searchGo">"Alle"</string>
+    <string name="careerstack_searchResults_button_searchGo">"Aller"</string>
     
     <!-- The retry label for the search results page. -->
     <string name="careerstack_searchResults_label_retry">"Ne pouvez pas établir une connexion"</string>
@@ -75,6 +79,21 @@
     
     <!-- Simply no matching results statement. -->
     <string name="careerstack_careerlist_noResults">"Pas de résultats correspondants"</string>
+    
+         <string name = "careerstack_careerlist_noResults_stub"
+         > Il n\'y aucun résultat pour \"%1$s\" </string>
+
+
+     <string name = "careerstack_careerlist_matchingResults_stub"
+         > Résultats de correspondants pour  \"%1$s\" </string>
+
+
+     <string name = "careerstack_careerlist_matchingResults"
+         >Résultats trouvés </string>
+
+
+
+     <string name = "careerstack_careerlist_resultsNear"> \u0020proche de %1$s </string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment/>
@@ -123,6 +142,19 @@
         >Thèmes de commutation rapide est expérimentale, et peuvent ne pas fonctionner sur tous les appareils. Essayez quand même? 
 \n\n(Nécessite le redémarrage de l\'app pour prendre effet.)</string>
     
+    
+    
+    <!-- The tablet mode settings -->
+    <eat-comment />
+    
+    <string name = "careerstack_settings_adsAndFeatures_title"
+         > Annonces &amp; fonctionnalités professionnelles </string>
+
+    <string name = "careerstack_settings_tabletMode_title"
+         > Mode double volet ou mode tablette </string>
+
+    <string name = "careerstack_settings_tabletMode_summary"
+         > Nécessite annonces. Voir les résultats en mode double volet, lorsque disponible </string>
     
     
     <!-- The pref title for clearin settings -->

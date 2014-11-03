@@ -20,8 +20,8 @@
     <string name="action_settings">"Configuración"</string>
     
         <string name="action_refresh">Actualizar</string>
-    <!-- The toggle day/night theme string -->    
-    <string name="action_toggleTheme">"Toggle Día / Noche Temática"</string>
+    
+    <string name = "action_toggleTheme"> Alternar Oscuro / Luz Tema </string>
     
     <string name="hello_blank_fragment">"Hola fragmento en blanco"</string>
     
@@ -30,6 +30,11 @@
     
     <!-- End titles -->
     <eat-comment/>
+    
+    
+    <string name = "careerstack_text_noJobDescriptionSelected"
+         > Seleccione un elemento de trabajo&#8230;</string>
+    
 
     <!-- Starts Main fragment strings -->
     <eat-comment/>
@@ -75,6 +80,19 @@
     
     <!-- Simply no matching results statement. -->
     <string name="careerstack_careerlist_noResults">"No hay resultados"</string>
+    
+    
+    <string name = "careerstack_careerlist_noResults_stub"
+         > No hay coincidencia para \"%1$s\" </string>
+
+	<string name = "careerstack_careerlist_matchingResults_stub"
+         > Coincidencia de resultados para \"%1$s\" </string>
+
+
+	<string name ="careerstack_careerlist_matchingResults">  Los resultados coinciden con </string>
+
+
+	<string name = "careerstack_careerlist_resultsNear"> \u0020cerca de %1$s </string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment/>
@@ -123,6 +141,19 @@
         >Temas de conmutación rápida es experimental y puede que no funcione en todos los dispositivos. Trate de todos modos? 
 \n\n(Requiere el reinicio de la aplicación entre en vigor.)</string>
     
+    
+    <!-- The tablet mode settings -->
+    <eat-comment />
+    
+    <string name = "careerstack_settings_adsAndFeatures_title"
+         > Anuncios &amp; pro características </string>
+
+
+	<string name = "careerstack_settings_tabletMode_title"
+         > Usa modo de panel de doble / modo de la tabeleta </string>
+
+	<string name = "careerstack_settings_tabletMode_summary"
+         > Requiere Anuncios. Ver resultados en el modo de doble panel, cuando esté disponible </string>
     
     
     <!-- The pref title for clearin settings -->

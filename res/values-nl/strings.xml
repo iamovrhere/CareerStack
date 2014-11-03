@@ -20,8 +20,8 @@
     <string name="action_settings">"Instellingen"</string>
     
     <string name="action_refresh">Vernieuwen</string>
-    <!-- The toggle day/night theme string -->    
-    <string name="action_toggleTheme">"Schakelen dag / nacht thema"</string>
+    
+    <string name = "action_toggleTheme">"Schakelen Donkere / Licht thema"</string>
     
     <string name="hello_blank_fragment">"Hallo leeg fragment"</string>
     
@@ -30,6 +30,10 @@
     
     <!-- End titles -->
     <eat-comment/>
+    
+    
+    <string name = "careerstack_text_noJobDescriptionSelected"
+         > Selecteer een job post&#8230;</string>
 
     <!-- Starts Main fragment strings -->
     <eat-comment/>
@@ -75,6 +79,16 @@
     
     <!-- Simply no matching results statement. -->
     <string name="careerstack_careerlist_noResults">"Geen overeenkomende resultaten"</string>
+    
+         <string name = "careerstack_careerlist_noResults_stub"
+         >Geen overeenkomstige resultaten voor \"%1$s\" </string>
+
+     <string name = "careerstack_careerlist_matchingResults_stub"
+         >Bijpassende resultaten voor \"%1$s\" </string>
+
+     <string name = "careerstack_careerlist_matchingResults">Bijpassende resultaten </string>
+
+     <string name = "careerstack_careerlist_resultsNear"> \u0020in de buurt van %1$s</string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment/>
@@ -123,6 +137,19 @@
         >Snel schakelen thema is experimenteel en werkt mogelijk niet op alle apparaten. Probeer het toch? 
 \n\n(Hiervoor moet de app opnieuw starten door te voeren.)</string>
     
+    
+    <!-- The tablet mode settings -->
+    <eat-comment />
+    
+    <string name = "careerstack_settings_adsAndFeatures_title"
+         > Advertenties &amp; pro functies </string>
+
+
+<string name = "careerstack_settings_tabletMode_title"
+         > Gebruik tablet dual ruiten mode </string>
+
+<string name = "careerstack_settings_tabletMode_summary"
+         > Vereist advertenties. Bekijk resultaten in dual pane mode, indien beschikbaar </string>
     
     
     <!-- The pref title for clearin settings -->
