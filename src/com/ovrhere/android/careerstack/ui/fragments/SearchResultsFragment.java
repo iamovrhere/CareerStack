@@ -33,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.6.0-20141028
+ * @version 0.6.1-20141103
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -44,7 +44,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/**Logtag for debugging purposes. */
 	final static private String LOGTAG = CLASS_NAME;
 	/** Whether or not to debug. */
-	final static private boolean DEBUG = false;
+	final static private boolean DEBUG = true;
 	
 		
 	/** Bundle key. This stores {@link #careerList}.
@@ -194,6 +194,8 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		Bundle backStackState = 
 				mFragInteractionListener.onPopSavedStateRequest();
 		
+		//default loading to true to start with loading/spinner
+		showLoadingBlock();
 		
 		if (backStackState != null){
 			debugSavedState(backStackState);
@@ -262,8 +264,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		prevQuery.putAll(args);
 		prevQuery.putBoolean(
 				CareersStackOverflowModel.KEY_USE_METRIC, 
-				UnitCheck.useMetric(prefs, getResources()) );		
-		asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RECORD_QUERY, prevQuery);
+				UnitCheck.useMetric(prefs, getResources()) );
+		//we are about to request, set up loading
+		showLoadingBlock(); 
+		asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RECORD_QUERY, prevQuery);		
 	}
 	
 	/** Resends the previous request. If no request was previously sent, an
