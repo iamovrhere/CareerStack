@@ -28,7 +28,7 @@ import com.ovrhere.android.careerstack.R;
 /** Uses decorator pattern to present the list results wrapped with ads dispersed 
  * between.
  * @author Jason J.
- * @version 0.1.1-20141027
+ * @version 0.1.2-20141104
  */
 public class AdViewListAdapter extends BaseAdapter {
 		/** The activity used for building ads. */
@@ -187,7 +187,7 @@ public class AdViewListAdapter extends BaseAdapter {
 	 * @return the number of ads displayed thus far
 	 */
 	private int adCount(int position){
-		if (position < minimumSize){
+		if (position < firstAdPosition){
 			return position/adFrequency;
 		}
 		return position/adFrequency + 1;

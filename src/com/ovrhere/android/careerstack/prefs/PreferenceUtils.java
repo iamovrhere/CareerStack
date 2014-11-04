@@ -23,7 +23,8 @@ import com.ovrhere.android.careerstack.R;
 
 /**
  * Preference Utility for handling the preferences and the preference container.
- * Has ability to set defaults. Requires <code>preference_info.xml</code>
+ * Has ability to set defaults. Requires <code>preference_info.xml</code> and
+ * <code>preference_defaults.xml</code>.
  * @author Jason J.
  * @version 0.6.0-20141030
  */
