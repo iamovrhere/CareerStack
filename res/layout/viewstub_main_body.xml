@@ -90,6 +90,7 @@
 	    
       		android:layout_below="@+id/careerstack_main_editin_location"
       		android:layout_alignLeft="@+id/careerstack_main_editin_location"
+      		android:layout_alignRight="@+id/careerstack_main_editin_location"
 	    android:layout_marginTop="@dimen/careerstack_main_interView_marginTop"
 	    
 	    android:layout="@layout/viewstub_distance_seekbar"
