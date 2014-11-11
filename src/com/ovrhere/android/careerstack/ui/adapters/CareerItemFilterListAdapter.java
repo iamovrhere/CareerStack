@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,7 +37,7 @@ import com.ovrhere.android.careerstack.dao.CareerItem;
 /** The career item filter list adapter.
  * <p><b>Filtering will be done at a later date.</b></p>
  * @author Jason J.
- * @version 0.4.1-20141031
+ * @version 0.5.0-20141111
  */
 public class CareerItemFilterListAdapter extends BaseAdapter implements
 		Filterable {
@@ -184,24 +185,38 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 		} else {
 			holder = (Holder) convertView.getTag();
 		}
-		//if no results, return no results message.
-		if (careerItems.size() <= 0){
-			holder.jobTitle.setText(emptyMessage);
-			holder.jobTitle.setGravity(Gravity.CENTER);
-			holder.companyLocationEtc_andDate.setText(subTitleMessage);
-			holder.companyLocationEtc_andDate.setGravity(Gravity.CENTER);
+		
+		if (position == 0){
+			if (careerItems.size() <= 0){
+				//if no results, return no results message.
+				holder.jobTitle.setText(emptyMessage);
+			} else {
+				//give top row message of : n Matching x
+				holder.jobTitle.setText(careerItems.size() +" " + firstRowMessage);
+			}			
+			holder.jobTitle.setGravity(Gravity.CENTER);			
+			holder.jobTitle.setTypeface(null, Typeface.ITALIC);
+			
+			if (subTitleMessage.isEmpty()){
+				//if no message, why show it?
+				holder.companyLocationEtc_andDate.setVisibility(View.GONE);
+			} else {
+				holder.companyLocationEtc_andDate.setVisibility(View.VISIBLE);
+				holder.companyLocationEtc_andDate.setText(subTitleMessage); 
+				holder.companyLocationEtc_andDate.setGravity(Gravity.CENTER);
+				holder.companyLocationEtc_andDate.setTypeface(null, Typeface.ITALIC);
+			}			
+			
 			return convertView;
-		} else if (position == 0){
-			//give top row message
-			holder.jobTitle.setText(firstRowMessage);
-			holder.jobTitle.setGravity(Gravity.CENTER);
-			holder.companyLocationEtc_andDate.setText(subTitleMessage); 
-			holder.companyLocationEtc_andDate.setGravity(Gravity.CENTER);
-			return convertView;
+			
 		} else {
 			position--; //reduce index to match
-			holder.jobTitle.setGravity(Gravity.LEFT);
+			holder.jobTitle.setGravity(Gravity.LEFT); //TODO use for Gravity.START in api 14+
+			holder.jobTitle.setTypeface(null, Typeface.BOLD);
+			
 			holder.companyLocationEtc_andDate.setGravity(Gravity.LEFT);
+			holder.companyLocationEtc_andDate.setVisibility(View.VISIBLE);	
+			holder.companyLocationEtc_andDate.setTypeface(null, Typeface.NORMAL);
 		}
 		
 		CareerItem item = careerItems.get(position);

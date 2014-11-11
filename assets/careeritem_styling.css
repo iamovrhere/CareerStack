@@ -20,6 +20,13 @@
 	color: rgba(224, 118, 20, 200);
   }
 
+/** 
+ * Defines the style of links.
+ */
+ a {
+ 	/** A lighter blue for darks, but dark enough for lights. */
+ 	color: #07C;	
+ }
 
 /**
   * Defines the size for paragraph strong text. 
