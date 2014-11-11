@@ -46,7 +46,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * after search or cancel is pressed.
  * </p>
  * @author Jason J.
- * @version 0.1.0-20141006
+ * @version 0.1.1-20141106
  */
 public class SearchBarDialogFragment extends DialogFragment 
 	implements OnClickListener, OnCheckedChangeListener {
@@ -342,29 +342,6 @@ public class SearchBarDialogFragment extends DialogFragment
 	////////////////////////////////////////////////////////////////////////////////////////////////
 		
 
-	/** Enables or disables input based upon the input given.
-	 * @param enabled <code>true</code> to enable buttons and edit views,
-	 * <code>false</code> to disable.	 */
-	@Deprecated
-	private void enableInput(boolean enabled){
-		et_keywords.setEnabled(enabled);
-		et_location.setEnabled(enabled);
-		
-		cb_relocationOffered.setEnabled(enabled);
-		cb_remoteAllowed.setEnabled(enabled);
-		
-		
-		//more convoluted logic for the distance button
-		if (enabled){
-			//Forcibly check with text watcher.
-			locationTextWatcher.afterTextChanged(
-						et_location.getEditableText()
-					);
-		} else {
-			btn_distance.setEnabled(false);
-		}
-		
-	}
 	
 	/** Updates the distance button's text & value of currentDistanceValue. */
 	private void updateDistanceButton(int value){

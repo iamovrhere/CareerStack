@@ -33,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.6.1-20141103
+ * @version 0.6.2-20141111
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -44,7 +44,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/**Logtag for debugging purposes. */
 	final static private String LOGTAG = CLASS_NAME;
 	/** Whether or not to debug. */
-	final static private boolean DEBUG = true;
+	final static private boolean DEBUG = false;
 	
 		
 	/** Bundle key. This stores {@link #careerList}.
