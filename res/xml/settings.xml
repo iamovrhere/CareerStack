@@ -16,7 +16,7 @@
 -->
 <PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android" 
     android:defaultValue="false" >
-    <!-- Default value = false, removes the padding for some reason. -->
+    <!-- Version 0.1.0-20141112 -->
     
     <CheckBoxPreference 
         android:key="@string/careerstack_pref_KEY_USE_MILES"
@@ -41,19 +41,13 @@
         android:enabled="false"
 	/>
     
-    
-    <CheckBoxPreference 
-        android:key="@string/careerstack_pref_KEY_ADS_AND_FEATURES"
-        android:title="@string/careerstack_settings_adsAndFeatures_title"
-        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_ADS_AND_FEATURES"
-	/>
+   
     
     <CheckBoxPreference 
         android:key="@string/careerstack_pref_KEY_USE_TABLET_LAYOUT"
         android:title="@string/careerstack_settings_tabletMode_title"
         android:summary="@string/careerstack_settings_tabletMode_summary"
         android:defaultValue="@bool/careerstack_pref_DEF_VALUE_USE_TABLET_LAYOUT"
-        android:dependency="@string/careerstack_pref_KEY_ADS_AND_FEATURES"
 	/>
     
     

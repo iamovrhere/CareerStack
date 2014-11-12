@@ -22,7 +22,7 @@ import com.ovrhere.android.careerstack.R;
 
 /** Simple util used by this project.
  * @author Jason J.
- * @version 0.1.0-20141031
+ * @version 0.1.1-20141112
  */
 public class TabletUtil {
 	
@@ -32,7 +32,7 @@ public class TabletUtil {
 	 * otherwise.	 */
 	static public boolean inTabletMode(Resources r, SharedPreferences prefs){
 		return r.getBoolean(R.bool.careerstack_in_tablet_mode) &&
-		prefs.getBoolean(r.getString(R.string.careerstack_pref_KEY_ADS_AND_FEATURES), false) &&
+		
 		prefs.getBoolean(r.getString(R.string.careerstack_pref_KEY_USE_TABLET_LAYOUT), false);
 		
 	}
