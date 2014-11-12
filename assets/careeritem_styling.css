@@ -1,8 +1,14 @@
 @CHARSET "UTF-8";
 /**
  * Defines styles for all types of career items.
+ * @version 0.2.0-20141111 
  */
  
+ /** 
+  * Font colors, sizes, and styles
+  * ===============================
+  */
+  
  
  /** Default size and color. */
    body {
@@ -25,12 +31,58 @@
  */
  a {
  	/** A lighter blue for darks, but dark enough for lights. */
- 	color: #07C;	
+ 	color: #2277ff; /*#07C;*/
+ 		
  }
-
+ 
+ 
 /**
   * Defines the size for paragraph strong text. 
   */
   p strong {
   	font-size: 16pt;
+  }
+ 
+ 
+ /** 
+  * General spacing 
+  * =========================
+  */
+ 
+ /**
+  * This should resolve the styling issue when lists have extra indents
+  * and excessive spacing such <br/> after <p>, <ul>, <li>,  
+  */
+ li > br,
+ li + br, 
+ p + br,
+ ul + br,
+ ul > br,
+ ol + br,
+ ol > br {
+ 	display: none;
+ }
+ 
+ /** 
+  * Add better spacing for list elements . 
+  */
+ li {
+ 	margin: 0.5em 0 0.5em 0.4em;
+ }
+ 
+ /** 
+  * Add extra padding for the sake of compensating the br removal. 
+  */
+ p {
+ 	/** Set it to be slightly larger than text. */
+ 	margin: 1.3em 0px; 
+ }
+
+  
+  /** 
+   * They really should have used a heading or p + strong.
+   * Oh well, I guess we'll have to fix this.
+   */
+  strong + br {
+  	display: block;
   }
