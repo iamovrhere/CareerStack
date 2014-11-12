@@ -33,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.6.2-20141111
+ * @version 0.7.0-20141112
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -113,6 +113,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	private CareerItemFilterListAdapter resultAdapter = null;
 	/** The adapter that is applied. 
 	 * May either be {@link #resultAdapter} directly or an {@link AdViewListAdapter}. */
+	@Deprecated
 	private BaseAdapter appliedAdapter = null;
 	
 	
@@ -287,18 +288,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/** Initializes the output views. */
 	private void initOutputs(View rootView){
 		resultAdapter = new CareerItemFilterListAdapter(getActivity());
-		
-		if (prefs.getBoolean(
-				getString(R.string.careerstack_pref_KEY_ADS_AND_FEATURES), false)){
-			//set ads
-			appliedAdapter = new AdViewListAdapter(getActivity(), resultAdapter);
-		} else {
-			appliedAdapter = resultAdapter; //turn off ads
-		}
-				
+						
 		lv_resultsView = (ListView)
 				rootView.findViewById(R.id.careerstack_searchResults_list_searchResults);
-		lv_resultsView.setAdapter(appliedAdapter);
+		lv_resultsView.setAdapter(resultAdapter);
 		lv_resultsView.setOnItemClickListener(this);
 		
 		retryContainer =
@@ -482,7 +475,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		try{
-			CareerItem item = (CareerItem) appliedAdapter.getItem(position);
+			CareerItem item = (CareerItem) resultAdapter.getItem(position);
 			if (item != null){
 				mFragInteractionListener.onCareerItemRequest(item);
 			}

@@ -30,6 +30,7 @@ import com.ovrhere.android.careerstack.R;
  * @author Jason J.
  * @version 0.1.2-20141104
  */
+@Deprecated
 public class AdViewListAdapter extends BaseAdapter {
 		/** The activity used for building ads. */
 	final private Activity activity;
