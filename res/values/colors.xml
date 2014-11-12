@@ -16,7 +16,7 @@
 -->
 <resources>
     <!-- Based loosely on the colour for Android buttons; ~85% opacity grey. -->
-    <color name="careerstack_translucent_grey" >#dc909090</color>
+    <color name="careerstack_translucent_grey" >#dc848484</color>
     
     <!-- White color for text; ~90% opacity white. -->
     <color name="careerstack_nearwhite_90" >#E5f0f0f0</color>
