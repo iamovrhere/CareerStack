@@ -51,7 +51,7 @@
     <!-- Label for the distance progress bar -->
     <string name="careerstack_label_distance">"Afstand"</string>
     <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
-    <string name="careerstack_formatString_distanceValue_miles">"%1$d mijlen"</string>
+    <string name="careerstack_formatString_distanceValue_miles">"%1$d mijl"</string>
     
 
     <!-- Work remotely check string for main. -->
@@ -112,7 +112,7 @@
     <!-- Starts settings fragment strings -->
     <eat-comment/>
     <!-- The setting title for distance units -->
-    <string name="careerstack_settings_useMetric_title">"Mijl"</string>
+    <string name="careerstack_settings_useMetric_title">"Mijlen"</string>
     <!-- The setting description for distance units -->
     <string name="careerstack_settings_useMetric_summary">"Gebruik het imperiale stelsel voor afstand"</string>
     
@@ -141,15 +141,12 @@
     <!-- The tablet mode settings -->
     <eat-comment />
     
-    <string name = "careerstack_settings_adsAndFeatures_title"
-         > Advertenties &amp; pro functies </string>
-
-
+   
 <string name = "careerstack_settings_tabletMode_title"
          > Gebruik tablet dual ruiten mode </string>
 
 <string name = "careerstack_settings_tabletMode_summary"
-         > Vereist advertenties. Bekijk resultaten in dual pane mode, indien beschikbaar </string>
+         > Bekijk resultaten in dual pane mode, indien beschikbaar </string>
     
     
     <!-- The pref title for clearin settings -->

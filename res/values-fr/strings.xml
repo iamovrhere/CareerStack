@@ -147,14 +147,12 @@
     <!-- The tablet mode settings -->
     <eat-comment />
     
-    <string name = "careerstack_settings_adsAndFeatures_title"
-         > Annonces &amp; fonctionnalités professionnelles </string>
-
+   
     <string name = "careerstack_settings_tabletMode_title"
          > Mode double volet ou mode tablette </string>
 
     <string name = "careerstack_settings_tabletMode_summary"
-         > Nécessite annonces. Voir les résultats en mode double volet, lorsque disponible </string>
+         > Voir les résultats en mode double volet, lorsque disponible </string>
     
     
     <!-- The pref title for clearin settings -->

@@ -148,16 +148,13 @@
     <!-- The tablet mode settings -->
     <eat-comment />
     
-    <string name = "careerstack_settings_adsAndFeatures_title"
-         > Anzeigen &amp; Pro-Features </string>
-
-
+    
 	<string name = "careerstack_settings_tabletMode_title"
          > Verwenden Dual-Fenster-Tablet -Modus </string>
 
 
 	<string name = "careerstack_settings_tabletMode_summary"
-         > Benötigt Ads. View in Dual-Fenster-Tablet-Modus, wenn verfügbar </string>
+         > View in Dual-Fenster-Tablet-Modus, wenn verfügbar </string>
     
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title">"Alle Einstellungen zurücksetzen"</string>

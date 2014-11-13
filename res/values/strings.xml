@@ -181,17 +181,14 @@
         \n\n(Requires restart to take effect.)</string>
     
     
-    <!-- The pref title for ads and additonal features. -->
-    <string name="careerstack_settings_adsAndFeatures_title"
-        >Ads &amp; pro features</string>
-    
+   
     
     <!-- The pref title for tablet mode -->
     <string name="careerstack_settings_tabletMode_title"
         >Use tablet/dual pane mode</string>
     <!-- The pref description for tablet mode  -->
     <string name="careerstack_settings_tabletMode_summary"
-        >Requires Ads. View results in dual pane mode, when available</string>
+        >View results in dual pane mode, when available</string>
         
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title"

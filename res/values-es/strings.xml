@@ -116,7 +116,7 @@
     <!-- Starts settings fragment strings -->
     <eat-comment/>
     <!-- The setting title for distance units -->
-    <string name="careerstack_settings_useMetric_title">"Miles"</string>
+    <string name="careerstack_settings_useMetric_title">"Millas"</string>
     <!-- The setting description for distance units -->
     <string name="careerstack_settings_useMetric_summary">"Utilice el sistema imperial de distancia"</string>
     
@@ -144,16 +144,13 @@
     
     <!-- The tablet mode settings -->
     <eat-comment />
-    
-    <string name = "careerstack_settings_adsAndFeatures_title"
-         > Anuncios &amp; pro características </string>
-
+   
 
 	<string name = "careerstack_settings_tabletMode_title"
          > Usa modo de panel de doble / modo de la tabeleta </string>
 
 	<string name = "careerstack_settings_tabletMode_summary"
-         > Requiere Anuncios. Ver resultados en el modo de doble panel, cuando esté disponible </string>
+         > Ver resultados en el modo de doble panel, cuando esté disponible </string>
     
     
     <!-- The pref title for clearin settings -->

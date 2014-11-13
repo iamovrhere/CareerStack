@@ -20,10 +20,10 @@
     <string name="app_name">CareerStack</string>
     <!-- The settings string -->
     <string name="action_settings">Settings</string>
-    <!-- The refresh string -->
+    <!-- The refresh string  -->
     <string name="action_refresh">Refresh</string>
-    <!-- The toggle day/night theme string -->    
-    <string name="action_toggleTheme">Toggle Day/Night Theme</string>
+    <!-- The toggle dark/light theme string -->    
+    <string name="action_toggleTheme">Toggle Dark/Light Theme</string>
     
     <string name="hello_blank_fragment">Hello blank fragment</string>
     
@@ -35,6 +35,9 @@
 
     
     
+    <!-- The message for when no job description is selected -->
+    <string name="careerstack_text_noJobDescriptionSelected"
+        >Select a job item&#8230;</string>
     
     
     <!-- Starts Main fragment strings -->
@@ -97,8 +100,23 @@
     <string name="careerstack_searchBar_check_offersRelocation"
         >Relocation</string>
     
-    <!-- Simply no matching results statement. -->
-    <string name="careerstack_careerlist_noResults">No matching results</string>
+    <!-- Simply No matching results statement.-->
+    <string name="careerstack_careerlist_noResults" 
+        >No matching results</string>
+    
+    <!-- No matching results statement, takes one term. -->
+    <string name="careerstack_careerlist_noResults_stub" 
+        >No matching results for \"%1$s\"</string>
+    
+    <!-- Matching results statement, takes one term. -->
+    <string name="careerstack_careerlist_matchingResults_stub" 
+        >Matching results for \"%1$s\"</string>
+    
+    <!-- Simply "Matching results" statement. -->
+    <string name="careerstack_careerlist_matchingResults">Matching results</string>
+    
+    <!-- Results near statement, takes 1 statment. -->
+    <string name="careerstack_careerlist_resultsNear">\u0020near %1$s</string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment />
@@ -148,7 +166,7 @@
     <!-- The pref title for quick switching themes -->
     <string name="careerstack_settings_quickSwitch_title"
         >Quick switch themes</string>
-    <!-- The pref description for quick switching themes -->
+    <!-- The pref description for quick switching themes  -->
     <string name="careerstack_settings_quickSwitch_summary"
         >WARNING! EXPERIMENTAL!
 \nSwitch between themes without restarting. Limited support.</string>    
@@ -156,12 +174,21 @@
     <string name="careerstack_settings_quickSwitch_support"
         >Support for Android 3.0 and up</string>
 
-	<!-- The pref dialog mesage for quick switching themes -->
+	<!-- The pref dialog mesage for quick switching themes  -->
     <string name="careerstack_settings_quickSwitch_confirmMsg"
         >Quick switching themes is experimental 
         and may not work on all devices. Try it anyway? 
-\n\n(Requires app restart to take effect.)</string>
+        \n\n(Requires restart to take effect.)</string>
     
+    
+   
+    
+    <!-- The pref title for tablet mode -->
+    <string name="careerstack_settings_tabletMode_title"
+        >Use tablet/dual pane mode</string>
+    <!-- The pref description for tablet mode  -->
+    <string name="careerstack_settings_tabletMode_summary"
+        >View results in dual pane mode, when available</string>
         
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title"
