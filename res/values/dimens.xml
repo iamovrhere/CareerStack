@@ -49,7 +49,7 @@
     <!-- Powered by margin top -->
     <dimen name="careerstack_main_poweredBy_marginTop">5dp</dimen>
     <!-- Powered by margin bottom -->
-    <dimen name="careerstack_main_poweredBy_marginBottom">30dp</dimen>
+    <dimen name="careerstack_main_poweredBy_marginBottom">32dp</dimen>
     
     <!-- Margin between text inputs.-->
     <dimen name="careerstack_main_text_marginTop">14dp</dimen>
