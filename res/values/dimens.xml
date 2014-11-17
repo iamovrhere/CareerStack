@@ -44,6 +44,9 @@
         <item name="android:layout_width">match_parent</item>
     </style>
     
+    <!-- The bottom padding to prevent button clipping -->
+    <dimen name="careerstack_main_paddingBottom">@dimen/careerstack_main_logo_marginTop</dimen>
+    
     <!-- Logo margin top -->
     <dimen name="careerstack_main_logo_marginTop">25dp</dimen>
     <!-- Powered by margin top -->
