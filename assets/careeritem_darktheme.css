@@ -5,6 +5,6 @@
   
  /** Change font color. */
    body {
-   /** Equivalent to #EFEFEF with 90% opacity or E5  */
-	color: rgba(239, 239, 239, 229);
+   /** Equivalent to #F6F6F5 with 90% opacity or E5  */
+	color: rgba(246,246,245, 229);
   }

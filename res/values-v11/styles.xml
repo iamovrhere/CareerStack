@@ -26,6 +26,7 @@
         <!-- API 11 theme customizations can go here. -->
         
         <item name="android:windowBackground">@color/careerstack_nearblack_background</item>
+        <item name="careerstack_background_color">@color/careerstack_nearblack_background</item>
         
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
         <item name="careerstack_title_color">@android:color/white</item>
@@ -44,6 +45,9 @@
     
     <!-- Light theme -->
     <style name="_AppBaseTheme.Light" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowBackground">@color/careerstack_offwhite_background</item>   
+        <item name="careerstack_background_color">@color/careerstack_offwhite_background</item>
+        
         <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>
         <item name="careerstack_title_color">@android:color/black</item>
         <!-- The colour of the x miles/km text -->

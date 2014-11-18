@@ -24,9 +24,10 @@
     -->
     <style name="_AppBaseTheme.Dark" parent="Theme.AppCompat"
          >
-         <item name="android:windowBackground">@color/careerstack_nearblack_background</item>
+        <item name="android:windowBackground">@color/careerstack_nearblack_background</item>
+        <item name="careerstack_background_color">@color/careerstack_nearblack_background</item>         
          
-         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
+        <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         <item name="careerstack_title_color">@android:color/white</item>
         <!-- Attribue drawable for the dark icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
@@ -50,7 +51,9 @@
     <!-- Light theme -->
     <style name="_AppBaseTheme.Light" parent="Theme.AppCompat.Light.DarkActionBar"
         >
-        <item name="android:windowBackground">@color/careerstack_offwhite_background</item>        
+        <item name="android:windowBackground">@color/careerstack_offwhite_background</item>   
+        <item name="careerstack_background_color">@color/careerstack_offwhite_background</item>
+        
         <item name="careerstack_title_color">@android:color/black</item>        
         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         
