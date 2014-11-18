@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -46,7 +47,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * after search or cancel is pressed.
  * </p>
  * @author Jason J.
- * @version 0.1.1-20141106
+ * @version 0.1.2-20141118
  */
 public class SearchBarDialogFragment extends DialogFragment 
 	implements OnClickListener, OnCheckedChangeListener {
@@ -166,10 +167,7 @@ public class SearchBarDialogFragment extends DialogFragment
 		View rootView = inflater.inflate(R.layout.dialog_fragment_search_bar, container,
 						false);
 		
-		Window win = getDialog().getWindow();
-		win.setGravity(Gravity.TOP);
-        win.setWindowAnimations(R.style.SearchBarAnimation);
-				 
+		initAnimationAndDim();  				 
 		initInputs(rootView);
 		
 		if (savedInstanceState != null){
@@ -180,6 +178,8 @@ public class SearchBarDialogFragment extends DialogFragment
 		
 		return rootView;
 	}
+
+	
 	
 	@Override
 	public void onResume() {
@@ -249,6 +249,18 @@ public class SearchBarDialogFragment extends DialogFragment
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Initializer helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** Initializes the dialogs animations and dim. */
+	private void initAnimationAndDim() {
+		Window win = getDialog().getWindow();
+		win.setGravity(Gravity.TOP);
+        win.setWindowAnimations(R.style.SearchBarAnimation);
+        
+        WindowManager.LayoutParams lp = win.getAttributes();  
+        lp.dimAmount = 0.3f;   //TODO abstract? is it necessary?
+        win.setAttributes(lp);  
+        win.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+	}
 	
 	/** Initializes all the native input views on the fragment. */
 	private void initInputs(View rootView){
