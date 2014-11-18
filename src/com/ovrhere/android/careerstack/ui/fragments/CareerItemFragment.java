@@ -8,17 +8,20 @@ import java.util.TimeZone;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources.Theme;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -33,23 +36,23 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
 /**
  * The listing of a job item. Provides ability to open, copy or share link.
  * @author Jason J.
- * @version 0.4.1-20141009
+ * @version 0.4.2-20141118
  */
 public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = CareerItemFragment.class
 			.getSimpleName();
-	/** Logtag for debuggin. */
+	/** Logtag for debugging. */
 	final static private String LOGTAG = CLASS_NAME;
-	/** Whether or not debuggin. */
-	final static private boolean DEBUG = true;
+	/** Whether or not debugging. */
+	final static private boolean DEBUG = false;
 	
 	
 	/** Bundle Key. The career item for this fragment. Parcelable/CareerItem. */
 	final static private String KEY_CAREER_ITEM =
 			CLASS_NAME +".KEY_CAREER_ITEM";
 	/** Bundle Key. The scroll position as a ratio of 
-	 * <code>pos/height</code>. Float. */
+	 * <code>pos/height</code>. Double. */
 	final static private String KEY_SCROLL_POSITION_RATIO =
 			CLASS_NAME +".KEY_SCROLL_POSITION_RATIO";
 	
@@ -58,6 +61,8 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The output date format string to use. */
+	/* We could use DateUtils like in CareerItemFilterListAdapter, but I favour
+	 * this format above all.	 */
 	final static private String DATE_FORMAT = "yyyy-MM-dd HH:mm";
 	
 	/** The dark theme css to use with {@link #HTML_WRAPPER}. */
@@ -124,8 +129,20 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Bool for backstack safety of whether view has been built. */
 	private boolean viewBuilt = false;
 	
+	/** Bool for when scroll view is pending. Set <code>true</code> in {@link #webViewListener}*/
+	private boolean scrollViewPending = false;
+	
+	/** The current scroll ratio for how far down the scroll. */
+	/* A ratio is used since the height WILL almost always change between 
+	 * orientation shifts. As such, scrolling to a pixel will be inaccurate 
+	 * between rotations, quickly creeping upwards. 
+	 * We use double to reduce rounding-creep. 	*/
+	private double scrollRatio = 0.0d;
+	
+	
+	
 	/**
-	 * Use this factory method createa new Career framgnet.
+	 * Use this factory method create a new Career fragment.
 	 * 
 	 * @param careerItem The item to pass directly on.
 	 * @return A new instance of fragment CareerItemFragment.
@@ -148,9 +165,24 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		super.onSaveInstanceState(outState);
 		outState.putParcelable(KEY_CAREER_ITEM, careerItem);
 		if (viewBuilt){
-			outState.putFloat(
-				KEY_SCROLL_POSITION_RATIO, 
-				(float)sv_scrollView.getScrollY()/(float)sv_scrollView.getHeight());
+			double scrollRatio = 
+					/* Note that the webview height is added. 
+					 * The reason for this is that the scroll view will ignore the
+					 * WebView height as its contents (thus height) 
+					 * is not present at loading.
+					 */
+					(double) sv_scrollView.getScrollY()/
+					(double) (sv_scrollView.getHeight() + wv_jobDescription.getHeight());
+			
+			if (DEBUG){
+				Log.d(LOGTAG, "Scroll ratio (" + sv_scrollView.getScrollY() 
+						+ "/"+sv_scrollView.getChildAt(0).getHeight()+") ");
+				Log.d(LOGTAG, "Scroll ratio stored: " + scrollRatio);
+			}
+			outState.putDouble(KEY_SCROLL_POSITION_RATIO, scrollRatio);
+		} else {
+			//use the preset value if no view is available
+			outState.putDouble(KEY_SCROLL_POSITION_RATIO, scrollRatio);
 		}
 	}
 
@@ -181,6 +213,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	public void onDestroyView() {
 		super.onDestroyView();
 		if (wv_jobDescription != null){
+			wv_jobDescription.setWebViewClient(null);
 			wv_jobDescription.post(new Runnable() {@Override
 				public void run() {
 					/* destroying is required or we get a:
@@ -195,25 +228,22 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Initialization & helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	/** Initializes the scroll view. */
+	
+	/** Initializes the scroll view. This must be done last. */
 	private void initScrollView(View rootView, Bundle saveState){
 		sv_scrollView = (ScrollView)
 				rootView.findViewById(R.id.careerstack_careerItem_scrollView);
 		if (saveState == null){
 			return;
 		}
-		/* We use a ratio because the height WILL change between orientation.
-		 * As such, scrolling to a pixel will be inaccurate between rotations,
-		 * slowly creeping upwards.	 */
-		final float scrollRatio = 
-				saveState.getFloat(KEY_SCROLL_POSITION_RATIO);
+		scrollRatio = saveState.getDouble(KEY_SCROLL_POSITION_RATIO);
+		if (DEBUG){
+			Log.d(LOGTAG, "Scroll ratio retrieved: "+scrollRatio);
+		}
 		
-		sv_scrollView.post(new Runnable() {@Override
-			public void run() {
-				float height = sv_scrollView.getHeight();
-				sv_scrollView.scrollBy(0, (int) (height * scrollRatio));
-			}
-		});
+		if (scrollViewPending){
+			resetScrollView();
+		}
 	}
 	
 	/** Initializes the output views. */
@@ -243,7 +273,9 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		wv_jobDescription = (WebView)
 				rootView.findViewById(R.id.careerstack_careerItem_webview_jobDescription);
 		wv_jobDescription.setScrollContainer(false);
-		wv_jobDescription.setBackgroundColor(0x00000000);
+		
+		int colour = getBackgroundColour();		
+		wv_jobDescription.setBackgroundColor(colour);
 		
 		WebSettings webSettings = wv_jobDescription.getSettings();
 		//webSettings.setUseWideViewPort(true);
@@ -254,17 +286,20 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		/* Tried: wv_jobDescription.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		 * but to no avail
 		 */
+			
 		
-		String htmlData = wrapDescription(careerItem.getDescription());
-		
-		wv_jobDescription.loadDataWithBaseURL( "file:///android_asset/", 
-				htmlData, "text/html", "UTF-8", null);		
+		loadJobDescription();		
 
 		wv_jobDescription.setContentDescription(
-				//strip html
+				//strip html for accessibility 
 				Html.fromHtml(careerItem.getDescription()).toString()
 				);
+		wv_jobDescription.setWebViewClient(webViewListener);
 	}
+
+	
+
+	
 	
 	
 	/** Initializes the buttons. */
@@ -286,6 +321,42 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/// Helper/Utility section
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/** Loads the job description into the WebView, if not null. */
+	private void loadJobDescription() {
+		if (wv_jobDescription != null){
+			String htmlData = wrapDescription(careerItem.getDescription());
+			wv_jobDescription.loadDataWithBaseURL( "file:///android_asset/", 
+					htmlData, "text/html", "UTF-8", null);
+		}
+	}
+	
+	
+	/** Resets scroll view to scrollRatio according to its height, if not <code>null</code>. */
+	private void resetScrollView(){
+		if (sv_scrollView != null){
+			sv_scrollView.post(new Runnable() {@Override
+				public void run() {
+					double height = 
+							sv_scrollView.getHeight() + wv_jobDescription.getHeight();
+					if (sv_scrollView.getScrollY() > 0 ){
+						//perhaps we have scrolled already?
+						return;
+					}
+					sv_scrollView.scrollBy(0, (int) (height * scrollRatio));
+					scrollViewPending = false;
+				}
+			});
+		}
+	}
+	
+	/** @returns The background colour based on theme via careerstack_background_color item. */
+	private int getBackgroundColour() {
+		TypedValue typedValue = new TypedValue();
+		Theme theme = getActivity().getTheme();
+		theme.resolveAttribute(R.attr.careerstack_background_color, typedValue, true);
+		int color = typedValue.data;
+		return color;
+	}
 	
 	/** Uses the preference to determine whether to apply the dark or light theme. 
 	 * @param description The description to wrap and theme. */
@@ -385,8 +456,50 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Implements listeners
+	/// Implemented listeners
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** The web view client to listen to when the view has been loaded. */
+	private WebViewClient webViewListener = new WebViewClient(){
+		/** The number of load attempts. */
+		protected int attempts = 0;
+		
+		/** Number of retries before giving up on loading the job description. */ 
+		final static private int RETRY_LIMIT = 5;
+		
+		@Override
+		public void onPageFinished(final WebView webView, String url) {
+			webView.post(new Runnable() {				
+				@Override
+				public void run() {
+					if (DEBUG){
+						Log.d(LOGTAG, "webview height: " + webView.getHeight());
+						if (sv_scrollView != null){
+							Log.d(LOGTAG, "full height: " + 
+								sv_scrollView.getChildAt(0).getHeight());
+						}
+					}
+					//TODO add progress bar + hide here
+					
+					/* Occasionally, the webview won't load. This may be caused
+					 * by the wrap_content layout. A "fix" is to force reload. */
+					if (webView.getHeight() <= 0){
+						//we have failed to load, retry
+						if (attempts++ < RETRY_LIMIT){
+							//webView.loadUrl("about:blank"); //clear first
+							loadJobDescription();
+						}
+						return;
+					} else {
+						//we have finished loading, reset scroll
+						scrollViewPending = true;
+						resetScrollView();
+					}
+					
+				}
+			});
+		};
+	};
 	
 	@Override
 	public void onClick(View v) {
