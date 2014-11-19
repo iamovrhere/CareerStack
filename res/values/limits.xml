@@ -26,8 +26,11 @@
     <!-- The default values for the seekbar -->
     <item name="careerstack_seekBar_default" type="integer">20</item>
     
-    <!-- The speed of the search bar animation -->
+    <!-- The speed of the search bar animation in milliseconds -->
     <item name="careerstack_searchBar_speed" type="integer">220</item>
+    
+    <!-- The speed of the quick-fade in/out animation in milliseconds -->
+    <item name="careerstack_quickfade_speed" type="integer">200</item>
     
     
     <!-- The minimum size required before showing ads -->

@@ -14,9 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -24,7 +25,6 @@ import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
 import com.ovrhere.android.careerstack.model.CareersStackOverflowModel;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
-import com.ovrhere.android.careerstack.ui.adapters.AdViewListAdapter;
 import com.ovrhere.android.careerstack.ui.adapters.CareerItemFilterListAdapter;
 import com.ovrhere.android.careerstack.utils.UnitCheck;
 
@@ -33,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.7.0-20141112
+ * @version 0.7.1-20141119
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -111,10 +111,6 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	private ArrayList<CareerItem> careerList = new ArrayList<CareerItem>();	
 	/** The adapter for the results. */
 	private CareerItemFilterListAdapter resultAdapter = null;
-	/** The adapter that is applied. 
-	 * May either be {@link #resultAdapter} directly or an {@link AdViewListAdapter}. */
-	@Deprecated
-	private BaseAdapter appliedAdapter = null;
 	
 	
 	/** If the fragment is currently loading results. */
@@ -196,7 +192,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 				mFragInteractionListener.onPopSavedStateRequest();
 		
 		//default loading to true to start with loading/spinner
-		showLoadingBlock();
+		showLoadingBlock(false);
 		
 		if (backStackState != null){
 			debugSavedState(backStackState);
@@ -207,7 +203,8 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			Bundle args = getArguments();
 			processArgBundle(args);
 			//if no values set, request.
-			sendRequest(args);
+			sendModelRequest(args);
+			showLoadingBlock(false);
 		} 
 		
 		viewBuilt = true;
@@ -255,21 +252,16 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/// Request updates start here
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	/** Prepares and sends request off to model.
+	/** Prepares and sends request off to model while setting views.
 	 * Sets the internal previous request.
 	 * @param args The args to send according to the KEYS given.  */
 	public void sendRequest(Bundle args){
-		if (prevQuery == null){ //should never be null, but just in case
-			prevQuery = new Bundle();
-		}
-		prevQuery.putAll(args);
-		prevQuery.putBoolean(
-				CareersStackOverflowModel.KEY_USE_METRIC, 
-				UnitCheck.useMetric(prefs, getResources()) );
 		//we are about to request, set up loading
-		showLoadingBlock(); 
-		asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RECORD_QUERY, prevQuery);		
+		showLoadingBlock(true);
+		
+		sendModelRequest(args);		
 	}
+
 	
 	/** Resends the previous request. If no request was previously sent, an
 	 * empty request is sent.	 */
@@ -323,11 +315,11 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			resultsTimeout = args.getBoolean(KEY_RESULTS_TIMEOUT);
 			
 			if (resultsTimeout){
-				showRetryBlock();
+				showRetryBlock(false);
 			} else if (isLoadingResults){
-				showLoadingBlock();
+				showLoadingBlock(false);
 			} else {
-				showResults();
+				showResults(false);
 			}
 			
 			if (args.getParcelableArrayList(KEY_CAREER_LIST) != null){
@@ -354,6 +346,22 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Helper methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+
+	/** Send the model the request. Sets the internal previous request. 
+	 * No view setting.
+	 * @param args The args to send according to the KEYS given.  */
+	private void sendModelRequest(Bundle args) {
+		if (prevQuery == null){ //should never be null, but just in case
+			prevQuery = new Bundle();
+		}
+		prevQuery.putAll(args);
+		prevQuery.putBoolean(
+				CareersStackOverflowModel.KEY_USE_METRIC, 
+				UnitCheck.useMetric(prefs, getResources()) );
+		 
+		asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RECORD_QUERY, prevQuery);
+	}
 	
 	/** Builds the saved state from views and other elements. */
 	private void buildSaveState(Bundle outState) {
@@ -393,43 +401,106 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// View updates start here
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Created a new fade out listener. Sets the view to GONE when animation ends. */
+	static private Animation.AnimationListener newFadeOutViewListener(final View view){
+		return new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+				//view.setVisibility(View.VISIBLE); //assume visible
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				view.setVisibility(View.GONE);				
+			}
+		};
+	}
 	
+	/** Fades views according to visibility.
+	 * If hideView1 is visible, it sets the animation to fade it and 
+	 * @param showView The view to fade into visibility.
+	 * @param hideView1 The view to fade/hide
+	 * @param hideView2 The view to fade/hide
+	 */
+	private void fadeViews(View showView, View hideView1, View hideView2){
+		final Animation fadein = 
+				AnimationUtils.loadAnimation(getActivity(), R.anim.quick_fade_in);
+		final Animation fadeout = 
+				AnimationUtils.loadAnimation(getActivity(), R.anim.quick_fade_out);
+		showView.setAnimation(fadein);
+		//make visible AFTER setting animation, so it starts dim.
+		showView.setVisibility(View.VISIBLE);  
+		
+		if (hideView1.getVisibility() == View.VISIBLE){
+			fadeout.setAnimationListener(newFadeOutViewListener(hideView1));
+			hideView1.setAnimation(fadeout);
+						
+			hideView2.setVisibility(View.GONE);			
+		} else if (hideView2.getVisibility() == View.VISIBLE){
+			fadeout.setAnimationListener(newFadeOutViewListener(hideView2));
+			hideView2.setAnimation(fadeout);
+			
+			hideView1.setVisibility(View.GONE);
+		}
+		//otherwise: do nothing, they're both invisible
+	}
 	
 	
 	/** Shows the retry block, hiding the other 2 views. Sets
 	 * {@link #isLoadingResults} to false and 
-	 * {@link #resultsTimeout} to <code>true</code>	 */
-	private void showRetryBlock(){
-		retryContainer.setVisibility(View.VISIBLE);
-		progressContainer.setVisibility(View.GONE);
-		lv_resultsView.setVisibility(View.GONE);
+	 * {@link #resultsTimeout} to <code>true</code>	
+	 * @param animate <code>true</code> to fade views, <code>false</code> 
+	 * to just switch visibility. */
+	private void showRetryBlock(boolean animate){
 		isLoadingResults = false;
 		resultsTimeout = true;
 		
+		if (animate){
+			fadeViews(retryContainer, progressContainer, lv_resultsView);
+		} else {
+			retryContainer.setVisibility(View.VISIBLE);
+			progressContainer.setVisibility(View.GONE);
+			lv_resultsView.setVisibility(View.GONE);
+		}		
 	}
 	
 	/** Shows the loading/progress block, hiding the other 2 views. Sets
 	 * {@link #isLoadingResults} to true and 
-	 * {@link #resultsTimeout} to <code>false</code>.	 */
-	private void showLoadingBlock(){
-		retryContainer.setVisibility(View.GONE);
-		progressContainer.setVisibility(View.VISIBLE);
-		lv_resultsView.setVisibility(View.GONE);
+	 * {@link #resultsTimeout} to <code>false</code>.	
+	 * @param animate <code>true</code> to fade views, <code>false</code> 
+	 * to just switch visibility.  */
+	private void showLoadingBlock(boolean animate){
 		isLoadingResults = true;
-		resultsTimeout = false;
+		resultsTimeout = false;	
 		
+		if (animate){
+			fadeViews(progressContainer, retryContainer, lv_resultsView);
+		} else {
+			retryContainer.setVisibility(View.GONE);
+			progressContainer.setVisibility(View.VISIBLE);
+			lv_resultsView.setVisibility(View.GONE);
+		}	
 	}
 	
 	/** Shows the list view, hiding the other 2 views. Sets
 	 * {@link #isLoadingResults} to false and 
-	 * {@link #resultsTimeout} to <code>false</code>	 */
-	private void showResults(){
-		retryContainer.setVisibility(View.GONE);
-		progressContainer.setVisibility(View.GONE);
-		lv_resultsView.setVisibility(View.VISIBLE);
-		
+	 * {@link #resultsTimeout} to <code>false</code>	
+	 * @param animate <code>true</code> to fade views, <code>false</code> 
+	 * to just switch visibility.  */
+	private void showResults(boolean animate){
 		isLoadingResults = false;
-		resultsTimeout = false;		
+		resultsTimeout = false;	
+		
+		if (animate){
+			fadeViews(lv_resultsView, progressContainer, retryContainer);
+		} else {
+			retryContainer.setVisibility(View.GONE);
+			progressContainer.setVisibility(View.GONE);
+			lv_resultsView.setVisibility(View.VISIBLE);
+		}	
 	}
 	
 	/** Resets the list position to top. */
@@ -459,12 +530,13 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			break;
 			
 		case R.id.careerstack_searchResults_button_cancel:
-			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_QUERY_CANCEL);
 			if (careerList.isEmpty()){
-				showRetryBlock();
+				showRetryBlock(false);
 			} else {
-				showResults();
+				showResults(true);
 			}
+			//set cancelled appearance first, before cancelling
+			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_QUERY_CANCEL);
 			//fall through
 		}
 	}
@@ -491,11 +563,11 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			}
 			switch (msg.what) {
 			case CareersStackOverflowModel.NOTIFY_STARTING_QUERY:
-				showLoadingBlock();
+				//showLoadingBlock(true); //taken care of in sendRequest(Bundle)
 				return true;
 				
 			case CareersStackOverflowModel.NOTIFY_CANCELLED_QUERY:
-				showResults();
+				//showResults(true); //taken care of in onClick(View)
 				return true;
 				
 			case CareersStackOverflowModel.REPLY_RECORDS_RESULT:
@@ -515,21 +587,25 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 						Log.e(LOGTAG, "Mismatched class? How irregular: " + e );
 					}
 				}
-				showResults();
-				resetListPosition();
+				if (isLoadingResults){ //if we have not cancelled
+					showResults(true);
+					resetListPosition();
+				}
 				return true;
 				
 			case CareersStackOverflowModel.ERROR_REQUEST_TIMEOUT:
-				showRetryBlock();
+				if (isLoadingResults){ //if we were loading results, and timeout
+					showRetryBlock(true);
+				}
 				return true;
 				
 			case CareersStackOverflowModel.ERROR_REQUEST_FAILED:
 				if (careerList.isEmpty() || isLoadingResults){
 					//if we have no elements, or were still loading results 
 					//i.e. not cancelled, retry block
-					showRetryBlock();
+					showRetryBlock(true);
 				} else {
-					showResults();
+					showResults(true);
 				}
 				return true;
 				
