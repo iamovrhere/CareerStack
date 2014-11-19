@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -36,7 +37,7 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
 /**
  * The listing of a job item. Provides ability to open, copy or share link.
  * @author Jason J.
- * @version 0.4.2-20141118
+ * @version 0.4.3-20141119
  */
 public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Class name for debugging purposes. */
@@ -488,9 +489,22 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 						if (attempts++ < RETRY_LIMIT){
 							//webView.loadUrl("about:blank"); //clear first
 							loadJobDescription();
+							
+							//make webview invisible for animation purposes
+							webView.setVisibility(View.INVISIBLE);
 						}
 						return;
 					} else {
+						//if invisible, we must want to fade it in.
+						if (webView.getVisibility() == View.INVISIBLE){
+							webView.setAnimation(
+									AnimationUtils.loadAnimation(
+											webView.getContext(), 
+											R.anim.quick_fade_in)
+									);
+							webView.setVisibility(View.VISIBLE);
+						}
+						
 						//we have finished loading, reset scroll
 						scrollViewPending = true;
 						resetScrollView();
