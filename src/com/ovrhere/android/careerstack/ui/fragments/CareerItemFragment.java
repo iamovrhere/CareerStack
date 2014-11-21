@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,13 +19,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
@@ -37,7 +36,7 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
 /**
  * The listing of a job item. Provides ability to open, copy or share link.
  * @author Jason J.
- * @version 0.4.3-20141119
+ * @version 0.5.0-20141121
  */
 public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Class name for debugging purposes. */
@@ -66,20 +65,59 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	 * this format above all.	 */
 	final static private String DATE_FORMAT = "yyyy-MM-dd HH:mm";
 	
-	/** The dark theme css to use with {@link #HTML_WRAPPER}. */
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Start HTML_WRAPPERS
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** The dark theme css to use with {@link #HTML_WRAPPER_DESCRIPTION}. */
 	final static private String CSS_DARK = "careeritem_darktheme";
-	/** The dark theme css to use with {@link #HTML_WRAPPER}. */
+	/** The dark theme css to use with {@link #HTML_WRAPPER_DESCRIPTION}. */
 	final static private String CSS_LIGHT = "careeritem_lighttheme";
 	
+	/** The light theme css to use with {@link #HTML_WRAPPER_TAGS}. */
+	final static private String HTML_TAGS_LIGHT_THEME = 
+			"<link rel='stylesheet' href='./careeritem_tags_lighttheme.css' "
+			+ "type='text/css' media='screen'>";
+	
 	/** The wrapper for the content description html. Takes two strings:
-	 * <ul><ol>The css file name (Either #CSS_DARK or #CSS_LIGHT)</ol>
-	 * <ol>The html to render</ol></li>
+	 * <ol><li>The css file name (Either #CSS_DARK or #CSS_LIGHT)</li>
+	 * <li>The html to render</li></ol>
 	 */
-	final static private String HTML_WRAPPER = "<!DOCTYPE html><html><head>"+
+	final static private String HTML_WRAPPER_DESCRIPTION = "<!DOCTYPE html><html><head>"+
 			"<link rel='stylesheet' href='./careeritem_styling.css' type='text/css' media='screen'>" +
 			"<link rel='stylesheet' href='./%s.css' type='text/css' media='screen'>" +
-			"<!--This line refer the css file--></head>" +
+			"<!--Previous lines refer to css files--></head>" +
 			"<body> %s </body></html>";
+	
+
+	/** The JavaScript object to use in calls. */
+	final static private String JAVASCRIPT_TAGS_OBJ = "AndroidCareerItem";
+
+	/** The wrapper for the tags html. Takes one strings:
+	 * <ol><li>The list of #HTML_TAG_BUTTON s </li>
+	 * <li>The light css html or blank</li></ol>	 */
+	final static private String HTML_WRAPPER_TAGS = "<!DOCTYPE html><html><head>"+
+			"<link rel='stylesheet' href='./careeritem_tags.css' type='text/css' media='screen'>" +
+			"%2$s"+
+			"<!--Previous lines refer to css files--></head>" +
+			//ontouchstart required for the :active styling to work
+			"<body ontouchstart='' > %1$s </body></html>";
+
+	
+	/** The HTML for the tag buttons. Takes one string (the name of the button). 
+	 * Methods match {@link JobTagsJSInterface#onTagClick(String)}  */
+	final static private String HTML_TAG_BUTTON = 
+			"<div class='job-tag' " +
+			//dirt simple, inline javascript
+			" onclick=\""+JAVASCRIPT_TAGS_OBJ+".onTagClick('%1$s')\"" +
+			//force redraw
+			" ontouchstart=\"this.className = 'job-tag'; \" " +
+			//ontouchmove, prevents button "sliding" styling issues
+			" ontouchmove=\"this.className = 'job-tag-inactive';\" " +
+			">%1$s</div>";
+	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Start share constants
@@ -117,8 +155,15 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	/** The webview reference for proper destruction. */
-	private WebView wv_jobDescription = null; 
+	
+	/** The preference handle. */
+	private SharedPreferences prefs = null;
+	
+	/** The job description webview reference for animation + proper destruction. */
+	private WebView wv_jobDescription = null;
+	
+	/** The tags webview reference for animation + proper destruction. */
+	private WebView wv_tags= null;
 	
 	/** The local instance of career item to display. */
 	private CareerItem careerItem = null;
@@ -130,8 +175,12 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** Bool for backstack safety of whether view has been built. */
 	private boolean viewBuilt = false;
 	
-	/** Bool for when scroll view is pending. Set <code>true</code> in {@link #webViewListener}*/
-	private boolean scrollViewPending = false;
+	/** Bool for when scroll view is pending. 
+	 * Set <code>true</code> in {@link #jobDescriptionWebViewListener}*/
+	private boolean scrollViewPending1 = false;	
+	/** Bool for when scroll view is pending. 
+	 * Set <code>true</code> in {@link #tagsWebViewListener}*/
+	private boolean scrollViewPending2 = false;
 	
 	/** The current scroll ratio for how far down the scroll. */
 	/* A ratio is used since the height WILL almost always change between 
@@ -195,6 +244,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		} else if (savedInstanceState != null){
 			careerItem = savedInstanceState.getParcelable(KEY_CAREER_ITEM);
 		}
+		prefs = PreferenceUtils.getPreferences(getActivity());
 	}
 
 	@Override
@@ -213,18 +263,11 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		if (wv_jobDescription != null){
-			wv_jobDescription.setWebViewClient(null);
-			wv_jobDescription.post(new Runnable() {@Override
-				public void run() {
-					/* destroying is required or we get a:
-					 * java.lang.IllegalArgumentException:  bitmap exceeds 32 bits exception */
-					wv_jobDescription.destroy(); 
-				}
-			});
-		}
+		destroyWebView(wv_jobDescription);
+		destroyWebView(wv_tags);
 		viewBuilt = false;
 	}
+
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Initialization & helpers
@@ -242,7 +285,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 			Log.d(LOGTAG, "Scroll ratio retrieved: "+scrollRatio);
 		}
 		
-		if (scrollViewPending){
+		if (scrollViewPending1){
 			resetScrollView();
 		}
 	}
@@ -257,6 +300,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 				rootView.findViewById(R.id.careerstack_careerItem_text_companyLocationEtc);
 		companyEtc.setText(careerItem.getCompanyLocationEtc());	
 		
+		initTags(rootView);
 		initJobDescription(rootView);
 		
 		TextView updateDate = (TextView)
@@ -268,8 +312,68 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 				);
 	}
 
+	/* 
+	 * Point of reference:
+	 * There are multiple approaches one could have taken when implementing the tags:
+	 * Firstly, in order to achieve horizontal wrapping (for 0 - n tags) 
+	 * one could have used layouts and programmatically added sublayouts,
+	 * organized a relative layout for the buttons, or used a webview. The latter
+	 * was done.
+	 * 
+	 * When executing the button clicks it could be either be done in:
+	 * - WebViewClient.onPageStarted(View, String, Bitmap) 
+	 * - JavaScript
+	 * 
+	 * However, styling issues were more readily handled with javascript enabled
+	 * and I just wanted to use it.
+	 * 
+	 * This is part of the reason why a separate WebView is used; we have little
+	 * control over the job description content. Safety dictates isolating 
+	 * execution in unsure states.
+	 */
+	
 	/** Sets up the job description, including styling. */
-	@SuppressLint({ "InlinedApi", "NewApi" })
+	@SuppressLint("SetJavaScriptEnabled")
+	private void initTags(View rootView) {
+		wv_tags = (WebView)
+				rootView.findViewById(R.id.careerstack_careerItem_webview_tags);
+		wv_tags.setScrollContainer(false);
+		
+		int colour = getBackgroundColour();		
+		wv_tags.setBackgroundColor(colour);
+		
+		WebSettings webSettings = wv_tags.getSettings();
+		
+		webSettings.setDefaultFontSize(12); //TODO abstract
+		webSettings.setSupportZoom(false);
+		webSettings.setJavaScriptEnabled(true);
+		wv_tags.addJavascriptInterface(new JobTagsJSInterface(this), JAVASCRIPT_TAGS_OBJ);
+		
+		/* Disable clipboard. */
+		wv_tags.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
+		
+		wv_tags.post(new Runnable() {	@Override
+			public void run() {
+				//increase likelihood of first time load.
+				buildAndLoadTags();
+			}
+		
+		});		
+
+		//TODO accessibility
+		/* wv_tags.setContentDescription(
+				//strip html for accessibility 
+				Html.fromHtml(careerItem.getDescription()).toString()
+				); */
+		wv_tags.setWebViewClient(tagsWebViewListener);
+	}
+	
+	/** Sets up the job description, including styling. */
 	private void initJobDescription(View rootView) {
 		wv_jobDescription = (WebView)
 				rootView.findViewById(R.id.careerstack_careerItem_webview_jobDescription);
@@ -283,25 +387,23 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		webSettings.setDefaultFontSize(14); //TODO abstract
 		webSettings.setSupportZoom(false);
 		
-		
-		/* Tried: wv_jobDescription.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-		 * but to no avail
-		 */
 			
-		
-		loadJobDescription();		
+		wv_jobDescription.post(new Runnable() {	@Override
+			public void run() {
+				//increase likelihood of first time load.
+				loadJobDescription();
+			}
+		});		
 
 		wv_jobDescription.setContentDescription(
 				//strip html for accessibility 
 				Html.fromHtml(careerItem.getDescription()).toString()
 				);
-		wv_jobDescription.setWebViewClient(webViewListener);
+		wv_jobDescription.setWebViewClient(jobDescriptionWebViewListener);
 	}
 
 	
 
-	
-	
 	
 	/** Initializes the buttons. */
 	private void initButtons(View rootView){
@@ -322,6 +424,38 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/// Helper/Utility section
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
+
+	/** Destroys the webview for safety reasons 
+	 * ( java.lang.IllegalArgumentException:  bitmap exceeds 32 bits exception ) */
+	private void destroyWebView(final WebView view) {
+		if (view != null){
+			view.setWebViewClient(null);
+			view.post(new Runnable() {
+				@Override
+				public void run() {
+					/* destroying is required or we get a:
+					 * java.lang.IllegalArgumentException:  bitmap exceeds 32 bits exception */
+				view.destroy(); 
+				}
+			});
+		}
+	}
+	
+	
+	/** Builds tags from the careeritem and loads them into the webview. */ 
+	private void buildAndLoadTags() {
+		String buttons = "";
+		String cats[] = careerItem.getCategories();
+		final int SIZE = cats.length;
+		for (int index = 0; index < SIZE; index++){
+			buttons += String.format(HTML_TAG_BUTTON, cats[index]);
+		}
+		String extraCss = isLightTheme() ? HTML_TAGS_LIGHT_THEME : "";
+		String htmlData = String.format(HTML_WRAPPER_TAGS, buttons, extraCss);
+		wv_tags.loadDataWithBaseURL( "file:///android_asset/", 
+			htmlData, "text/html", "UTF-8", null);
+	}
+	
 	/** Loads the job description into the WebView, if not null. */
 	private void loadJobDescription() {
 		if (wv_jobDescription != null){
@@ -332,9 +466,10 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	}
 	
 	
-	/** Resets scroll view to scrollRatio according to its height, if not <code>null</code>. */
+	/** Resets scroll view to scrollRatio according to its height, 
+	 * if not <code>null</code> and scroll view is pending. */
 	private void resetScrollView(){
-		if (sv_scrollView != null){
+		if (sv_scrollView != null && scrollViewPending1 && scrollViewPending2){
 			sv_scrollView.post(new Runnable() {@Override
 				public void run() {
 					double height = 
@@ -344,7 +479,8 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 						return;
 					}
 					sv_scrollView.scrollBy(0, (int) (height * scrollRatio));
-					scrollViewPending = false;
+					scrollViewPending1 = false;
+					scrollViewPending2 = false;
 				}
 			});
 		}
@@ -361,25 +497,35 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	
 	/** Uses the preference to determine whether to apply the dark or light theme. 
 	 * @param description The description to wrap and theme. */
-	private String wrapDescription(String description){
-		SharedPreferences prefs = PreferenceUtils.getPreferences(getActivity());
+	private String wrapDescription(String description){		
+		String cssTheme = isLightTheme() ? CSS_LIGHT : CSS_DARK;
+		return String.format(HTML_WRAPPER_DESCRIPTION, cssTheme, description);		
+	}
+	
+	/** @return <code>true</code> if it is light theme, <code>false</code> for dark. */
+	private boolean isLightTheme(){		
 		final String theme = prefs.getString(
 				getString(R.string.careerstack_pref_KEY_THEME_PREF), 
 				"");
-		String cssTheme = "";
-		if (theme.equals(getString(R.string.careerstack_pref_VALUE_THEME_LIGHT))){
-			//light theme
-			cssTheme = CSS_LIGHT; 
-					
-		} else {
-			//implied is dark theme or:
-			//if (theme.equals(getString(R.string.careerstack_pref_VALUE_THEME_DARK)))
-			cssTheme = CSS_DARK;
-		}
-		
-		return String.format(HTML_WRAPPER, cssTheme, description);
-		
+		return theme.equals(getString(R.string.careerstack_pref_VALUE_THEME_LIGHT));
 	}
+	
+	
+	/** Processes the date into a semi-readable string of 
+	 * {@link #DATE_FORMAT}.
+	 * @param date The date to process
+	 * @return The readable date.	 */
+	static private String processDate(Date date){
+		SimpleDateFormat dateFormat = 
+				new SimpleDateFormat(DATE_FORMAT, Locale.US);
+		dateFormat.setTimeZone(TimeZone.getDefault());
+		return dateFormat.format(date);
+	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Start Intent methods
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** Launches internal url. */
 	private void launchUrl(){
@@ -444,29 +590,53 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		share.launchShare(getActivity()); //launch
 	}
 	
-	/** Processes the date into a semi-readable string of 
-	 * {@link #DATE_FORMAT}.
-	 * @param date The date to process
-	 * @return The readable date.	 */
-	static private String processDate(Date date){
-		SimpleDateFormat dateFormat = 
-				new SimpleDateFormat(DATE_FORMAT, Locale.US);
-		dateFormat.setTimeZone(TimeZone.getDefault());
-		return dateFormat.format(date);
-	}
-
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Implemented listeners
+	/// Internal classes
 	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * The javascript interface of the {@link #wv_tags}
+	 * @author Jason J.
+	 * @version 0.1.0-20141120
+	 */
+	static private class JobTagsJSInterface {
+		private CareerItemFragment careerItemFragment = null;
+		public JobTagsJSInterface(CareerItemFragment careerItemFragment) {
+			this.careerItemFragment = careerItemFragment;
+		}
+		
+		/** The interface action for when a tag is clicked
+		 * Name must match {@link #HTML_TAG_BUTTON}
+		 * @param tag The tag that was clicked
+		 */
+		@JavascriptInterface
+		public void onTagClick(String tag){
+			careerItemFragment.toastManager.toastLong(tag);
+			//TODO actual tag searching
+		}		
+	}
 	
-	/** The web view client to listen to when the view has been loaded. */
-	private WebViewClient webViewListener = new WebViewClient(){
+	/** A simple class to reduce repetition. 
+	 * @version 0.1.0-20141121 */
+	static private class AnimatedRetryWebViewClient extends WebViewClient {
 		/** The number of load attempts. */
 		protected int attempts = 0;
 		
 		/** Number of retries before giving up on loading the job description. */ 
 		final static private int RETRY_LIMIT = 5;
+		
+		private RetryListener retryListener = null;
+		private CareerItemFragment careerItemFragment = null;
+		
+		/** Animates the WebView if the webview starts off visible, otherwise 
+		 * it just quietly reloads it in backgrond. */
+		public AnimatedRetryWebViewClient(CareerItemFragment careerItemFragment, 
+				RetryListener retryListener) {
+			super();
+			this.careerItemFragment = careerItemFragment;
+			this.retryListener = retryListener;
+		}
 		
 		@Override
 		public void onPageFinished(final WebView webView, String url) {
@@ -475,23 +645,22 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 				public void run() {
 					if (DEBUG){
 						Log.d(LOGTAG, "webview height: " + webView.getHeight());
-						if (sv_scrollView != null){
+						if (careerItemFragment.sv_scrollView != null){
 							Log.d(LOGTAG, "full height: " + 
-								sv_scrollView.getChildAt(0).getHeight());
+									careerItemFragment.sv_scrollView.getChildAt(0).getHeight());
 						}
 					}
-					//TODO add progress bar + hide here
+
+					//make webview invisible for animation purposes
+					if (webView.getVisibility() == View.VISIBLE){
+						webView.setVisibility(View.INVISIBLE);
+					}
 					
-					/* Occasionally, the webview won't load. This may be caused
-					 * by the wrap_content layout. A "fix" is to force reload. */
+					/* In case the WebView does not load correctly. */
 					if (webView.getHeight() <= 0){
 						//we have failed to load, retry
 						if (attempts++ < RETRY_LIMIT){
-							//webView.loadUrl("about:blank"); //clear first
-							loadJobDescription();
-							
-							//make webview invisible for animation purposes
-							webView.setVisibility(View.INVISIBLE);
+							retryListener.onRetry();
 						}
 						return;
 					} else {
@@ -505,15 +674,59 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 							webView.setVisibility(View.VISIBLE);
 						}
 						
-						//we have finished loading, reset scroll
-						scrollViewPending = true;
-						resetScrollView();
+						retryListener.onAnimationSet();
 					}
 					
 				}
 			});
 		};
-	};
+		
+		/** @version 0.1.0-20141121 */
+		public interface RetryListener {
+			/** Executed when webview is attempted to retry. */
+			public void onRetry();
+			/** Executed when the animate is set. */
+			public void onAnimationSet();
+		}
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Implemented listeners
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** The Job description web view client to listen to when the view has been loaded. */
+	private AnimatedRetryWebViewClient tagsWebViewListener = 
+			new AnimatedRetryWebViewClient(this, new AnimatedRetryWebViewClient.RetryListener() {		
+		@Override
+		public void onRetry() {
+			buildAndLoadTags();		
+		}
+		
+		@Override
+		public void onAnimationSet() {
+			//nothing to do here
+			scrollViewPending2 = true;
+			resetScrollView();
+		}
+	});
+	
+	/** The Job description web view client to listen to when the view has been loaded. */
+	private AnimatedRetryWebViewClient jobDescriptionWebViewListener = 
+			new AnimatedRetryWebViewClient(this, new AnimatedRetryWebViewClient.RetryListener() {		
+		@Override
+		public void onRetry() {
+			loadJobDescription();			
+		}
+		
+		@Override
+		public void onAnimationSet() {
+			//we have finished loading, reset scroll
+			scrollViewPending1 = true;
+			resetScrollView();
+		}
+	});
+	
+	
 	
 	@Override
 	public void onClick(View v) {

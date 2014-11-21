@@ -1,0 +1,49 @@
+@CHARSET "UTF-8";
+/**
+ * Defines styles for career tags, primarily dark theme.
+ * @version 0.1.0-20141121 
+ */
+ 
+ /** 
+  * Font colors, sizes, and styles
+  * ===============================
+  */
+  
+/** Defines styles for the tag. */
+  .job-tag,
+  .job-tag-inactive {
+ 	/** A near white. */
+	color: #efefef;
+ 
+  	/* near black grey. */
+    background-color: #22222f;
+    border: solid 3pt;
+    /* near black grey. */
+    border-color: #202026;
+    border-top-color: #2a2a3a;
+    
+    margin: 4pt 10pt 4pt 0pt;
+    padding: 4pt 8pt;
+    text-decoration: none;
+    font-size: 12pt;
+    line-height: 1.33;
+    white-space: nowrap;
+    text-transform: lowercase;
+    display: inline-block;
+    
+    
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+   	/* Necessary for 2.3.3 to remove orange ring. */
+	-webkit-focus-ring-color: rgba(0, 0, 0, 0);
+}
+
+/** The styles for the active clicks */
+.job-tag:active,
+.job-tag:focus { 
+	background-color: rgba(224, 118, 20, 200);
+	border-color: rgba(229, 123, 25, 100);
+	
+	color: #222;
+	text-decoration:none;
+	outline:0;
+} 

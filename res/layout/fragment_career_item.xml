@@ -92,6 +92,25 @@
 		android:textColor="@color/careerstack_translucent_grey"
 		/>
 
+	    <!-- TODO custom drawable for the checkbox to toggle tag view -->
+	    <CheckBox
+	        android:id="@+id/careerstack_careerItem_check_showTags"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:visibility="gone"
+	        />
+
+	    <WebView
+	        android:id="@+id/careerstack_careerItem_webview_tags"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
+	        
+	        android:text="android, java, basket-weaving"
+	        android:textAppearance="?android:attr/textAppearanceSmall"
+	        	        
+	        tools:ignore="HardcodedText,WebViewLayout" />
+	    
 	    <WebView
 	        android:id="@+id/careerstack_careerItem_webview_jobDescription"
 	        android:layout_width="match_parent"

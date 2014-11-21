@@ -1,0 +1,24 @@
+@CHARSET "UTF-8";
+/**
+ * Defines light theme style for career tags.
+ * @version 0.1.0-20141121 
+ */
+ 
+ /** 
+  * Font colors, sizes, and styles
+  * ===============================
+  */
+  
+/** Defines styles for the tag. */
+  .job-tag,
+  .job-tag-inactive {
+	/** A near black. */
+	color: #080808;
+ 
+  	/* near white grey. */
+    background-color: #e5e5f9;
+    /* near white grey. */
+    border-color: #e1e1f4;
+    border-top-color: #eef;
+}
+ 

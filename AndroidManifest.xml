@@ -23,7 +23,9 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppBaseTheme.Dark" >
+        android:theme="@style/AppBaseTheme.Dark" 
+        android:hardwareAccelerated="true"
+        >
         
        	<meta-data
             android:name="com.google.android.gms.version"
