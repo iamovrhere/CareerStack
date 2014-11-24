@@ -15,7 +15,7 @@
    limitations under the License.
 -->
 <PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android" >
-    <!-- Version 0.1.0-20141112 -->
+    <!-- Version 0.2.0-20141124 -->
     
     <CheckBoxPreference 
         android:key="@string/careerstack_pref_KEY_USE_MILES"
@@ -36,6 +36,12 @@
      <CheckBoxPreference 
         android:key="@string/careerstack_pref_KEY_USE_TABLET_LAYOUT"
         android:defaultValue="@bool/careerstack_pref_DEF_VALUE_USE_TABLET_LAYOUT"
+	/> 
+	
+     
+      <CheckBoxPreference 
+        android:key="@string/careerstack_pref_KEY_SHOW_ITEM_TAGS"
+        android:defaultValue="@bool/careerstack_pref_DEF_VALUE_SHOW_ITEM_TAGS"
 	/> 
     
     <Preference 

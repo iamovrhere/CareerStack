@@ -15,7 +15,7 @@
    limitations under the License.
 -->
 <resources>
-    <!-- Version 0.7.0  -->
+    <!-- Version 0.8.0-20141124  -->
     <eat-comment />
     <!-- The string used as the preference file name. -->
     <string name="preferenceutil_PREFERENCE_FILE_KEY" >
@@ -74,13 +74,17 @@
     </string>
     
     
-     <!-- Boolean key. Whether or not to use tablet layout; 
-     dependant on careerstack_pref_KEY_ADS_AND_FEATURES.  -->
+     <!-- Boolean key. Whether or not to use tablet layout.  -->
     <string name="careerstack_pref_KEY_USE_TABLET_LAYOUT" >
         careerstack_pref_KEY_USE_TABLET_LAYOUT
     </string> 
     
     
+    <!-- Boolean key. Whether or not to show tags.  -->
+    <string name="careerstack_pref_KEY_SHOW_ITEM_TAGS" >
+        careerstack_pref_KEY_SHOW_ITEM_TAGS
+    </string> 
+        
     
     
     
@@ -129,4 +133,8 @@
     <item name="careerstack_pref_DEF_VALUE_USE_TABLET_LAYOUT" 
         type="bool">@bool/careerstack_has_tablet_mode</item>   
 	
+    <!-- Default value for careerstack_pref_KEY_SHOW_ITEM_TAGS. False for most phones -->
+    <item  name="careerstack_pref_DEF_VALUE_SHOW_ITEM_TAGS" 
+    	type="bool">@bool/careerstack_show_tags_toggle</item>
+    
 </resources>

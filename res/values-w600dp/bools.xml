@@ -14,14 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<resources>
-    <!-- Whether or not the app is in tablet mode based on dimensions.
-    Default is false.  -->
-    <item name="careerstack_in_tablet_mode" type="bool" >0</item>
-    
-    <!-- Whether the devices has the capablity for tablet mode. Default false. -->
-    <item name="careerstack_has_tablet_mode" type="bool" >0</item>
-    
-    <!-- Whether to show the tags toggle on the career item. -->
-    <item name="careerstack_show_tags_toggle" type="bool" >0</item>
+<resources>    
+    <!-- True for width or height 640dp. -->
+    <item name="careerstack_show_tags_toggle" type="bool" >1</item>
 </resources>
