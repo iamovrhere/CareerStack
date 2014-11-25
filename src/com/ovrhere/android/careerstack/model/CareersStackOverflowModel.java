@@ -30,9 +30,9 @@ import com.ovrhere.android.careerstack.model.asyncmodel.RunnableHeadlessFragment
 import com.ovrhere.android.careerstack.model.careersstackoverflow.CareerStackOverflowRssRequest;
 
 /** Async model for the stack overflow rss career feed.
- * Ensure that you call #dispose() in onDestroy().
+ * Ensure that you call #dispose() before discarding (e.g. in onDestroy() ).
  * @author Jason J.
- * @version 0.2.0-20140921
+ * @version 0.4.0-20141125
  */
 public class CareersStackOverflowModel extends AsyncModel 
 	implements CareerStackRequestParserWrapper.OnFeedbackListener {
@@ -109,12 +109,19 @@ public class CareersStackOverflowModel extends AsyncModel
 	/** Notification for cancelling query.*/
 	final static public int NOTIFY_CANCELLED_QUERY = 0x204;
 	
+	/** Notification that there is an update of counts.
+	 * Accompanied by 2 ints: 
+	 * <ol><li>Parsed record count</li><li>Total records expected</li></ol>
+	 * and <code>null</code> */
+	final static public int NOTIFY_PROGRESS_UPDATE = 0x205;
+	
 	/** The error for when a request times out. */
 	final static public int ERROR_REQUEST_TIMEOUT = 0x404;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** The fragment manager for getting the fragment. */
 	private FragmentManager mfragManager = null;
 	/** The current request wrapper. */
@@ -310,6 +317,11 @@ public class CareersStackOverflowModel extends AsyncModel
 			}
 			notifyHandlers(ERROR_REQUEST_FAILED, null);
 		}
+	}
+	
+	@Override
+	public void onAsyncCountUpdate(int count, int total) {
+		notifyHandlers(NOTIFY_PROGRESS_UPDATE, count, total, null);		
 	}
 
 }

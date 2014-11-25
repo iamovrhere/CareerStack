@@ -36,25 +36,35 @@ import com.ovrhere.android.careerstack.model.parsers.AbstractXmlParser;
  * Found at: <code>http://careers.stackoverflow.com/jobs/feed?...</code>.
  * <p>Remember that this is thread blocking; sleeping during {@link #pause()}
  * and yielding every {@value #YIELD_TAG_THROTTLE} tags (for throttling). </p>
+ * <p>Use {@link OnAsyncUpdateListener} to get async updates. </p>
  * @author Jason J.
- * @version 0.1.3-20141008
+ * @version 0.2.0-20141125
  * @see CareerStackOverflowRssRequest */
 public class CareersStackOverflowRssXmlParser 
-	extends AbstractXmlParser<List<CareerItem>> {	
+	extends AbstractXmlParser<List<CareerItem>> {
+	
 	/** The tag for debugging purposes. */
 	final static private String LOGTAG = CareersStackOverflowRssXmlParser.class
 			.getSimpleName();
 	/** Boolean for debugging. */
 	final static private boolean DEBUG = false;
+	
 	/** The number of tags to yield after. */
 	final static private int YIELD_TAG_THROTTLE = 250;
+	/** How often to update count via {@link #mOnAsyncUpdateListener}. */
+	final static private int STAT_UPDATE_INTERVAL = 5;
+	
 	
 	/** The root tag of the rss feed. */
 	final static private String TAG_RSS_ROOT = "rss";
 	/** The outer tag of channel. */
 	final static private String TAG_CHANNEL = "channel";
+	
+	/** Outer tag for result total. */
+	final static private String TAG_RESULT_TOTAL = "os:totalResults";
 	/** Outer tag for career item. */
 	final static private String TAG_CAREER_ITEM = "item";
+	
 	/** Tag for for job titles. Expects one per {@link #TAG_CAREER_ITEM} */
 	final static private String TAG_CAREER_TITLE = "title";
 	/** Tag for for job descriptions. Expects one per {@link #TAG_CAREER_ITEM} */
@@ -81,11 +91,72 @@ public class CareersStackOverflowRssXmlParser
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/*
+	 * Feed form example (2014-11-11):
+	 * 
+	 *  <?xml version="1.0" encoding="utf-8"?>
+	 *  <rss xmlns:a10="http://www.w3.org/2005/Atom" version="2.0">
+	 *  	<channel xmlns:os="http://a9.com/-/spec/opensearch/1.1/">
+	 *  		<title>Jobs matching “Android” - Stack Overflow Careers</title>
+	 *  		<link>http://careers.stackoverflow.com/jobs</link>
+	 *  		<description>Jobs matching “Android” - Stack Overflow Careers</description>
+	 *  		<os:totalResults>132</os:totalResults>
+	 *  
+	 *  		<item>
+	 *  			<guid isPermaLink="true">http://careers.stackoverflow.com/jobs/123...</guid>
+	 *  			<link>http://careers.stackoverflow.com/jobs/123...</link>
+	 *  			<category>android</category>
+	 *  			...
+	 *  			<category>c++</category>
+	 *  			<title>Software Engineer at Exciting Company Inc. (New York, NY)</title>
+	 *  			<description>
+	 *  				&lt;p&gt;Are you looking for currency in exchange for performing services?&lt;/p&gt;
+	 *  				...
+	 *  			</description>
+	 *  			<pubDate>Sat, 18 Oct 2014 02:19:02 Z</pubDate>
+	 *  			<a10:updated>2014-10-18T02:19:02Z</a10:updated>
+	 *  		</item>
+	 *  		
+	 *  		...
+	 *  
+	 *  		<item>
+	 *  			<guid isPermaLink="true">http://careers.stackoverflow.com/jobs/345...</guid>
+	 *  			<link>http://careers.stackoverflow.com/jobs/345...</link>
+	 *  			<category>android</category>
+	 *  			...
+	 *  			<category>java</category>
+	 *  			<title>Android Engineer at Different Company Inc. (New York, NY)</title>
+	 *  			<description>
+	 *  				&lt;p&gt;This company pays &lt;b&gt;currency&lt;/b&gt; in exchange for the performance of services! &lt;/p&gt;
+	 *  				...
+	 *  			</description>
+	 *  			<pubDate>Fri, 07 Nov 2014 18:19:02 Z</pubDate>
+	 *  			<a10:updated>2014-11-07T18:19:02Z</a10:updated>  		
+	 *  		</item> 
+	 * 		</channel>
+	 * 	</rss>
+	 * 
+	 */
+	
+	
+	/** The listener of async updated. */
+	private OnAsyncUpdateListener mOnAsyncUpdateListener = null;  
+	
 	/** Initializes parser.
 	 * @throws XmlPullParserException  if parser or factory fails 
 	 * to be created. */
 	public CareersStackOverflowRssXmlParser() throws XmlPullParserException {
 		super();
+	}
+	
+	/** Initializes parser.
+	 * @param listener The listener to send updates through 
+	 * @throws XmlPullParserException  if parser or factory fails 
+	 * to be created. */
+	public CareersStackOverflowRssXmlParser(OnAsyncUpdateListener listener) 
+			throws XmlPullParserException {
+		super();
+		this.mOnAsyncUpdateListener = listener;
 	}
 	
 	
@@ -101,6 +172,10 @@ public class CareersStackOverflowRssXmlParser
 		pullParser.require(XmlPullParser.START_TAG, null, TAG_RSS_ROOT);
 		pullParser.nextTag();
 		pullParser.require(XmlPullParser.START_TAG, null, TAG_CHANNEL);
+		
+		//total number of records
+		int total = 0;
+		
 		//Used to determine when to yield.
 		int tagCountSinceYield = 0;		
 		while (pullParser.next() != XmlPullParser.END_TAG) {
@@ -118,16 +193,27 @@ public class CareersStackOverflowRssXmlParser
 					results.add(item);
 				}
 				checkPause();
+			} else if (name.equalsIgnoreCase(TAG_RESULT_TOTAL)){
+				try {
+					total = Integer.parseInt(readText());
+				} catch (NumberFormatException notANumber){
+					Log.e(LOGTAG, "Unexpected parse error: " + notANumber);
+				}
 			} else {
 				skipTag(); //skip all other tags
 			}
+			
 			//yields after tag throttle 
 			if (tagCountSinceYield++ >= YIELD_TAG_THROTTLE){
 				if (DEBUG){
 					Log.d(LOGTAG, "Yielding");
 				}
+				updateStats(results.size(), total);
+				
 				tagCountSinceYield = 0; //reset
 				Thread.yield();
+			} else if (results.size() % STAT_UPDATE_INTERVAL == 0){
+				updateStats(results.size(), total);
 			}
 		}
 		
@@ -138,6 +224,13 @@ public class CareersStackOverflowRssXmlParser
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Helper methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void updateStats(int count, int total){
+		if (mOnAsyncUpdateListener != null){
+			mOnAsyncUpdateListener.onParseCountUpdate(count, total);
+		}
+	}
+	
 	/** Parses an item block to produce a career item.
 	 * @return The fully formed {@link CareerItem} or <code>null</code>.
 	 * @throws XmlPullParserException re-thrown
@@ -187,14 +280,14 @@ public class CareersStackOverflowRssXmlParser
 		String datestamp = readText();		
 		try {
 			return parseDate(UPDATE_DATE_FORMAT, datestamp);
-		} catch (ParseException e) {
+		} catch (ParseException notUpdateFormat) {
 			if (DEBUG){
-				e.printStackTrace();
+				notUpdateFormat.printStackTrace();
 			}
 			try {
 				return parseDate(PUBLISH_DATE_FORMAT, datestamp);
-			} catch (ParseException e1) {
-				e1.printStackTrace();
+			} catch (ParseException notPublishFormat) {
+				notPublishFormat.printStackTrace();
 			}
 		} 
 		return null;
@@ -210,14 +303,14 @@ public class CareersStackOverflowRssXmlParser
 		String datestamp = readText();		
 		try {
 			return parseDate(PUBLISH_DATE_FORMAT, datestamp);
-		} catch (ParseException e) {
+		} catch (ParseException notPublishFormat) {
 			if (DEBUG){
-				e.printStackTrace();
+				notPublishFormat.printStackTrace();
 			}
 			try {
 				return parseDate(UPDATE_DATE_FORMAT, datestamp);
-			} catch (ParseException e1) {
-				e1.printStackTrace();
+			} catch (ParseException notUpdateFormat) {
+				notUpdateFormat.printStackTrace();
 			}
 		} 
 		return null;
@@ -252,13 +345,13 @@ public class CareersStackOverflowRssXmlParser
 					.setUpdateDate(updateDate)
 					.setCategories(categories)
 					.create();
-		} catch (IllegalArgumentException e){
+		} catch (IllegalArgumentException emptyString){
 			if (DEBUG){
-				Log.e(LOGTAG, "Likely empty string: " + e);
+				Log.e(LOGTAG, "Likely empty string: " + emptyString);
 			}
-		} catch (NullPointerException e){
+		} catch (NullPointerException forbiddenNull){
 			if (DEBUG){
-				Log.e(LOGTAG, "Likely a Null Date: " + e);
+				Log.e(LOGTAG, "Likely a Null Date: " + forbiddenNull);
 			}
 		}
 		return item;
@@ -297,5 +390,18 @@ public class CareersStackOverflowRssXmlParser
 				new SimpleDateFormat(dateFormat, Locale.US);
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC")); //all times are in GMT/UTC
 		return sdf.parse(datestamp);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Internal interfaces
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/** @version 0.1.0-20141125 */
+	public static interface OnAsyncUpdateListener {
+		
+		/** Sends updated statistics about the parsing
+		 * @param parseCount The number of records parsed thus far
+		 * @param total The overall total records		 */
+		public void onParseCountUpdate(int parseCount, int total);
 	}
 }

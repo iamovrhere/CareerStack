@@ -19,14 +19,16 @@ import com.ovrhere.android.careerstack.model.requests.AbstractSimpleHttpRequest;
  * will happen on the same thread. This allows for pauses and resuming of the 
  * process.
  * @author Jason J.
- * @version 0.1.1-20140921	 */
+ * @version 0.2.0-20141125	 */
 class CareerStackRequestParserWrapper implements Runnable,
-	AbstractSimpleHttpRequest.OnRequestEventListener {
+	AbstractSimpleHttpRequest.OnRequestEventListener,
+	CareersStackOverflowRssXmlParser.OnAsyncUpdateListener {
+	
 	/** Class name for debugging purposes. */
 	final static private String LOGTAG = 
 				CareerStackRequestParserWrapper.class.getSimpleName();
 	/** Debugging bool. */
-	final static private boolean DEBUG = true;
+	final static private boolean DEBUG = false;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
@@ -154,12 +156,17 @@ class CareerStackRequestParserWrapper implements Runnable,
 	/// Internal listeners
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** The results interface; sends feedback on the entire procedure.
-	 * @version 0.1.0-20140919 */
+	 * @version 0.2.0-20141125 */
 	public static interface OnFeedbackListener {
 		/** Publishes results when available. */
 		public void onResults(List<CareerItem> careerList);
 		/** Sends exceptions if encountered. */
 		public void onException(Exception exception);
+		
+		/** Sends the number of results parsed thus far. 
+		 * @param count The parse count
+		 * @param total The full total of expected results		 */
+		public void onAsyncCountUpdate(int count, int total);
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +190,7 @@ class CareerStackRequestParserWrapper implements Runnable,
 	public void onStart(InputStream in) {
 		try {	
 			if (checkContinue()){
-				mParser = new CareersStackOverflowRssXmlParser();
+				mParser = new CareersStackOverflowRssXmlParser(this);
 				resultItems = mParser.parseXmlStream(in);
 			}
 			checkContinue();
@@ -235,4 +242,15 @@ class CareerStackRequestParserWrapper implements Runnable,
 			running.set(false);
 		}
 	}
+	
+	//start CareersStackOverflowRssXmlParser listeners
+	
+	/* (non-Javadoc)
+	 * @see com.ovrhere.android.careerstack.model.careersstackoverflow.CareersStackOverflowRssXmlParser.OnAsyncUpdateListener#onParseCountUpdate(int, int)
+	 */
+	@Override
+	public void onParseCountUpdate(int parseCount, int total) {
+		mListener.onAsyncCountUpdate(parseCount, total);
+	}
+	//end CareersStackOverflowRssXmlParser listeners
 }
