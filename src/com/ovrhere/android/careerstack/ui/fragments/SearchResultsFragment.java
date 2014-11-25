@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
@@ -33,7 +34,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.7.2-20141124
+ * @version 0.8.0-20141125
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -104,6 +105,9 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/** The list of results. */
 	private ListView lv_resultsView = null;
 	
+	/** The loading progress, set to blank by default. */
+	private TextView tv_progress = null;
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End views
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,11 +175,13 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-		if (isLoadingResults){
-			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_PAUSE_QUERY);
+		synchronized (asyncModel) {
+			super.onDestroy();
+			if (isLoadingResults){
+				asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_PAUSE_QUERY);
+			}
+			asyncModel.dispose();		
 		}
-		asyncModel.dispose();
 	}
 
 	@Override
@@ -226,12 +232,14 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	
 	@Override
 	public void onDestroyView() {
-		Bundle state = new Bundle();
-		buildSaveState(state); //holds the state
-		mFragInteractionListener.onHoldSavedStateRequest(state);
-		
-		super.onDestroyView();
-		viewBuilt = false;
+		synchronized (asyncModel) {
+			Bundle state = new Bundle();
+			buildSaveState(state); //holds the state
+			mFragInteractionListener.onHoldSavedStateRequest(state);
+			
+			super.onDestroyView();
+			viewBuilt = false;
+		}
 	}
 	
 	@Override
@@ -253,13 +261,17 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** Prepares and sends request off to model while setting views.
-	 * Sets the internal previous request.
+	 * Clears and sets the internal previous request.
 	 * @param args The args to send according to the KEYS given.  */
 	public void sendRequest(Bundle args){
 		//we are about to request, set up loading
 		showLoadingBlock(true);
 		
-		prevQuery = new Bundle(); //clean the old request
+		if (prevQuery == null){
+			prevQuery = new Bundle();
+		}
+		prevQuery.clear(); //clean the old request //TODO reallow
+		
 		sendModelRequest(args);		
 	}
 
@@ -270,7 +282,9 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		if (prevQuery == null){ //should never be null, but just in case
 			prevQuery = new Bundle();
 		}
-		sendRequest(prevQuery);
+		//we are about to request, set up loading
+		showLoadingBlock(true);
+		sendModelRequest(prevQuery);
 	};
 	
 	
@@ -291,6 +305,9 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 				rootView.findViewById(R.id.careerstack_searchResults_layout_retry);
 		progressContainer =
 				rootView.findViewById(R.id.careerstack_searchResults_layout_progressBar);
+		
+		tv_progress = (TextView)
+				rootView.findViewById(R.id.careerstack_searchResults_text_progress);
 	}
 	
 	
@@ -312,8 +329,8 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	private void processArgBundle(Bundle args){
 		//safety first, always try restore block
 		try {
-			isLoadingResults = args.getBoolean(KEY_IS_LOADING_RESULTS);
-			resultsTimeout = args.getBoolean(KEY_RESULTS_TIMEOUT);
+			isLoadingResults = args.getBoolean(KEY_IS_LOADING_RESULTS, false);
+			resultsTimeout = args.getBoolean(KEY_RESULTS_TIMEOUT, false);
 			
 			if (resultsTimeout){
 				showRetryBlock(false);
@@ -396,6 +413,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		if (keyword == null){
 			keyword = prevQuery.getString(KEY_TAG_TEXT);
 		}
+		
 		String location = prevQuery.getString(KEY_LOCATION_TEXT);
 		if (location == null){
 			location = "";
@@ -485,6 +503,9 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		isLoadingResults = true;
 		resultsTimeout = false;	
 		
+		//always clear progress
+		tv_progress.setText("");
+		
 		if (animate){
 			fadeViews(progressContainer, retryContainer, lv_resultsView);
 		} else {
@@ -566,64 +587,80 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean handleMessage(Message msg) {
-		try {
-			if (DEBUG){
-				Log.d(LOGTAG, "Message: " +msg.what);
-			}
-			switch (msg.what) {
-			case CareersStackOverflowModel.NOTIFY_STARTING_QUERY:
-				//showLoadingBlock(true); //taken care of in sendRequest(Bundle)
-				return true;
-				
-			case CareersStackOverflowModel.NOTIFY_CANCELLED_QUERY:
-				//showResults(true); //taken care of in onClick(View)
-				return true;
-				
-			case CareersStackOverflowModel.REPLY_RECORDS_RESULT:
-				if (msg.obj instanceof List<?>){
-					try {
-						careerList = (ArrayList<CareerItem>) msg.obj;
-						//cast check
-						if (careerList.size() > 0){
-							@SuppressWarnings("unused")
-							CareerItem item = careerList.get(0);
-						}
-						
-						resultAdapter.setCareerItems(careerList);
-						setSearchTerms();
-						
-					} catch (ClassCastException e){
-						Log.e(LOGTAG, "Mismatched class? How irregular: " + e );
+		synchronized (this) {
+			try {
+				if (DEBUG){
+					Log.d(LOGTAG, "Message: " +msg.what);
+				}
+				switch (msg.what) {
+				case CareersStackOverflowModel.NOTIFY_STARTING_QUERY:
+					//showLoadingBlock(true); //taken care of in sendRequest(Bundle)
+					return true;
+					
+				case CareersStackOverflowModel.NOTIFY_CANCELLED_QUERY:
+					//showResults(true); //taken care of in onClick(View)
+					return true;
+					
+				case CareersStackOverflowModel.NOTIFY_PROGRESS_UPDATE:
+					if (msg.arg1 > -1 && msg.arg2 > 0){
+						//updates to be x / y
+						tv_progress.setText(
+								new StringBuilder().append(msg.arg1)
+													.append(" / ")
+													.append(msg.arg2)
+													.toString() );
 					}
+					return true;
+					
+				case CareersStackOverflowModel.REPLY_RECORDS_RESULT:
+					
+					if (msg.obj instanceof List<?>){
+						try {
+							careerList = (ArrayList<CareerItem>) msg.obj;
+							//cast check
+							if (careerList.size() > 0){
+								@SuppressWarnings("unused")
+								CareerItem item = careerList.get(0);
+							}
+							
+							resultAdapter.setCareerItems(careerList);
+							setSearchTerms();
+							
+						} catch (ClassCastException e){
+							Log.e(LOGTAG, "Mismatched class? How irregular: " + e );
+						}
+					}
+					
+					if (isLoadingResults){ //if we have not cancelled
+						showResults(true);
+						resetListPosition();
+					}
+					isLoadingResults = false; //ensure we are complete
+					
+					return true;
+					
+				case CareersStackOverflowModel.ERROR_REQUEST_TIMEOUT:
+					if (isLoadingResults){ //if we were loading results, and timeout
+						showRetryBlock(true);
+					}
+					return true;
+					
+				case CareersStackOverflowModel.ERROR_REQUEST_FAILED:
+					if (careerList.isEmpty() || isLoadingResults){
+						//if we have no elements, or were still loading results 
+						//i.e. not cancelled, retry block
+						showRetryBlock(true);
+					} else {
+						showResults(true);
+					}
+					return true;
+					
 				}
-				
-				if (isLoadingResults){ //if we have not cancelled
-					showResults(true);
-					resetListPosition();
+			} catch (Exception e){
+				if (DEBUG){
+					Log.d(LOGTAG, "Seems we have a problem here: " + e );
+					e.printStackTrace();
 				}
-				return true;
-				
-			case CareersStackOverflowModel.ERROR_REQUEST_TIMEOUT:
-				if (isLoadingResults){ //if we were loading results, and timeout
-					showRetryBlock(true);
-				}
-				return true;
-				
-			case CareersStackOverflowModel.ERROR_REQUEST_FAILED:
-				if (careerList.isEmpty() || isLoadingResults){
-					//if we have no elements, or were still loading results 
-					//i.e. not cancelled, retry block
-					showRetryBlock(true);
-				} else {
-					showResults(true);
-				}
-				return true;
-				
-			}
-		} catch (Exception e){
-			if (DEBUG){
-				Log.d(LOGTAG, "Seems we have a problem here: " + e );
-				e.printStackTrace();
 			}
 		}
 		return false;

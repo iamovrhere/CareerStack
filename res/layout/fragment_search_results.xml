@@ -41,6 +41,18 @@
 	        android:layout_height="wrap_content" 
 	        android:layout_gravity="center"
 	        />
+	     
+	     <TextView 
+         	android:id="@+id/careerstack_searchResults_text_progress"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_gravity="center"
+    	    android:text=""
+    	    style="?android:attr/textAppearanceMedium"
+    	    android:textColor="?attr/careerstack_distance_color"
+    	    android:padding="9dp"
+    	    />
+	     
 	     <Button
 		    android:id="@+id/careerstack_searchResults_button_cancel"
 		    android:layout_width="wrap_content"
