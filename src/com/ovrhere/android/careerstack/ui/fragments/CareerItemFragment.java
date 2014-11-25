@@ -43,10 +43,11 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
  * or launch a search from tags (via {@link OnFragmentInteractionListener})
  * 
  * @author Jason J.
- * @version 0.6.0-20141124
+ * @version 0.7.0-20141125
  */
 public class CareerItemFragment extends Fragment implements 
-	OnClickListener, OnCheckedChangeListener {
+	OnClickListener, OnCheckedChangeListener, 
+	SharedPreferences.OnSharedPreferenceChangeListener {
 	
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = CareerItemFragment.class
@@ -187,6 +188,9 @@ public class CareerItemFragment extends Fragment implements
 	/** The parent scroll view. */
 	private ScrollView sv_scrollView = null;
 	
+	/** The reference for toggling tags. */
+	private CompoundButton chk_toggleTags = null;
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End views
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,6 +289,8 @@ public class CareerItemFragment extends Fragment implements
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_career_item, 
 				container, false);
+		
+		prefs.registerOnSharedPreferenceChangeListener(this);
 		toastManager = new ToastManager(getActivity());
 		
 		initOutputViews(rootView);
@@ -298,6 +304,8 @@ public class CareerItemFragment extends Fragment implements
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		prefs.unregisterOnSharedPreferenceChangeListener(this);
+		
 		destroyWebView(wv_jobDescription);
 		destroyWebView(wv_tags);
 		viewBuilt = false;
@@ -486,14 +494,14 @@ public class CareerItemFragment extends Fragment implements
 				rootView.findViewById(R.id.careerstack_careerItem_button_copyUrl);
 		copyUrl.setOnClickListener(this);  
 		
-		CompoundButton toggleTags = (CompoundButton)
+		chk_toggleTags = (CompoundButton)
 				rootView.findViewById(R.id.careerstack_careerItem_check_showTags);
-		toggleTags.setVisibility(showTagButtonVisible ? View.VISIBLE : View.GONE);
-		toggleTags.setOnCheckedChangeListener(this);
+		chk_toggleTags.setVisibility(showTagButtonVisible ? View.VISIBLE : View.GONE);
+		chk_toggleTags.setOnCheckedChangeListener(this);
 		
 		boolean checked = prefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false);
-		toggleTags.setChecked(checked);
-		onCheckedChanged(toggleTags, checked);
+		chk_toggleTags.setChecked(checked);
+		onCheckedChanged(chk_toggleTags, checked);
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -864,6 +872,18 @@ public class CareerItemFragment extends Fragment implements
 							isChecked)
 				.commit();
 			checkTagVisiblity();
+		}
+	}
+	
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
+		if (key.equals(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS))){
+			boolean prefValue = sharedPreferences.getBoolean(key, false);
+			if (chk_toggleTags.isChecked() != prefValue){
+				//ensure the value is the same, the listener will deal with the rest
+				chk_toggleTags.setChecked(prefValue);
+			}
 		}
 	}
 	

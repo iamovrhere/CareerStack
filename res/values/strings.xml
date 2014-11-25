@@ -191,6 +191,12 @@
     
     
    
+    <!-- The pref title for showing tags -->
+    <string name="careerstack_settings_showTags_title"
+        >Show tags</string>
+    <!-- The pref description for tablet mode  -->
+    <string name="careerstack_settings_showTags_summary"
+        >Shows searchable job tags for current description</string>
     
     <!-- The pref title for tablet mode -->
     <string name="careerstack_settings_tabletMode_title"
