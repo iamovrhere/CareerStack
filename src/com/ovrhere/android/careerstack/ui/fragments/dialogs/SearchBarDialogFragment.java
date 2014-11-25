@@ -47,7 +47,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * after search or cancel is pressed.
  * </p>
  * @author Jason J.
- * @version 0.1.2-20141118
+ * @version 0.2.0-20141124
  */
 public class SearchBarDialogFragment extends DialogFragment 
 	implements OnClickListener, OnCheckedChangeListener {
@@ -66,7 +66,8 @@ public class SearchBarDialogFragment extends DialogFragment
 	/// Start public keys
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	/** Bundle key. The value of tags. String */
+	/** Not used. */
+	@Deprecated
 	final static public String KEY_TAG_TEXT = 
 			CLASS_NAME + ".KEY_TAG_TEXT";
 	
@@ -312,10 +313,14 @@ public class SearchBarDialogFragment extends DialogFragment
 		String keywords = args.getString(KEY_KEYWORD_TEXT);
 		if (keywords != null){
 			et_keywords.setText(keywords);
+		} else {
+			et_keywords.setText("");
 		}
 		String location = args.getString(KEY_LOCATION_TEXT);
 		if (location != null){
 			et_location.setText(location);
+		} else {
+			et_location.setText("");
 		}
 		cb_relocationOffered.setChecked(
 				args.getBoolean(KEY_RELOCATE_OFFER, false));

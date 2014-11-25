@@ -33,7 +33,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.7.1-20141119
+ * @version 0.7.2-20141124
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -259,6 +259,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		//we are about to request, set up loading
 		showLoadingBlock(true);
 		
+		prevQuery = new Bundle(); //clean the old request
 		sendModelRequest(args);		
 	}
 
@@ -391,9 +392,17 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		if (prevQuery == null){
 			prevQuery = new Bundle();
 		}
+		String keyword = prevQuery.getString(KEY_KEYWORD_TEXT); 
+		if (keyword == null){
+			keyword = prevQuery.getString(KEY_TAG_TEXT);
+		}
+		String location = prevQuery.getString(KEY_LOCATION_TEXT);
+		if (location == null){
+			location = "";
+		}
 		resultAdapter.setSearchTerms(
-				prevQuery.getString(KEY_KEYWORD_TEXT), 
-				prevQuery.getString(KEY_LOCATION_TEXT), 
+				keyword, 
+				location, 
 				prevQuery.getBoolean(KEY_REMOTE_ALLOWED, false), 
 				prevQuery.getBoolean(KEY_RELOCATE_OFFER, false));		
 	}
@@ -587,6 +596,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 						Log.e(LOGTAG, "Mismatched class? How irregular: " + e );
 					}
 				}
+				
 				if (isLoadingResults){ //if we have not cancelled
 					showResults(true);
 					resetListPosition();
