@@ -143,6 +143,15 @@
 \n\n(Nécessite le redémarrage de l\'app pour prendre effet.)</string>
     
     
+    <!-- Search tag settings -->
+    <eat-comment />
+    
+    <string name = "careerstack_settings_showTags_title"
+         > Afficher les catégories de recherche </string>
+
+     <string name = "careerstack_settings_showTags_summary"
+         > Affiche catégories de recherche pour la description de l\'emploi </string>
+    
     
     <!-- The tablet mode settings -->
     <eat-comment />

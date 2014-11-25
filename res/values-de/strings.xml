@@ -145,9 +145,17 @@
 \n\n(Erfordert die Anwendung neu starten zu übernehmen.)</string>
     
     
-    <!-- The tablet mode settings -->
-    <eat-comment />
+    <!-- Search tag settings -->
+    <eat-comment />    
+    <string name = "careerstack_settings_showTags_title"
+         > Zeige Such-Kategorien anzeigen </string>
+
+     <string name = "careerstack_settings_showTags_summary"
+         > Zeigt Such-Kategorien für Stellenbeschreibung </string>
     
+    
+    <!-- The tablet mode settings -->
+    <eat-comment />    
     
 	<string name = "careerstack_settings_tabletMode_title"
          > Verwenden Dual-Fenster-Tablet -Modus </string>

@@ -138,9 +138,18 @@
 \n\n(Hiervoor moet de app opnieuw starten door te voeren.)</string>
     
     
-    <!-- The tablet mode settings -->
+    <!-- Search tag settings -->
     <eat-comment />
     
+    <string name = "careerstack_settings_showTags_title"
+         > Toon zoekcategorieën </string>
+
+     <string name = "careerstack_settings_showTags_summary"
+         > Toont zoeken categorieën voor functieomschrijving </string>
+             
+    
+    <!-- The tablet mode settings -->
+    <eat-comment />
    
 <string name = "careerstack_settings_tabletMode_title"
          > Gebruik tablet dual ruiten mode </string>

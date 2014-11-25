@@ -141,11 +141,17 @@
         >Temas de conmutación rápida es experimental y puede que no funcione en todos los dispositivos. Trate de todos modos? 
 \n\n(Requiere el reinicio de la aplicación entre en vigor.)</string>
     
+    <!-- Search tag settings -->
+    <eat-comment />
+    <string name = "careerstack_settings_showTags_title"
+         > Mostrar categorías de búsqueda </string>
+
+    <string name = "careerstack_settings_showTags_summary"
+         > Muestra las categorías de búsqueda para la descripción del trabajo </string>
+     
     
     <!-- The tablet mode settings -->
     <eat-comment />
-   
-
 	<string name = "careerstack_settings_tabletMode_title"
          > Usa modo de panel de doble / modo de la tabeleta </string>
 
