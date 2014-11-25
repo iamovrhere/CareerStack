@@ -50,11 +50,12 @@ import com.ovrhere.android.careerstack.utils.TabletUtil;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.8.0-20141031
+ * @version 0.9.0-20141124
  */
 public class MainActivity extends ActionBarActivity 
 	implements OnBackStackChangedListener, DialogInterface.OnClickListener,
 	MainFragment.OnFragmentInteractionListener, 
+	CareerItemFragment.OnFragmentInteractionListener,
 	SearchResultsFragment.OnFragmentInteractionListener,
 	SettingsFragment.OnFragmentInteractionListener,
 	SearchBarDialogFragment.OnDialogResultsListener{
@@ -526,6 +527,7 @@ public class MainActivity extends ActionBarActivity
 					ConfirmationDialogFragment.class.getName() +
 					CLASS_NAME);
 	}
+	
 	/** Initializes and shows the search bar dialog using the current
 	 * search state. 	 */
 	private void showSearchBarDialog(){
@@ -881,6 +883,24 @@ public class MainActivity extends ActionBarActivity
 	}
 	
 	//end SettingsFragment
+	
+	
+	//start CareerItemFragment listeners
+	@Override
+	public boolean onTagClick(String tag) {
+		Bundle searchArgs = new Bundle(); //prepare search args for tag
+		searchArgs.putString(SearchResultsFragment.KEY_TAG_TEXT, tag);
+		
+		currSearchBarState = new Bundle(); //replace search with tag only
+		currSearchBarState.putString(SearchBarDialogFragment.KEY_KEYWORD_TEXT,  tag);
+		
+		//remove any previous states
+		fragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG); 
+		//launch request
+		sendSearchRequest(searchArgs);
+		return true;
+	}
+	//end CareerItemFragment listeners
 	
 	
 	//start SearchBarDialogFragment

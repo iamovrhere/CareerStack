@@ -4,7 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources.Theme;
@@ -24,8 +26,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
@@ -34,11 +39,15 @@ import com.ovrhere.android.careerstack.utils.ShareIntentUtil;
 import com.ovrhere.android.careerstack.utils.ToastManager;
 
 /**
- * The listing of a job item. Provides ability to open, copy or share link.
+ * The listing of a job item. Provides ability to open, copy or share link
+ * or launch a search from tags (via {@link OnFragmentInteractionListener})
+ * 
  * @author Jason J.
- * @version 0.5.0-20141121
+ * @version 0.6.0-20141124
  */
-public class CareerItemFragment extends Fragment implements OnClickListener {
+public class CareerItemFragment extends Fragment implements 
+	OnClickListener, OnCheckedChangeListener {
+	
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = CareerItemFragment.class
 			.getSimpleName();
@@ -48,7 +57,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	final static private boolean DEBUG = false;
 	
 	
-	/** Bundle Key. The career item for this fragment. Parcelable/CareerItem. */
+	/** Bundle Key. The career item for this fragment. Parcellable/CareerItem. */
 	final static private String KEY_CAREER_ITEM =
 			CLASS_NAME +".KEY_CAREER_ITEM";
 	/** Bundle Key. The scroll position as a ratio of 
@@ -159,18 +168,35 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	/** The preference handle. */
 	private SharedPreferences prefs = null;
 	
+	/** The fragment interaction listener, namely main. */
+	private OnFragmentInteractionListener mFragInteractionListener = null;
+	
+	/** The simple toast manager. */
+	private ToastManager toastManager = null;
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Start views 
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** The job description webview reference for animation + proper destruction. */
 	private WebView wv_jobDescription = null;
 	
 	/** The tags webview reference for animation + proper destruction. */
 	private WebView wv_tags= null;
+		
+	/** The parent scroll view. */
+	private ScrollView sv_scrollView = null;
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// End views
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The local instance of career item to display. */
 	private CareerItem careerItem = null;
-	/** The simple toast manager. */
-	private ToastManager toastManager = null;
-	/** The parent scroll view. */
-	private ScrollView sv_scrollView = null;
+	
+	/** Whether or not to show the "show tags" button. 
+	 * Should only be true if: 1. The resolution supports it, 2. There are tags */
+	private boolean showTagButtonVisible  = false;
 	
 	/** Bool for backstack safety of whether view has been built. */
 	private boolean viewBuilt = false;
@@ -244,7 +270,14 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		} else if (savedInstanceState != null){
 			careerItem = savedInstanceState.getParcelable(KEY_CAREER_ITEM);
 		}
+		
 		prefs = PreferenceUtils.getPreferences(getActivity());
+		
+		if (careerItem.getCategories() != null ){
+			/* If the resolution supports it AND there are actually tags to show. */ 
+			showTagButtonVisible = careerItem.getCategories().length > 0 &&
+				getResources().getBoolean(R.bool.careerstack_show_tags_toggle);
+		}	
 	}
 
 	@Override
@@ -253,9 +286,11 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		View rootView = inflater.inflate(R.layout.fragment_career_item, 
 				container, false);
 		toastManager = new ToastManager(getActivity());
+		
 		initOutputViews(rootView);
 		initButtons(rootView);
 		initScrollView(rootView, savedInstanceState);
+		
 		viewBuilt = true;
 		return rootView;
 	}
@@ -268,6 +303,18 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		viewBuilt = false;
 	}
 
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			this.mFragInteractionListener = 
+					(OnFragmentInteractionListener) activity;
+		} catch (ClassCastException e){
+			Log.e(LOGTAG, "Activity must implement :" +
+					OnFragmentInteractionListener.class.getSimpleName());
+			throw e;
+		}
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Initialization & helpers
@@ -346,10 +393,11 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		
 		webSettings.setDefaultFontSize(12); //TODO abstract
 		webSettings.setSupportZoom(false);
+		
 		webSettings.setJavaScriptEnabled(true);
 		wv_tags.addJavascriptInterface(new JobTagsJSInterface(this), JAVASCRIPT_TAGS_OBJ);
 		
-		/* Disable clipboard. */
+		/* Hack to disable copying. */
 		wv_tags.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
             public boolean onLongClick(View v) {
@@ -357,6 +405,13 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
             }
         });
 		
+		/* ----- Initial setup complete. ----- */
+		
+		/* we either show/hide it based on preference;
+		 * subsequently, this will control if it fades in or just loads quietly in background. */
+		checkTagVisiblity();
+		
+		wv_tags.setWebViewClient(tagsWebViewListener);
 		wv_tags.post(new Runnable() {	@Override
 			public void run() {
 				//increase likelihood of first time load.
@@ -370,7 +425,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 				//strip html for accessibility 
 				Html.fromHtml(careerItem.getDescription()).toString()
 				); */
-		wv_tags.setWebViewClient(tagsWebViewListener);
+		
 	}
 	
 	/** Sets up the job description, including styling. */
@@ -387,19 +442,31 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		webSettings.setDefaultFontSize(14); //TODO abstract
 		webSettings.setSupportZoom(false);
 		
-			
-		wv_jobDescription.post(new Runnable() {	@Override
+		/* ----- Initial setup complete. ----- */
+		
+		long delay = 1;
+		if (showTagButtonVisible && 
+			prefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false)){
+			//if the tags are being shown, delay job description
+			delay = getResources().getInteger(R.integer.careerstack_jobdescription_delay);
+		}
+		
+		//always fade in
+		wv_jobDescription.setVisibility(View.INVISIBLE);
+		
+		wv_jobDescription.setWebViewClient(jobDescriptionWebViewListener);
+		wv_jobDescription.postDelayed((new Runnable() {	@Override
 			public void run() {
 				//increase likelihood of first time load.
 				loadJobDescription();
 			}
-		});		
+		}), delay);		
 
 		wv_jobDescription.setContentDescription(
 				//strip html for accessibility 
 				Html.fromHtml(careerItem.getDescription()).toString()
 				);
-		wv_jobDescription.setWebViewClient(jobDescriptionWebViewListener);
+		
 	}
 
 	
@@ -418,6 +485,15 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		Button copyUrl = (Button)
 				rootView.findViewById(R.id.careerstack_careerItem_button_copyUrl);
 		copyUrl.setOnClickListener(this);  
+		
+		CompoundButton toggleTags = (CompoundButton)
+				rootView.findViewById(R.id.careerstack_careerItem_check_showTags);
+		toggleTags.setVisibility(showTagButtonVisible ? View.VISIBLE : View.GONE);
+		toggleTags.setOnCheckedChangeListener(this);
+		
+		boolean checked = prefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false);
+		toggleTags.setChecked(checked);
+		onCheckedChanged(toggleTags, checked);
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -441,27 +517,49 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		}
 	}
 	
+	/** Checks the preference for tag visibility, and 
+	 * sets visibility accordingly. */ 
+	private void checkTagVisiblity(){
+		final boolean isVisible = prefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false);
+		if (wv_tags != null ){ //safety			
+			wv_tags.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+		}		
+	}
 	
 	/** Builds tags from the careeritem and loads them into the webview. */ 
 	private void buildAndLoadTags() {
-		String buttons = "";
-		String cats[] = careerItem.getCategories();
-		final int SIZE = cats.length;
-		for (int index = 0; index < SIZE; index++){
-			buttons += String.format(HTML_TAG_BUTTON, cats[index]);
+		//extra safety
+		try {
+			/* ensure the view is valid and our fragment is still attached (for async calls) */
+			if (wv_tags != null && !isDetached()){
+				String buttons = "";
+				String cats[] = careerItem.getCategories();
+				final int SIZE = cats.length;
+				for (int index = 0; index < SIZE; index++){
+					buttons += String.format(HTML_TAG_BUTTON, cats[index]);
+				}
+				String extraCss = isLightTheme() ? HTML_TAGS_LIGHT_THEME : "";
+				String htmlData = String.format(HTML_WRAPPER_TAGS, buttons, extraCss);
+				wv_tags.loadDataWithBaseURL( "file:///android_asset/", 
+				htmlData, "text/html", "UTF-8", null);
+			}
+		} catch (Exception e){
+			Log.e(LOGTAG, "Unusual behaviour during tag build: " + e);
 		}
-		String extraCss = isLightTheme() ? HTML_TAGS_LIGHT_THEME : "";
-		String htmlData = String.format(HTML_WRAPPER_TAGS, buttons, extraCss);
-		wv_tags.loadDataWithBaseURL( "file:///android_asset/", 
-			htmlData, "text/html", "UTF-8", null);
 	}
 	
 	/** Loads the job description into the WebView, if not null. */
 	private void loadJobDescription() {
-		if (wv_jobDescription != null){
-			String htmlData = wrapDescription(careerItem.getDescription());
-			wv_jobDescription.loadDataWithBaseURL( "file:///android_asset/", 
-					htmlData, "text/html", "UTF-8", null);
+		//extra safety
+		try {
+			/* ensure the view is valid and our fragment is still attached (for async calls) */
+			if (wv_jobDescription != null && !isDetached()){
+				String htmlData = wrapDescription(careerItem.getDescription());
+				wv_jobDescription.loadDataWithBaseURL( "file:///android_asset/", 
+						htmlData, "text/html", "UTF-8", null);
+			}
+		} catch (Exception e){
+			Log.e(LOGTAG, "Unusual behaviour during job description: " + e);
 		}
 	}
 	
@@ -596,9 +694,9 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * The javascript interface of the {@link #wv_tags}
+	 * The JavaScript interface of the {@link #wv_tags}
 	 * @author Jason J.
-	 * @version 0.1.0-20141120
+	 * @version 0.1.1-20141124
 	 */
 	static private class JobTagsJSInterface {
 		private CareerItemFragment careerItemFragment = null;
@@ -611,9 +709,18 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		 * @param tag The tag that was clicked
 		 */
 		@JavascriptInterface
-		public void onTagClick(String tag){
-			careerItemFragment.toastManager.toastLong(tag);
-			//TODO actual tag searching
+		public void onTagClick(final String tag){
+			//send the tag to the main activity
+			careerItemFragment.wv_tags.post(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						careerItemFragment.mFragInteractionListener.onTagClick(tag);
+					} catch (Exception e){
+						Log.e(LOGTAG, "Unusual behaviour: " + e);
+					}
+				}
+			});
 		}		
 	}
 	
@@ -630,7 +737,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		private CareerItemFragment careerItemFragment = null;
 		
 		/** Animates the WebView if the webview starts off visible, otherwise 
-		 * it just quietly reloads it in backgrond. */
+		 * it just quietly reloads it in background. */
 		public AnimatedRetryWebViewClient(CareerItemFragment careerItemFragment, 
 				RetryListener retryListener) {
 			super();
@@ -699,7 +806,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 			new AnimatedRetryWebViewClient(this, new AnimatedRetryWebViewClient.RetryListener() {		
 		@Override
 		public void onRetry() {
-			buildAndLoadTags();		
+			buildAndLoadTags();
 		}
 		
 		@Override
@@ -715,7 +822,7 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 			new AnimatedRetryWebViewClient(this, new AnimatedRetryWebViewClient.RetryListener() {		
 		@Override
 		public void onRetry() {
-			loadJobDescription();			
+			loadJobDescription();	
 		}
 		
 		@Override
@@ -744,6 +851,40 @@ public class CareerItemFragment extends Fragment implements OnClickListener {
 		default:
 			//fall through
 		}
+	}
+	
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		if (buttonView.getId() == R.id.careerstack_careerItem_check_showTags){
+			//change the button text
+			buttonView.setText(isChecked ? getString(R.string.careerstack_careeritem_showtags_on) : 
+											getString(R.string.careerstack_careeritem_showtags_off) );
+			prefs.edit()
+				.putBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), 
+							isChecked)
+				.commit();
+			checkTagVisiblity();
+		}
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Internal listeners
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * The interaction listener that the activity must implement to handle the 
+	 * {@link CareerItemFragment}'s requests. 
+	 * @author Jason J.
+	 * @version 0.1.0-20141124
+	 */
+	static public interface OnFragmentInteractionListener {	
+		
+		/** Sends activity a search a tag. 
+		 * @param tag The tag that is clicked and for the activity to search. 
+		 * {@link MainFragment} keys.
+		 * @return <code>true</code> if the activity has honoured the request,
+		 * <code>false</code> if has been ignored.		 */
+		public boolean onTagClick(String tag);
 	}
 
 }
