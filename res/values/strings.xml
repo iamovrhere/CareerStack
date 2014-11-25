@@ -139,6 +139,15 @@
     <!-- The string for "%1$s(job) at %2$s(place) -->
     <string name="careerstack_formatString_jobAtPlace"
         >%1$s at %2$s</string>
+    
+    
+    <!-- The string to show when tags are on. -->
+    <string name="careerstack_careeritem_showtags_on"
+        >[ - ]</string>
+    
+    <!-- The string to show when tags are off. -->
+    <string name="careerstack_careeritem_showtags_off"
+        >[ + ]</string>
 
 	<!-- Ends career item  fragment strings -->
     <eat-comment />

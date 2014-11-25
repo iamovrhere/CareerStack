@@ -29,6 +29,8 @@
         <item name="careerstack_background_color">@color/careerstack_nearblack_background</item>
         
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
+        <item name="careerstack_checkbox_button" >@drawable/appbasetheme_dark_btn_default_holo_dark</item>
+        
         <item name="careerstack_title_color">@android:color/white</item>
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
@@ -49,6 +51,8 @@
         <item name="careerstack_background_color">@color/careerstack_offwhite_background</item>
         
         <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>
+        <item name="careerstack_checkbox_button" >@drawable/appbasetheme_light_btn_default_holo_light</item>
+        
         <item name="careerstack_title_color">@android:color/black</item>
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>

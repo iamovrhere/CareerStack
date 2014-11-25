@@ -32,6 +32,9 @@
 	    
 	    <!-- Background color used in both dark & light themes -->
 	    <attr name="careerstack_background_color" format="reference|integer"/>
+	    
+	    <!-- Drawable for checkbox used as button -->
+	    <attr name="careerstack_checkbox_button" format="reference|integer"/>
 	</declare-styleable>
 	
 </resources>

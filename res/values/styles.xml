@@ -32,6 +32,8 @@
         <!-- Attribue drawable for the dark icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
         
+        <!-- The checkbox style for button use -->
+        <item name="careerstack_checkbox_button" >@drawable/appbasetheme_dark_btn_default_holo_dark</item>
     
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
@@ -59,6 +61,9 @@
         
         <!-- Attribue drawable for the light icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>        
+        
+        <!-- The checkbox style for button use -->
+        <item name="careerstack_checkbox_button" >@drawable/appbasetheme_light_btn_default_holo_light</item>
         
         <!-- Assume grey for light theme -->
         <item name="careerstack_searchbar_color">@color/careerstack_actionBar_light</item>

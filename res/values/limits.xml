@@ -32,6 +32,9 @@
     <!-- The speed of the quick-fade in/out animation in milliseconds -->
     <item name="careerstack_quickfade_speed" type="integer">200</item>
     
+    <!-- The delay between tags and job description, if tags are enabled  -->
+    <item name="careerstack_jobdescription_delay" type="integer">120</item>
+    
     
     <!-- The minimum size required before showing ads -->
     <item name="careerstack_listview_ad_minSize" type="integer">5</item>

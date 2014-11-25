@@ -57,49 +57,65 @@
 	        android:orientation="horizontal"
 	        android:gravity="top"
 	        >
-	    <Button
-		android:id="@+id/careerstack_careerItem_button_openLink"
-		android:textSize="14sp"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1.0"
-		android:text="@string/careerstack_careerItem_button_openLink" />
-
-	    <Button
-		android:id="@+id/careerstack_careerItem_button_copyUrl"
-		android:textSize="14sp"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1.0"
-		android:text="@android:string/copyUrl" />
-
-	    <Button
-		android:id="@+id/careerstack_careerItem_button_share"
-		android:textSize="14sp"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1.0"
-		android:text="@string/careerstack_careerItem_button_shareJob" />
+		    <Button
+			android:id="@+id/careerstack_careerItem_button_openLink"
+			android:textSize="14sp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:text="@string/careerstack_careerItem_button_openLink" />
+	
+		    <Button
+			android:id="@+id/careerstack_careerItem_button_copyUrl"
+			android:textSize="14sp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:text="@android:string/copyUrl" />
+	
+		    <Button
+			android:id="@+id/careerstack_careerItem_button_share"
+			android:textSize="14sp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:text="@string/careerstack_careerItem_button_shareJob" />
 	    </LinearLayout>
 		
-	    <TextView
-		android:id="@+id/careerstack_careerItem_text_updateDate"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="@dimen/careerstack_careeritem_interText_marginTop"
-		android:text="@string/careerstack_formatString_publishUpdateDate" 
-		android:textSize="14sp"
-		android:textColor="@color/careerstack_translucent_grey"
-		/>
-
-	    <!-- TODO custom drawable for the checkbox to toggle tag view -->
-	    <CheckBox
-	        android:id="@+id/careerstack_careerItem_check_showTags"
-	        android:layout_width="wrap_content"
+	    <LinearLayout
+	        android:layout_width="match_parent" 
 	        android:layout_height="wrap_content"
-	        android:visibility="gone"
-	        />
+	        
+	        android:orientation="horizontal"
+	        
+	        android:gravity="center_vertical"
+	        >
 
+	        <TextView
+	            android:id="@+id/careerstack_careerItem_text_updateDate"
+	            android:layout_width="0dp"
+	            android:layout_height="wrap_content"
+	            
+	            android:text="@string/careerstack_formatString_publishUpdateDate"
+	            android:textColor="@color/careerstack_translucent_grey"
+	            
+	            android:layout_weight="1.0"
+	            android:textSize="14sp" />
+
+		    
+		    <CheckBox
+		        android:id="@+id/careerstack_careerItem_check_showTags"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:gravity="center"
+		        android:text="@string/careerstack_careeritem_showtags_on"
+		        android:button="@null"
+		        android:background="?attr/careerstack_checkbox_button"
+		        
+		        />
+	        
+        </LinearLayout>
+	    
 	    <WebView
 	        android:id="@+id/careerstack_careerItem_webview_tags"
 	        android:layout_width="match_parent"
