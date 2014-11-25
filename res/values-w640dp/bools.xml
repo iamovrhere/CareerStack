@@ -15,8 +15,8 @@
    limitations under the License.
 -->
 <resources>    
-    <!-- True for width or height 720dp. -->
+    <!-- True for width or height 640dp. -->
     <item name="careerstack_has_tablet_mode" type="bool" >1</item>
-    <!-- True for width 720dp -->
+    <!-- True for width 640dp -->
     <item name="careerstack_in_tablet_mode"  type="bool">1</item>
 </resources>
