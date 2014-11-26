@@ -34,7 +34,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.8.0-20141125
+ * @version 0.8.1-20141126
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -64,6 +64,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Start public keys
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	
 	/*
 	 * Using a quick cheat here: Could rebuilt the argument bundles for the model
@@ -117,10 +118,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	private CareerItemFilterListAdapter resultAdapter = null;
 	
 	
-	/** If the fragment is currently loading results. */
+	/** If the fragment is currently loading results. Default false. */
 	private boolean isLoadingResults = false;
 	
-	/** If the fragment failed during last load. */
+	/** If the fragment failed during last load.  Default false. */
 	private boolean resultsTimeout = false;
 		
 	/** The fragment request listener from activity. */
@@ -208,8 +209,11 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		} else if (getArguments() != null) {
 			Bundle args = getArguments();
 			processArgBundle(args);
-			//if no values set, request.
-			sendModelRequest(args);
+			
+			//if no values are set and we aren't loading, request.
+			if (!isLoadingResults){ 
+				sendModelRequest(args);
+			}
 			showLoadingBlock(false);
 		} 
 		
@@ -428,6 +432,7 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// View updates start here
 	////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/** Created a new fade out listener. Sets the view to GONE when animation ends. */
 	static private Animation.AnimationListener newFadeOutViewListener(final View view){
 		return new Animation.AnimationListener() {
@@ -491,7 +496,11 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			retryContainer.setVisibility(View.VISIBLE);
 			progressContainer.setVisibility(View.GONE);
 			lv_resultsView.setVisibility(View.GONE);
-		}		
+		}
+		
+		if (DEBUG){
+			Log.v(LOGTAG, "showRetryBlock: " + animate);
+		}
 	}
 	
 	/** Shows the loading/progress block, hiding the other 2 views. Sets
@@ -504,7 +513,9 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		resultsTimeout = false;	
 		
 		//always clear progress
-		tv_progress.setText("");
+		if (tv_progress != null){
+			tv_progress.setText("");
+		}
 		
 		if (animate){
 			fadeViews(progressContainer, retryContainer, lv_resultsView);
@@ -513,6 +524,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			progressContainer.setVisibility(View.VISIBLE);
 			lv_resultsView.setVisibility(View.GONE);
 		}	
+		
+		if (DEBUG){
+			Log.v(LOGTAG, "showLoadingBlock: " + animate);
+		}
 	}
 	
 	/** Shows the list view, hiding the other 2 views. Sets
@@ -530,7 +545,11 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			retryContainer.setVisibility(View.GONE);
 			progressContainer.setVisibility(View.GONE);
 			lv_resultsView.setVisibility(View.VISIBLE);
-		}	
+		}
+		
+		if (DEBUG){
+			Log.v(LOGTAG, "showResults: " + animate);
+		}
 	}
 	
 	/** Resets the list position to top. */
@@ -602,8 +621,8 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 					return true;
 					
 				case CareersStackOverflowModel.NOTIFY_PROGRESS_UPDATE:
-					if (msg.arg1 > -1 && msg.arg2 > 0){
-						//updates to be x / y
+					if (msg.arg1 > -1 && msg.arg2 > 0 && tv_progress != null){
+						//updates to be x / y; e.g. "5 / 133"
 						tv_progress.setText(
 								new StringBuilder().append(msg.arg1)
 													.append(" / ")

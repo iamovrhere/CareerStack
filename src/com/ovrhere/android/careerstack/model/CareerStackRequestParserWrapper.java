@@ -18,6 +18,7 @@ import com.ovrhere.android.careerstack.model.requests.AbstractSimpleHttpRequest;
 /** The request + parser wrapper for easier handling (as both
  * will happen on the same thread. This allows for pauses and resuming of the 
  * process.
+ * <p>Only supports single requests per object. </p>
  * @author Jason J.
  * @version 0.2.0-20141125	 */
 class CareerStackRequestParserWrapper implements Runnable,

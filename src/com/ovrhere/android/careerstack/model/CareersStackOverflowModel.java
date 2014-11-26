@@ -32,7 +32,7 @@ import com.ovrhere.android.careerstack.model.careersstackoverflow.CareerStackOve
 /** Async model for the stack overflow rss career feed.
  * Ensure that you call #dispose() before discarding (e.g. in onDestroy() ).
  * @author Jason J.
- * @version 0.4.0-20141125
+ * @version 0.4.1-20141126
  */
 public class CareersStackOverflowModel extends AsyncModel 
 	implements CareerStackRequestParserWrapper.OnFeedbackListener {
@@ -82,9 +82,11 @@ public class CareersStackOverflowModel extends AsyncModel
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Queries an rss feed for results. Accompanied by {@link Bundle} with
 	 * keys. Responds via {@link #REPLY_RECORDS_RESULT}. 
+	 * <p>This model will only allow one query per object; call {@link #REQUEST_QUERY_CANCEL}
+	 * before trying a new query. </p>
 	 * <p>This query is paused during
 	 * {@link #dispose()} and would need resuming via 
-	 * {@link #REQUEST_RESUME_QUERY}.*/
+	 * {@link #REQUEST_RESUME_QUERY}.</p> */
 	final static public int REQUEST_RECORD_QUERY = 0x001;
 	
 	/** Requests that any running queries be paused. Note that
@@ -148,6 +150,10 @@ public class CareersStackOverflowModel extends AsyncModel
 	public int sendMessage(int what, Bundle data) {
 		switch (what) {
 		case REQUEST_RECORD_QUERY:
+			if (currentRequestWrapper != null && currentRequestWrapper.isRunning()){
+				//we cannot request if requesting.
+				return -1;
+			}
 			buildAndSendRequest(data);
 			return 0;
 		default:
@@ -163,20 +169,23 @@ public class CareersStackOverflowModel extends AsyncModel
 			if (currentRequestWrapper != null){
 				currentRequestWrapper.cancel();
 			}
-			notifyHandlers(REQUEST_QUERY_CANCEL, null);
+			notifyHandlers(NOTIFY_CANCELLED_QUERY, null);
 			return 0;
+			
 		case REQUEST_PAUSE_QUERY:
 			if (currentRequestWrapper != null && currentRequestWrapper.isRunning()){
 				currentRequestWrapper.pause();
 			}
 			notifyHandlers(NOTIFY_QUERY_PAUSED, null);
 			return 0;
+			
 		case REQUEST_RESUME_QUERY:
 			if (currentRequestWrapper != null && currentRequestWrapper.isRunning()){
 				currentRequestWrapper.resume();
 			}
 			notifyHandlers(NOTIFY_QUERY_RESUMED, null);
-			return 0;	
+			return 0;
+			
 		default:
 			//break;
 		}
