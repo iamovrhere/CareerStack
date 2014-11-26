@@ -43,7 +43,7 @@ import com.ovrhere.android.careerstack.utils.ToastManager;
  * or launch a search from tags (via {@link OnFragmentInteractionListener})
  * 
  * @author Jason J.
- * @version 0.7.0-20141125
+ * @version 0.7.1-20141126
  */
 public class CareerItemFragment extends Fragment implements 
 	OnClickListener, OnCheckedChangeListener, 
@@ -66,6 +66,7 @@ public class CareerItemFragment extends Fragment implements
 	final static private String KEY_SCROLL_POSITION_RATIO =
 			CLASS_NAME +".KEY_SCROLL_POSITION_RATIO";
 	
+		
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End keys
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,8 +103,10 @@ public class CareerItemFragment extends Fragment implements
 			"<body> %s </body></html>";
 	
 
-	/** The JavaScript object to use in calls. */
-	final static private String JAVASCRIPT_TAGS_OBJ = "AndroidCareerItem";
+	/** The link/href to use in link work around. */
+	final static private String HREF_TAGS_ID = 
+			//must be lowercase for urls, uppercase for readability
+			"AndroidCareerItem:tag=".toLowerCase(Locale.US); 
 
 	/** The wrapper for the tags html. Takes one strings:
 	 * <ol><li>The list of #HTML_TAG_BUTTON s </li>
@@ -117,16 +120,16 @@ public class CareerItemFragment extends Fragment implements
 
 	
 	/** The HTML for the tag buttons. Takes one string (the name of the button). 
-	 * Methods match {@link JobTagsJSInterface#onTagClick(String)}  */
+	 *   */
 	final static private String HTML_TAG_BUTTON = 
-			"<div class='job-tag' " +
-			//dirt simple, inline javascript
-			" onclick=\""+JAVASCRIPT_TAGS_OBJ+".onTagClick('%1$s')\"" +
+			"<a class='job-tag' " +
+			//dirt simple, href redirect
+			" href=\""+HREF_TAGS_ID+"%1$s\"" +
 			//force redraw
 			" ontouchstart=\"this.className = 'job-tag'; \" " +
 			//ontouchmove, prevents button "sliding" styling issues
 			" ontouchmove=\"this.className = 'job-tag-inactive';\" " +
-			">%1$s</div>";
+			">%1$s</a>";
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,6 +304,7 @@ public class CareerItemFragment extends Fragment implements
 		return rootView;
 	}
 	
+	
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
@@ -376,11 +380,27 @@ public class CareerItemFragment extends Fragment implements
 	 * was done.
 	 * 
 	 * When executing the button clicks it could be either be done in:
-	 * - WebViewClient.onPageStarted(View, String, Bitmap) 
+	 * - WebViewClient.shouldOverrideUrlLoading(WebView, String) 
 	 * - JavaScript
 	 * 
-	 * However, styling issues were more readily handled with javascript enabled
-	 * and I just wanted to use it.
+	 * Originally, I had planned to use JavaScript, however there are some issues
+	 * in 2.3.3 namely:
+	 * - https://code.google.com/p/android/issues/detail?id=12987
+	 * 
+	 * This issue is more common in emulators but in theory CAN happen on certain
+	 * devices:
+	 * - https://code.google.com/p/android/issues/detail?id=12987#c117. 
+	 * 
+	 * So, for safety, I'd like to address it. In order to this one can either create: 
+	 * - JavaScript-Bridge like:
+	 *  + http://www.jasonshah.com/handling-android-2-3-webviews-broken-addjavascriptinterface/
+	 *  + https://github.com/twig/twigstechtips-snippets/blob/master/GingerbreadJSFixExample.java
+	 * - The previous method (WebViewClient)
+	 *  
+	 * For this project I am going to opt for the simpler previous 
+	 * method of the WebViewClient. It's simple and requires less code.
+	 * 
+	 * JavaScript remains enabled for the purposes of styling.
 	 * 
 	 * This is part of the reason why a separate WebView is used; we have little
 	 * control over the job description content. Safety dictates isolating 
@@ -402,8 +422,8 @@ public class CareerItemFragment extends Fragment implements
 		webSettings.setDefaultFontSize(12); //TODO abstract
 		webSettings.setSupportZoom(false);
 		
+		//enabled for the sake of styling
 		webSettings.setJavaScriptEnabled(true);
-		wv_tags.addJavascriptInterface(new JobTagsJSInterface(this), JAVASCRIPT_TAGS_OBJ);
 		
 		/* Hack to disable copying. */
 		wv_tags.setOnLongClickListener(new View.OnLongClickListener() {
@@ -499,6 +519,14 @@ public class CareerItemFragment extends Fragment implements
 		chk_toggleTags.setVisibility(showTagButtonVisible ? View.VISIBLE : View.GONE);
 		chk_toggleTags.setOnCheckedChangeListener(this);
 		
+		setToggleTagsCheck();
+	}
+
+	/** Sets the toggle tag check according to preference. */
+	private void setToggleTagsCheck() {
+		if (prefs == null || chk_toggleTags == null){
+			return; //give up if null
+		}
 		boolean checked = prefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false);
 		chk_toggleTags.setChecked(checked);
 		onCheckedChanged(chk_toggleTags, checked);
@@ -706,6 +734,7 @@ public class CareerItemFragment extends Fragment implements
 	 * @author Jason J.
 	 * @version 0.1.1-20141124
 	 */
+	@Deprecated
 	static private class JobTagsJSInterface {
 		private CareerItemFragment careerItemFragment = null;
 		public JobTagsJSInterface(CareerItemFragment careerItemFragment) {
@@ -766,13 +795,14 @@ public class CareerItemFragment extends Fragment implements
 						}
 					}
 
+					final int visibility = webView.getVisibility();
 					//make webview invisible for animation purposes
-					if (webView.getVisibility() == View.VISIBLE){
+					if (visibility == View.VISIBLE){
 						webView.setVisibility(View.INVISIBLE);
 					}
 					
 					/* In case the WebView does not load correctly. */
-					if (webView.getHeight() <= 0){
+					if (webView.getHeight() <= 0 && visibility != View.GONE){
 						//we have failed to load, retry
 						if (attempts++ < RETRY_LIMIT){
 							retryListener.onRetry();
@@ -811,35 +841,65 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** The Job description web view client to listen to when the view has been loaded. */
 	private AnimatedRetryWebViewClient tagsWebViewListener = 
-			new AnimatedRetryWebViewClient(this, new AnimatedRetryWebViewClient.RetryListener() {		
-		@Override
-		public void onRetry() {
-			buildAndLoadTags();
-		}
+			new AnimatedRetryWebViewClient(this, 
+				new AnimatedRetryWebViewClient.RetryListener() {		
+					@Override
+					public void onRetry() {
+						buildAndLoadTags();
+					}
+					
+					@Override
+					public void onAnimationSet() {
+						//nothing to do here
+						scrollViewPending2 = true;
+						resetScrollView();
+					}
+				}){
 		
+
+		/* Over ride the load resource to avoid the javascript bug in 2.3.3
+		 * 
+		 * (non-Javadoc)
+		 * @see android.webkit.WebViewClient#shouldOverrideUrlLoading(android.webkit.WebView, java.lang.String)
+		 */
 		@Override
-		public void onAnimationSet() {
-			//nothing to do here
-			scrollViewPending2 = true;
-			resetScrollView();
+		public boolean shouldOverrideUrlLoading(WebView view, String url){
+			if (DEBUG){
+				Log.d(LOGTAG, "url: " +url);
+			}
+			
+			if (url.startsWith(HREF_TAGS_ID)){
+				try {
+					//this should take "AndroidCareerItem:tag=android" and produce "android"
+					mFragInteractionListener.onTagClick(url.replaceAll(HREF_TAGS_ID, ""));
+				} catch (Exception tagE){
+					Log.e(LOGTAG, "Unusual tag behaviour: " + tagE);
+					if (DEBUG){
+						tagE.printStackTrace();
+					}
+				}
+				return true; 
+			}
+			return false;
 		}
-	});
+	};
 	
 	/** The Job description web view client to listen to when the view has been loaded. */
 	private AnimatedRetryWebViewClient jobDescriptionWebViewListener = 
-			new AnimatedRetryWebViewClient(this, new AnimatedRetryWebViewClient.RetryListener() {		
-		@Override
-		public void onRetry() {
-			loadJobDescription();	
-		}
-		
-		@Override
-		public void onAnimationSet() {
-			//we have finished loading, reset scroll
-			scrollViewPending1 = true;
-			resetScrollView();
-		}
-	});
+			new AnimatedRetryWebViewClient(this, 
+				new AnimatedRetryWebViewClient.RetryListener() {		
+					@Override
+					public void onRetry() {
+						loadJobDescription();	
+					}
+					
+					@Override
+					public void onAnimationSet() {
+						//we have finished loading, reset scroll
+						scrollViewPending1 = true;
+						resetScrollView();
+					}
+				});
 	
 	
 	
@@ -863,6 +923,9 @@ public class CareerItemFragment extends Fragment implements
 	
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		if (DEBUG){
+			Log.d(LOGTAG, "onCheckedChanged: " + isChecked);
+		}
 		if (buttonView.getId() == R.id.careerstack_careerItem_check_showTags){
 			//change the button text
 			buttonView.setText(isChecked ? getString(R.string.careerstack_careeritem_showtags_on) : 
@@ -872,6 +935,9 @@ public class CareerItemFragment extends Fragment implements
 							isChecked)
 				.commit();
 			checkTagVisiblity();
+			if (DEBUG){
+				Log.d(LOGTAG, "show tags: " + isChecked);
+			}
 		}
 	}
 	

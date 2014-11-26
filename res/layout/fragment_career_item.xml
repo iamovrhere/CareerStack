@@ -102,7 +102,8 @@
 	            android:layout_weight="1.0"
 	            android:textSize="14sp" />
 
-		    
+		    <!-- Set  saveEnabled to false as it is set by a preference which is,
+		     in turn, set in multiple places -->
 		    <CheckBox
 		        android:id="@+id/careerstack_careerItem_check_showTags"
 		        android:layout_width="wrap_content"
@@ -111,7 +112,7 @@
 		        android:text="@string/careerstack_careeritem_showtags_on"
 		        android:button="@null"
 		        android:background="?attr/careerstack_checkbox_button"
-		        
+		        android:saveEnabled="false"
 		        />
 	        
         </LinearLayout>

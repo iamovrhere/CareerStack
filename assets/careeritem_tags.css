@@ -1,7 +1,7 @@
 @CHARSET "UTF-8";
 /**
  * Defines styles for career tags, primarily dark theme.
- * @version 0.1.0-20141121 
+ * @version 0.1.1-20141126 
  */
  
  /** 
@@ -38,6 +38,7 @@
 }
 
 /** The styles for the active clicks */
+.job-tag:hover,
 .job-tag:active,
 .job-tag:focus { 
 	background-color: rgba(224, 118, 20, 200);
