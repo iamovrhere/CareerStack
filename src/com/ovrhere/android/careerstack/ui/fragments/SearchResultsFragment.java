@@ -34,7 +34,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.8.1-20141126
+ * @version 0.8.2-20141127
  */
 public class SearchResultsFragment extends Fragment 
 implements OnClickListener, OnItemClickListener, Handler.Callback {
@@ -60,6 +60,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	 * {@link #resultsTimeout}. Boolean */
 	final static private String KEY_RESULTS_TIMEOUT = 
 			CLASS_NAME +".KEY_RESULTS_TIMEOUT";
+	
+	/** Bundle key. The previous query state. Bundle. */
+	final static private String KEY_PREV_QUERY = 
+			CLASS_NAME +".KEY_PREV_QUERY";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Start public keys
@@ -126,8 +130,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		
 	/** The fragment request listener from activity. */
 	private OnFragmentInteractionListener mFragInteractionListener = null;
-	/** Used in {@link #onSaveInstanceState(Bundle)} to determine if 
-	 * views are visible. */
+	
+	/** Used to determine if views are valid. 
+	 * Set true in {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}
+	 * false in {@link #onDestroyView()} */
 	@SuppressWarnings("unused")
 	private boolean viewBuilt = false;
 	
@@ -198,14 +204,13 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		Bundle backStackState = 
 				mFragInteractionListener.onPopSavedStateRequest();
 		
-		//default loading to true to start with loading/spinner
-		showLoadingBlock(false);
-		
 		if (backStackState != null){
 			debugSavedState(backStackState);
 			processArgBundle(backStackState);
+			
 		} else if (savedInstanceState != null){
-			processArgBundle(savedInstanceState);			
+			processArgBundle(savedInstanceState);	
+			
 		} else if (getArguments() != null) {
 			Bundle args = getArguments();
 			processArgBundle(args);
@@ -333,8 +338,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	private void processArgBundle(Bundle args){
 		//safety first, always try restore block
 		try {
-			isLoadingResults = args.getBoolean(KEY_IS_LOADING_RESULTS, false);
-			resultsTimeout = args.getBoolean(KEY_RESULTS_TIMEOUT, false);
+			//if we began loading results before the view was recreated
+			isLoadingResults = isLoadingResults || args.getBoolean(KEY_IS_LOADING_RESULTS, false);
+			//if results timeout out before view was recreated
+			resultsTimeout = resultsTimeout || args.getBoolean(KEY_RESULTS_TIMEOUT, false);
 			
 			if (resultsTimeout){
 				showRetryBlock(false);
@@ -352,8 +359,13 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 						Log.e(LOGTAG, "Career list mistmatched class?" + e);
 					}
 			}
+			
 			if (prevQuery == null){
-				prevQuery = getArguments();
+				//only restore previous query if we don't have one already 
+				prevQuery = args.getBundle(KEY_PREV_QUERY);
+				if (prevQuery == null){ //still null? try the args.
+					prevQuery = getArguments();
+				}
 			}
 			setSearchTerms();
 			
@@ -391,6 +403,8 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		
 		outState.putBoolean(KEY_IS_LOADING_RESULTS, isLoadingResults);
 		outState.putBoolean(KEY_RESULTS_TIMEOUT, resultsTimeout);
+		
+		outState.putBundle(KEY_PREV_QUERY, prevQuery);
 		
 		debugSavedState(outState);
 	}
@@ -490,12 +504,15 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		isLoadingResults = false;
 		resultsTimeout = true;
 		
-		if (animate){
-			fadeViews(retryContainer, progressContainer, lv_resultsView);
-		} else {
-			retryContainer.setVisibility(View.VISIBLE);
-			progressContainer.setVisibility(View.GONE);
-			lv_resultsView.setVisibility(View.GONE);
+		if (	retryContainer != null && progressContainer != null && 
+				lv_resultsView != null ){ //ensure views valid
+			if (animate){
+				fadeViews(retryContainer, progressContainer, lv_resultsView);
+			} else {
+				retryContainer.setVisibility(View.VISIBLE);
+				progressContainer.setVisibility(View.GONE);
+				lv_resultsView.setVisibility(View.GONE);
+			}
 		}
 		
 		if (DEBUG){
@@ -512,18 +529,19 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		isLoadingResults = true;
 		resultsTimeout = false;	
 		
-		//always clear progress
-		if (tv_progress != null){
+		if (	retryContainer != null && progressContainer != null && 
+				lv_resultsView != null && tv_progress != null){ //ensure views valid
+			//always clear progress
 			tv_progress.setText("");
+			
+			if (animate){
+				fadeViews(progressContainer, retryContainer, lv_resultsView);
+			} else {
+				retryContainer.setVisibility(View.GONE);
+				progressContainer.setVisibility(View.VISIBLE);
+				lv_resultsView.setVisibility(View.GONE);
+			}
 		}
-		
-		if (animate){
-			fadeViews(progressContainer, retryContainer, lv_resultsView);
-		} else {
-			retryContainer.setVisibility(View.GONE);
-			progressContainer.setVisibility(View.VISIBLE);
-			lv_resultsView.setVisibility(View.GONE);
-		}	
 		
 		if (DEBUG){
 			Log.v(LOGTAG, "showLoadingBlock: " + animate);
@@ -539,12 +557,15 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		isLoadingResults = false;
 		resultsTimeout = false;	
 		
-		if (animate){
-			fadeViews(lv_resultsView, progressContainer, retryContainer);
-		} else {
-			retryContainer.setVisibility(View.GONE);
-			progressContainer.setVisibility(View.GONE);
-			lv_resultsView.setVisibility(View.VISIBLE);
+		if (	retryContainer != null && progressContainer != null && 
+				lv_resultsView != null ){ //ensure views valid
+			if (animate){
+				fadeViews(lv_resultsView, progressContainer, retryContainer);
+			} else {
+				retryContainer.setVisibility(View.GONE);
+				progressContainer.setVisibility(View.GONE);
+				lv_resultsView.setVisibility(View.VISIBLE);
+			}
 		}
 		
 		if (DEBUG){
@@ -554,15 +575,17 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	
 	/** Resets the list position to top. */
 	private void resetListPosition(){
-		//ensure we are at the top. 
-		lv_resultsView.setSelectionFromTop(0, 0);
-		lv_resultsView.postDelayed(new Runnable() {@Override
-			public void run() {
-				try{ //catch as we are delaying
-					lv_resultsView.setSelectionFromTop(0, 0);
-				}catch(Exception e){}
-			}
-		}, 50);
+		if (lv_resultsView != null){ //ensure view valid
+			//ensure we are at the top. 
+			lv_resultsView.setSelectionFromTop(0, 0);
+			lv_resultsView.postDelayed(new Runnable() {@Override
+				public void run() {
+					try{ //catch as we are delaying
+						lv_resultsView.setSelectionFromTop(0, 0);
+					}catch(Exception e){}
+				}
+			}, 50);
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
