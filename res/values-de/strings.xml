@@ -19,14 +19,14 @@
     <!-- The settings string -->
     <string name="action_settings">"Einstellungen"</string>
     
-    <string name="action_refresh">Erfrischen</string>
+    <string name="action_refresh">Aktualisieren</string>
     <!-- The toggle day/night theme string -->    
-    <string name = "action_toggleTheme"> Toggle Dunkel / Hell Theme </string>
+    <string name = "action_toggleTheme">Helles / Dunkles Design umschalten</string>
     
     <string name="hello_blank_fragment">"Hallo leer Fragment"</string>
     
     <!-- The title for the DistanceDialogFragment -->
-    <string name="careerstack_dialog_distance_title">"Gesetzt Entfernung"</string>
+    <string name="careerstack_dialog_distance_title">"Gesetzte Entfernung"</string>
     
     <!-- End titles -->
     <eat-comment/>
@@ -34,25 +34,25 @@
     
     
 	<string name = "careerstack_text_noJobDescriptionSelected"
-         > Wählen Sie einen Job Artikel&#8230; </string>
+         > Wählen Sie eine Stellenbeschreibung aus&#8230; </string>
 
     <!-- Starts Main fragment strings -->
     <eat-comment/>
     
     <!-- The content description to describe career-stack image -->
-    <string name="careerstack_img_careerstack_contentDescription">"Career Stack (Karriere Stapel)"</string>
+    <string name="careerstack_img_careerstack_contentDescription">"Career Stack"</string>
     <!-- The content description to describe powered by image -->
     <string name="careerstack_img_poweredBy_contentDescription">"Bereitgestellt von Careers 2.0, von Stack Overflow"</string>
 
     <!-- Hint value for keywords -->
-    <string name="careerstack_input_hint_keywords">"Stichworte (zB Android Java)"</string>
+    <string name="careerstack_input_hint_keywords">"Stichwörter (z.B. Android, Java)"</string>
     <!-- Hint value for location -->
-    <string name="careerstack_input_hint_location">"Stadt, Land oder PLZ (zB Berlin)"</string>
+    <string name="careerstack_input_hint_location">"Stadt, Land oder PLZ (z.B. Berlin)"</string>
 
     <!-- Label for the distance progress bar -->
     <string name="careerstack_label_distance">"Entfernung"</string>
     <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
-    <string name="careerstack_formatString_distanceValue_miles">"%1$d meilen"</string>
+    <string name="careerstack_formatString_distanceValue_miles">"%1$d Meilen"</string>
     
 
     <!-- Work remotely check string for main. -->
@@ -74,7 +74,7 @@
     <string name="careerstack_searchResults_button_retry">"Nochmal"</string>
     
     <!-- Work remotely check string for main. -->
-    <string name="careerstack_searchBar_check_workRemotely">"Arbeit fern"</string>
+    <string name="careerstack_searchBar_check_workRemotely">"Fernarbeit"</string>
     <!-- Offers relocation check string for main. -->
     <string name="careerstack_searchBar_check_offersRelocation">"Umzug"</string>
     
@@ -86,13 +86,13 @@
 
 
      <string name = "careerstack_careerlist_matchingResults_stub"
-         > Passenden Ergebnisse für \"%1$s\" </string>
+         > Passende Ergebnisse für \"%1$s\" </string>
 
 
      <string name = "careerstack_careerlist_matchingResults"> Passende Ergebnisse </string>
 
 
-     <string name = "careerstack_careerlist_resultsNear"> \u0020 der nähe von %1$s </string>
+     <string name = "careerstack_careerlist_resultsNear"> \u0020 in der Nähe von %1$s </string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment/>
@@ -102,11 +102,11 @@
     <!-- The open career link button. -->
     <string name="careerstack_careerItem_button_openLink">"Link öffnen"</string>
     <!-- The share this job button. -->
-    <string name="careerstack_careerItem_button_shareJob">"Teilen Sie diese job"</string>
+    <string name="careerstack_careerItem_button_shareJob">"Diese Stelle teilen"</string>
     <!-- Published & last update string. Formatted: accepts 2 strigns. -->
-    <string name="careerstack_formatString_publishUpdateDate">"Veröffentlicht: %1$s \nLetzte aktualisiert: %2$s"</string>
+    <string name="careerstack_formatString_publishUpdateDate">"Veröffentlicht: %1$s \nZuletzt aktualisiert: %2$s"</string>
     <!-- Copied Link. -->
-    <string name="careerstack_toast_copiedLink">"Link in die Zwischenablage kopieren"</string>
+    <string name="careerstack_toast_copiedLink">"Link in die Zwischenablage kopiert"</string>
     <!-- The string for "%1$s(job) at %2$s(place) -->
     <string name="careerstack_formatString_jobAtPlace">"%1$s um %2$s"</string>
 
@@ -118,12 +118,12 @@
     <!-- The setting title for distance units -->
     <string name="careerstack_settings_useMetric_title">"Meilen"</string>
     <!-- The setting description for distance units -->
-    <string name="careerstack_settings_useMetric_summary">"Verwenden Sie das imperiale System für Distanz"</string>
+    <string name="careerstack_settings_useMetric_summary">"Das imperiale System für Distanzen verwenden"</string>
     
     <!-- The pref title for keeping settings for search -->
-    <string name="careerstack_settings_keepSearchSettings_title">"Persistent Sucheinstellungen"</string>
+    <string name="careerstack_settings_keepSearchSettings_title">"Persistente Sucheinstellungen"</string>
     <!-- The pref description for keeping settings for search  -->
-    <string name="careerstack_settings_keepSearchSettings_summary">"Wiederherstellung von Sucheinstellungen vorherigen Sitzung"</string>
+    <string name="careerstack_settings_keepSearchSettings_summary">"Wiederherstellung von Sucheinstellungen der vorherigen Sitzung"</string>
         
     
     
@@ -131,43 +131,43 @@
     
     
         <string name="careerstack_settings_quickSwitch_title"
-        >Schnellschalt Thema</string>
+        >Schnelle Designwahl</string>
 
     <string name="careerstack_settings_quickSwitch_summary"
-        >WARNUNG! Experimenteller! 
-\nWechsel zwischen Themen ohne Neustart. Begrenzte Unterstützung.</string>
+        >WARNUNG! Experimentell! 
+\nWechsel zwischen Designs ohne Neustart. Begrenzte Unterstützung.</string>
 
     <string name="careerstack_settings_quickSwitch_support"
         >Unterstützung für Android 3.0 oder höher</string>
 
     <string name="careerstack_settings_quickSwitch_confirmMsg"
-        >Schnellschalt Themen ist experimentell und kann nicht auf allen Geräten funktionieren. Versuchen Sie es trotzdem? 
-\n\n(Erfordert die Anwendung neu starten zu übernehmen.)</string>
+        >Schnelle Designwahl ist experimentell und funktioniert nicht auf allen Geräten. Trotzdem versuchen? 
+\n\n(Erfordert einen Neustart der Anwendung zum Übernehmen.)</string>
     
     
     <!-- Search tag settings -->
     <eat-comment />    
     <string name = "careerstack_settings_showTags_title"
-         > Zeige Such-Kategorien anzeigen </string>
+         > Suchkategorien anzeigen </string>
 
      <string name = "careerstack_settings_showTags_summary"
-         > Zeigt Such-Kategorien für Stellenbeschreibung </string>
+         > Zeigt Suchkategorien für Stellenbeschreibungen an </string>
     
     
     <!-- The tablet mode settings -->
     <eat-comment />    
     
 	<string name = "careerstack_settings_tabletMode_title"
-         > Verwenden Dual-Fenster-Tablet -Modus </string>
+         > Dual-Fenster-Modus verwenden </string>
 
 
 	<string name = "careerstack_settings_tabletMode_summary"
-         > View in Dual-Fenster-Tablet-Modus, wenn verfügbar </string>
+         > Dual-Fenster-Modus auf Tablets verwenden, wenn verfügbar </string>
     
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title">"Alle Einstellungen zurücksetzen"</string>
     <!-- The pref description for clearing settings  -->
-    <string name="careerstack_settings_clearSettings_summary">"Setzen Sie alle Einstellungen auf die Standardwerte"</string>
+    <string name="careerstack_settings_clearSettings_summary">"Setzt alle Einstellungen auf die Standardwerte zürück"</string>
     <!-- The clearing settings confirmation message  -->
     <string name="careerstack_settings_clearSettings_confirmMsg">"Sind Sie sicher, dass Sie ALLE Einstellungen zurücksetzen möchten? Dies kann nicht rückgängig gemacht werden."</string>
     
@@ -183,7 +183,7 @@
     <!-- Starts theme dialog fragment strings -->
     <eat-comment/>
     <!-- The changing theme confirmation message  -->
-    <string name="careerstack_theme_dialogMsg">"Ändern des Themas wird die App neu starten. Sie erhalten keine geladen sucht verlieren. Sind Sie sicher?"</string>
-        <string name="careerstack_restart_dialogMsg_confirm">"Ja, Neustart"</string>
+    <string name="careerstack_theme_dialogMsg">"Ändern des Designs wird die App neustarten. Sie verlieren Ihre aktuelle Suche. Sind Sie sicher?"</string>
+        <string name="careerstack_restart_dialogMsg_confirm">"Ja, neustarten"</string>
     
 </resources>
