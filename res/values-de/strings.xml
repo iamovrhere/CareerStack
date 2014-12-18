@@ -167,7 +167,7 @@
     <!-- The pref title for clearin settings -->
     <string name="careerstack_settings_clearSettings_title">"Alle Einstellungen zurücksetzen"</string>
     <!-- The pref description for clearing settings  -->
-    <string name="careerstack_settings_clearSettings_summary">"Setzt alle Einstellungen auf die Standardwerte zürück"</string>
+    <string name="careerstack_settings_clearSettings_summary">"Setzt alle Einstellungen auf die Standardwerte zurück"</string>
     <!-- The clearing settings confirmation message  -->
     <string name="careerstack_settings_clearSettings_confirmMsg">"Sind Sie sicher, dass Sie ALLE Einstellungen zurücksetzen möchten? Dies kann nicht rückgängig gemacht werden."</string>
     
