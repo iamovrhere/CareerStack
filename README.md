@@ -1,7 +1,9 @@
 #CareerStack 
 
-[!["Get 'CareerStack' on Google Play"](https://bitbucket.org/iamovrhere/careerstack/raw/master/res/drawable-hdpi/ic_launcher.png)
-](https://play.google.com/store/apps/details?id=com.ovrhere.android.careerstack "Get 'CareerStack' on Google Play")  [!["Get 'CareerStack' on Google Play"](https://bitbucket.org/iamovrhere/careerstack/raw/master/screenshots/get_on_play_45.png)
+[!["Get 'CareerStack' on Google Play"](https://bitbucket.org/iamovrhere/careerstack/raw/master/screenshots/careerstack_feature_graphic.png)
+](https://play.google.com/store/apps/details?id=com.ovrhere.android.careerstack "Get 'CareerStack' on Google Play")  
+
+[!["Get 'CareerStack' on Google Play"](https://bitbucket.org/iamovrhere/careerstack/raw/master/screenshots/get_on_play_45.png)
 ](https://play.google.com/store/apps/details?id=com.ovrhere.android.careerstack "Get 'CareerStack' on Google Play")
 
 Powered by [Stack Overflow Careers](http://careers.stackoverflow.com/ 
@@ -13,7 +15,7 @@ Designed for mobile & tablet devices, **Android 2.3.3** and up, it can be found 
 
 ###Notes
 
-This project is primarily hosted on [Bitbucket](https://bitbucket.org/iamovrhere/careerstack/ "CareerStack on Bitbucket"), as are [its issues](https://bitbucket.org/iamovrhere/careerstack/issues?status=new&status=open "CareerStack issues"). As such, absolute paths are used for links in this README.
+This project is primarily hosted on [Bitbucket](https://bitbucket.org/iamovrhere/careerstack/ "CareerStack on Bitbucket") with [its issues](https://bitbucket.org/iamovrhere/careerstack/issues?status=new&status=open "CareerStack issues") and the source mirrored on [GitHub](https://github.com/iamovrhere/CareerStack/ "CareerStack on GitHub"). As such, absolute paths are used for images/links in this README.
 
 This project requires:
 
@@ -34,13 +36,17 @@ The application is designed for tablets and multiple screen sizes, both large an
 
 Translations likely need some work at this point as English is my native language, with only a cursory knowledge of French from secondary/high school.
 
+###Contributors
+
+* [cochrane343](https://github.com/cochrane343 "Find cochrane343 on GitHub") - German translations
+
 
 ###Screenshots
 ![Screenshot showing multiple themes](https://bitbucket.org/iamovrhere/careerstack/raw/master/screenshots/screenshot_4_darklight.png "Screenshot showing multiple themes") 
 
 ![Screenshot showing light theme + search](https://bitbucket.org/iamovrhere/careerstack/raw/master/screenshots/screenshot_5.png "Screenshot showing light theme + search") ![Screenshot showing dark theme + job item](https://bitbucket.org/iamovrhere/careerstack/raw/master/screenshots/screenshot_3.png "Screenshot showing dark theme + job item")
 
-![Screenshot showing 7 inch tablet layout](https://bitbucket.org/iamovrhere/careerstack/raw/master/screenshots/screenshot_tablet_7in_0.png "[Screenshot showing 7 inch tablet layout")
+![Screenshot showing 7 inch tablet layout](https://bitbucket.org/iamovrhere/careerstack/raw/master/screenshots/screenshot_tablet_7in_0.png "Screenshot showing 7 inch tablet layout")
 
 #License
 ***
