@@ -30,7 +30,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,9 +50,9 @@ import com.ovrhere.android.careerstack.utils.TabletUtil;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.9.0-20141124
+ * @version 0.10.0-20151004
  */
-public class MainActivity extends ActionBarActivity 
+public class MainActivity extends AppCompatActivity 
 	implements OnBackStackChangedListener, DialogInterface.OnClickListener,
 	MainFragment.OnFragmentInteractionListener, 
 	CareerItemFragment.OnFragmentInteractionListener,

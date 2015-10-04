@@ -24,15 +24,45 @@
     <color name="careerstack_nearblack_90" >#E5282828</color>
     
     
-    <!-- Colour straight from stackoverflow background -->
-    <color name="careerstack_offwhite_background">#F6F6F5</color>
-    <!-- Colour near to black but not quite -->
-    <color name="careerstack_nearblack_background">#080808</color>
-    
-    <!-- The grey for the light actionbar -->
+     <!-- The grey for the light actionbar -->
     <color name="careerstack_actionBar_light">#333</color>
     
     <!-- Very transparent text color -->
     <color name="careerstack_verytranslucent_grey" >#55909090</color>
+    
+    <!-- App theme specific colors -->
+    <eat-comment />
+    <color name="appbasetheme_dark_color">#33b5e5</color>    
+    <color name="appbasetheme_light_color">#33b5e5</color>
+    
+    <!-- Standard Material design colors. Easily reference through the app, if needed. 
+    Note that some are designated in the attrs.xml -->
+	<eat-comment />
+	
+	<!-- Dark theme material colours -->
+	<eat-comment />
+    <color name="colorPrimary_darkTheme">#0d0d0d</color>
+	<color name="colorPrimaryDark_darkTheme">#080808</color>	
+    <!--Colour used for the light theme background-->
+    <color name="windowBackground_darkTheme">#141414</color>
+    
+    <color name="textColorPrimary_darkTheme">#DEDEDE</color>
+	<color name="textColorSecondary_darkTheme">#8D8D8D</color>
+	
+	<!-- Light theme material colours -->
+	<eat-comment />
+	<color name="colorPrimary_lightTheme">#5c5c5c</color>
+	<color name="colorPrimaryDark_lightTheme">#313131</color>	
+	<!-- Colour used for the dark theme background -->
+	<color name="windowBackground_lightTheme">#F2F2F2</color>	
+	
+	<color name="textColorPrimary_lightTheme">#212121</color>
+	<color name="textColorSecondary_lightTheme">#727272</color>
+	
+	<!-- Shared material colours -->
+	<eat-comment />
+	
+	<color name="colorControlNormal">@color/careerstack_translucent_grey</color>
+	<color name="colorAccent">#fb8c18</color>	
     
 </resources>

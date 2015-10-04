@@ -36,7 +36,7 @@
          
          android:background="@drawable/transparent_btn_holo_dark"
          android:contentDescription="@android:string/cancel"
-         android:src="@drawable/abc_ic_ab_back_holo_dark" />
+         android:src="@drawable/ic_back" />
 
     <include 
        	layout="@layout/viewstub_search_texts"

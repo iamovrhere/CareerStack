@@ -19,22 +19,30 @@
     	  xmlns:careerstack="http://schemas.android.com/apk/res-auto" 
     	  >
     
-    <!--
-       Dark theme
-    -->
-    <style name="_AppBaseTheme.Dark" parent="Theme.AppCompat"
-         >
-        <item name="android:windowBackground">@color/careerstack_nearblack_background</item>
-        <item name="careerstack_background_color">@color/careerstack_nearblack_background</item>         
+    <!-- Dark theme    -->
+    <style name="_AppBaseTheme.Dark" parent="Theme.AppCompat">
+        	
+   		<item name="colorPrimary">@color/colorPrimary_darkTheme</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_darkTheme</item>
+        <item name="colorAccent">@color/colorAccent</item>
+       
+        <item name="android:textColorPrimary">@color/textColorPrimary_darkTheme</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary_darkTheme</item>
+        
+        
+        <!-- Set colours like spinner arrows & unselected radios/checkboxes -->
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+        
+        
+        <item name="android:windowBackground">@color/windowBackground_darkTheme</item>
+        <item name="careerstack_background_color">@color/windowBackground_darkTheme</item>         
          
         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         <item name="careerstack_title_color">@android:color/white</item>
         <!-- Attribue drawable for the dark icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
         
-        <!-- The checkbox style for button use -->
-        <item name="careerstack_checkbox_button" >@drawable/appbasetheme_dark_btn_default_holo_dark</item>
-    
+       
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		
@@ -43,18 +51,24 @@
         <!-- Orange -->
    		<item name="careerstack_searchbar_border">@drawable/ab_dark_background_strip</item>
    		
-   		<!-- Set actionbar -->
-   		<item name="android:actionBarStyle" tools:targetApi="11">@style/MyDarkActionBar</item>
-		
-        <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/MyDarkActionBar</item>
+   		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle</item>
     </style>
     
     <!-- Light theme -->
-    <style name="_AppBaseTheme.Light" parent="Theme.AppCompat.Light.DarkActionBar"
-        >
-        <item name="android:windowBackground">@color/careerstack_offwhite_background</item>   
-        <item name="careerstack_background_color">@color/careerstack_offwhite_background</item>
+    <style name="_AppBaseTheme.Light" parent="Theme.AppCompat.Light.DarkActionBar"   >
+        <item name="colorPrimary">@color/colorPrimary_lightTheme</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_lightTheme</item>
+        <item name="colorAccent">@color/colorAccent</item>
+       
+        <item name="android:textColorPrimary">@color/textColorPrimary_lightTheme</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary_lightTheme</item>
+        
+        <!-- Set colours like spinner arrows & unselected radios/checkboxes -->
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+        
+        
+        <item name="android:windowBackground">@color/windowBackground_lightTheme</item>
+        <item name="careerstack_background_color">@color/windowBackground_lightTheme</item>  
         
         <item name="careerstack_title_color">@android:color/black</item>        
         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
@@ -62,9 +76,7 @@
         <!-- Attribue drawable for the light icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>        
         
-        <!-- The checkbox style for button use -->
-        <item name="careerstack_checkbox_button" >@drawable/appbasetheme_light_btn_default_holo_light</item>
-        
+         
         <!-- Assume grey for light theme -->
         <item name="careerstack_searchbar_color">@color/careerstack_actionBar_light</item>
         
@@ -73,34 +85,22 @@
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		
-   		<!-- Set actionbar -->
-   		<item name="android:actionBarStyle" tools:targetApi="11">@style/MyLightActionBar</item>
-		
-        <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/MyLightActionBar</item>
+   		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle</item>   		
     </style>
     
+    <!-- End basic application themes -->
+    <eat-comment />
     
-     <!-- General styles for the dark action bar -->
-    <style name="MyDarkActionBar"
-           parent="@style/Widget.AppCompat.ActionBar">
-        <item name="android:windowBackground">@color/careerstack_nearblack_background</item>
-        
-        <!-- The orange strip -->
-        <item name="android:background">@drawable/careerstack_ab_transparent_strip</item>
- 		
-        <!-- Support library compatibility -->
-        <item name="background">@drawable/careerstack_ab_transparent_strip</item>
+    
+    <!-- General styles for the dark action bar -->
+    <style name="ActionBar.Solid.CareerStack.NoTitle" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="displayOptions">useLogo|showHome</item>
+        <item name="logo">@drawable/ic_logo</item>        
     </style>
     
-    <!-- General styles for the light action bar -->
-    <style name="MyLightActionBar"
-           parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/careerstack_actionBar_light</item>
- 		
-        <!-- Support library compatibility -->
-        <item name="background">@color/careerstack_actionBar_light</item>
-    </style>
+ 	<!-- End action bar themes -->
+    <eat-comment />
+    
     
     <!-- The styling for the search bar; ensures it is always full -->
     <style name="SearchBarDialogStyle"   >
@@ -114,17 +114,7 @@
 	
     <!-- Search box style for dark;  ensures it always matches the actionbar -->
     <style name="SearchBarDialogStyle.Dark" parent="Theme.AppCompat" >
-	    <item name="android:editTextStyle">@style/EditTextAppBaseTheme_Dark</item>	
-	    <item name="android:textColorHighlight">#9933b5e5</item>	
-	    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewAppBaseTheme_Dark</item>	
-	    <item name="android:checkboxStyle">@style/CheckBoxAppBaseTheme_Dark</item>	
-	    <item name="android:buttonStyle">@style/ButtonAppBaseTheme_Dark</item>	
-	    <item name="android:imageButtonStyle">@style/ImageButtonAppBaseTheme_Dark</item>	
-	    <item name="android:seekBarStyle">@style/SeekBarAppBaseTheme_Dark</item>	
-	    <item name="android:listViewStyle">@style/ListViewAppBaseTheme_Dark</item>	
-	    <item name="android:listViewWhiteStyle">@style/ListViewAppBaseTheme_Dark.White</item>	
-	    <item name="android:spinnerItemStyle">@style/SpinnerItemAppBaseTheme_Dark</item>
-	    
+	   
 	    <!--  Ensure the background is the correct colour -->
 	    <item name="android:windowBackground">?attr/careerstack_searchbar_color</item>
 	    
@@ -149,7 +139,6 @@
     
     <!-- Dialog theme fix for 2.3.3 -->
     <style name="DialogTheme" parent="@android:style/Theme.Dialog">
-        <item name="android:seekBarStyle">@style/SeekBarAppBaseTheme_Dark</item>
         <!-- The colour of the x miles/km text -->
         <item  name="careerstack_distance_color" >@android:color/primary_text_dark</item>
 	</style>

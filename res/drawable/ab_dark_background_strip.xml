@@ -17,7 +17,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
     <item >
         <shape android:shape="rectangle">
-            <solid android:color="@color/careerstack_nearblack_background"/>
+            <solid android:color="@color/colorPrimaryDark_darkTheme"/>
         </shape>
     </item>
     <item >

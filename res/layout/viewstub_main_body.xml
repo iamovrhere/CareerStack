@@ -127,6 +127,8 @@
         android:layout_below="@+id/careerstack_main_check_offerRelocation"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/careerstack_main_searchButton_marginTop"
-        android:text="@android:string/search_go" />
+        android:text="@android:string/search_go" 
+        android:elevation="2dp"
+        />
 
 </RelativeLayout>

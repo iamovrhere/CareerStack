@@ -5,25 +5,7 @@
 
   <style name="AppBaseTheme.Dark" parent="_AppBaseTheme.Dark">
 
-    <item name="android:editTextStyle">@style/EditTextAppBaseTheme_Dark</item>
-
-    <item name="android:textColorHighlight">#9933b5e5</item>
-
-    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewAppBaseTheme_Dark</item>
-
-    <item name="android:checkboxStyle">@style/CheckBoxAppBaseTheme_Dark</item>
-
-    <item name="android:buttonStyle">@style/ButtonAppBaseTheme_Dark</item>
-
-    <item name="android:imageButtonStyle">@style/ImageButtonAppBaseTheme_Dark</item>
-
-    <item name="android:seekBarStyle">@style/SeekBarAppBaseTheme_Dark</item>
-
-    <item name="android:listViewStyle">@style/ListViewAppBaseTheme_Dark</item>
-
-    <item name="android:listViewWhiteStyle">@style/ListViewAppBaseTheme_Dark.White</item>
-
-    <item name="android:spinnerItemStyle">@style/SpinnerItemAppBaseTheme_Dark</item>
+    
 
   </style>
 

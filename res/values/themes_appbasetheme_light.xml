@@ -5,26 +5,6 @@
 
   <style name="AppBaseTheme.Light" parent="_AppBaseTheme.Light">
 
-    <item name="android:editTextStyle">@style/EditTextAppBaseTheme_Light</item>
-
-    <item name="android:textColorHighlight">#9933b5e5</item>
-
-    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewAppBaseTheme_Light</item>
-
-    <item name="android:checkboxStyle">@style/CheckBoxAppBaseTheme_Light</item>
-
-    <item name="android:buttonStyle">@style/ButtonAppBaseTheme_Light</item>
-
-    <item name="android:imageButtonStyle">@style/ImageButtonAppBaseTheme_Light</item>
-
-    <item name="android:seekBarStyle">@style/SeekBarAppBaseTheme_Light</item>
-
-    <item name="android:listViewStyle">@style/ListViewAppBaseTheme_Light</item>
-
-    <item name="android:listViewWhiteStyle">@style/ListViewAppBaseTheme_Light.White</item>
-
-    <item name="android:spinnerItemStyle">@style/SpinnerItemAppBaseTheme_Light</item>
-
   </style>
 
 </resources>

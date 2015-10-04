@@ -26,6 +26,7 @@ local.properties
 .classpath
 .project
 project.properties
+.settings
 
 #Special - Do not track ad_strings.xml which contains secret keys
 res/values/ad_strings.xml
