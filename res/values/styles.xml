@@ -51,7 +51,7 @@
         <!-- Orange -->
    		<item name="careerstack_searchbar_border">@drawable/ab_dark_background_strip</item>
    		
-   		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle</item>
+   		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle.Dark</item>
     </style>
     
     <!-- Light theme -->
@@ -85,7 +85,7 @@
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		
-   		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle</item>   		
+   		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle.Light</item>   		
     </style>
     
     <!-- End basic application themes -->
@@ -96,6 +96,17 @@
     <style name="ActionBar.Solid.CareerStack.NoTitle" parent="@style/Widget.AppCompat.ActionBar">
         <item name="displayOptions">useLogo|showHome</item>
         <item name="logo">@drawable/ic_logo</item>        
+    </style>
+    
+    
+     <!-- General styles for the dark action bar -->
+    <style name="ActionBar.Solid.CareerStack.NoTitle.Dark" parent="ActionBar.Solid.CareerStack.NoTitle">
+        <item name="background">@color/colorPrimary_darkTheme</item>
+    </style>
+    
+     <!-- General styles for the dark action bar -->
+    <style name="ActionBar.Solid.CareerStack.NoTitle.Light" parent="ActionBar.Solid.CareerStack.NoTitle">
+        <item name="background">@color/colorPrimary_lightTheme</item>
     </style>
     
  	<!-- End action bar themes -->
