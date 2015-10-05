@@ -7,8 +7,8 @@
 ](https://play.google.com/store/apps/details?id=com.ovrhere.android.careerstack "Get 'CareerStack' on Google Play")
 
 Powered by [Stack Overflow Careers](http://careers.stackoverflow.com/ 
-Stack Overflow Careers
-), **CareerStack** is the unofficial app to search Stack Careers' RSS feed for new tech job oppertunites.
+"Stack Overflow Careers"
+), **CareerStack** is the unofficial app to search Stack Careers' RSS feed for new tech job opportunities.
 
 Designed for mobile & tablet devices, **Android 2.3.3** and up, it can be found on [Google Play](https://play.google.com/store/apps/details?id=com.ovrhere.android.careerstack "Get 'CareerStack' on Google Play").
 
