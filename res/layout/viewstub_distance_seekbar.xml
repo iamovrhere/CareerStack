@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
+    	
        android:layout_width="match_parent"
-       android:layout_height="wrap_content"
+       android:layout_height="wrap_content"       
        >
 
-	    <SeekBar
-	    android:id="@+id/careerstack_distanceSeekbar_seekBar"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
+    <com.gc.materialdesign.views.Slider
+         android:id="@+id/careerstack_distanceSeekbar_slider"
+         android:layout_width="match_parent"
+	   	 android:layout_height="wrap_content"
+         android:layout_centerInParent="true"
+         android:background="@color/colorAccent"         
+         materialdesign:min="@integer/careerstack_seekBar_min"
+         materialdesign:max="@integer/careerstack_seekBar_max"
+         
+         
 	    android:layout_below="@+id/careerstack_distanceSeekbar_text_label"
 	    android:layout_alignLeft="@+id/careerstack_distanceSeekbar_text_label"
-	    android:max="100"
-	    />
+         />
 
 	<TextView
 	    android:id="@+id/careerstack_distanceSeekbar_text_label"

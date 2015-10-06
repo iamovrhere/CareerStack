@@ -24,7 +24,6 @@
     android:paddingRight="@dimen/searchbar_horizontal_margin"
     android:paddingBottom="@dimen/searchbar_vertical_margin"
     
-    android:background="?careerstack_searchbar_border"
     >
 
      <ImageButton
@@ -57,7 +56,8 @@
         android:layout_alignLeft="@+id/careerstack_searchBar_container_edits"
         
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="wrap_content"        
+        android:minHeight="40dp"
         android:orientation="horizontal"
         android:gravity="center_vertical|center_horizontal"
         >

@@ -17,6 +17,8 @@
         android:ellipsize="none"
         android:layout_weight="1.0"
         android:layout_marginBottom="3dp"
+        android:nextFocusForward="@+id/careerstack_searchBar_editin_location"
+        android:nextFocusDown="@+id/careerstack_searchBar_editin_location"
          />
 
     <EditText

@@ -47,10 +47,8 @@
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		
    		<!-- Assume black for dark theme -->
-        <item name="careerstack_searchbar_color">@android:color/black</item>
-        <!-- Orange -->
-   		<item name="careerstack_searchbar_border">@drawable/ab_dark_background_strip</item>
-   		
+        <item name="careerstack_searchbar_color">@color/colorPrimaryDark_darkTheme</item>
+        
    		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle.Dark</item>
     </style>
     
@@ -78,10 +76,8 @@
         
          
         <!-- Assume grey for light theme -->
-        <item name="careerstack_searchbar_color">@color/careerstack_actionBar_light</item>
-        
-        <item name="careerstack_searchbar_border">@null</item>
-        
+        <item name="careerstack_searchbar_color">@color/colorPrimaryDark_lightTheme</item>
+       
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		
@@ -119,7 +115,6 @@
 	    <item name="android:windowNoTitle">true</item>
 	    <item name="android:windowFullscreen">true</item>
 	    <item name="android:windowIsFloating">true</item>
-	    
 	</style>
 	
 	
@@ -137,6 +132,10 @@
 		
         <!-- Support library compatibility -->
         <item name="windowActionBar" >false</item>
+	    
+        <!-- Set colours like spinner arrows & unselected radios/checkboxes -->
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+        <item name="colorAccent">@color/colorAccent</item>
   	</style>
   	
     

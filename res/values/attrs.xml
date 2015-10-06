@@ -27,8 +27,6 @@
 	    <!-- The colour used by the seekbar distance display-->
 	    <attr name="careerstack_distance_color" format="integer|color"/>
 	    
-	    <!-- Drawable used for search bar border. Can be @null -->
-	    <attr name="careerstack_searchbar_border" format="reference|integer"/>
 	    
 	    <!-- Background color used in both dark & light themes -->
 	    <attr name="careerstack_background_color" format="reference|integer"/>	    

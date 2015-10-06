@@ -24,9 +24,6 @@
     <color name="careerstack_nearblack_90" >#E5282828</color>
     
     
-     <!-- The grey for the light actionbar -->
-    <color name="careerstack_actionBar_light">#333</color>
-    
     <!-- Very transparent text color -->
     <color name="careerstack_verytranslucent_grey" >#55909090</color>
     
@@ -54,7 +51,7 @@
 	<color name="colorPrimary_lightTheme">#5c5c5c</color>
 	<color name="colorPrimaryDark_lightTheme">#313131</color>	
 	<!-- Colour used for the dark theme background -->
-	<color name="windowBackground_lightTheme">#F2F2F2</color>	
+	<color name="windowBackground_lightTheme">#F9F9F9</color>	
 	
 	<color name="textColorPrimary_lightTheme">#212121</color>
 	<color name="textColorSecondary_lightTheme">#727272</color>
