@@ -30,22 +30,23 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.ContextThemeWrapper;
 import android.view.View;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.gc.materialdesign.views.Slider;
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
-import com.ovrhere.android.careerstack.ui.wrappers.SeekBarWrapper;
+import com.ovrhere.android.careerstack.ui.wrappers.MaterialSliderWrapper;
 import com.ovrhere.android.careerstack.utils.UnitCheck;
 
 /** The dialog fragment for distance. Makes use of 
  * layout <code>viewstub_distance_seekbar.xml</code>. Requires the user use
  * <code>onActivityResult</code> and request codes to get result.
  * @author Jason J.
- * @version 0.2.0-20141003
+ * @version 0.3.0-20151006
  */
-public class DistanceDialogFragment extends DialogFragment 
-implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListener {	
+public class DistanceDialogFragment extends DialogFragment implements 
+	MaterialSliderWrapper.OnValueChangedListener, DialogInterface.OnClickListener {
+	
 	/** Class name for debugging purposes. */
 	final static private String CLASS_NAME = DistanceDialogFragment.class
 			.getSimpleName();
@@ -58,17 +59,17 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** The shared preferences. */
-	private SharedPreferences prefs = null;
+	private SharedPreferences mPrefs = null;
 	
 	/** The wrapper for the seekbar. */
-	private SeekBarWrapper seekbarWrapper =  null;
+	private MaterialSliderWrapper mSliderWrapper =  null;
 	/** The seekbar reference. */
-	private SeekBar sb_seekbar = null;
+	private Slider mSliderSeekbar = null;
 	/** The displayed distance. */
-	private TextView tv_distance = null;
+	private TextView mTv_distance = null;
 	
 	/** The current distance. */
-	private int currentDistanceValue = 0;
+	private int mCurrentDistanceValue = 0;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End memebers
@@ -93,11 +94,11 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true); //retain.
-		prefs = PreferenceUtils.getPreferences(getActivity());
+		mPrefs = PreferenceUtils.getPreferences(getActivity());
 		
 		if (getArguments() != null){
-			currentDistanceValue = 
-					getArguments().getInt(KEY_DISTANCE, currentDistanceValue);
+			mCurrentDistanceValue = 
+					getArguments().getInt(KEY_DISTANCE, mCurrentDistanceValue);
 		}
 	}
 	/* Required for compatibility library bug:
@@ -108,9 +109,9 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	  if (getDialog() != null && getRetainInstance())
 	    getDialog().setOnDismissListener(null);
 	  super.onDestroyView();
-	  seekbarWrapper = null;
-	  sb_seekbar = null;
-	  tv_distance = null;
+	  mSliderWrapper = null;
+	  mSliderSeekbar = null;
+	  mTv_distance = null;
 	}
 	
 	
@@ -137,7 +138,7 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 				r.getDimensionPixelSize(R.dimen.dialog_margins),
 				r.getDimensionPixelSize(R.dimen.dialog_margins));
 		dialog.setView(content);		
-		onValueUpdate(currentDistanceValue);
+		onValueUpdate(mCurrentDistanceValue);
 		return dialog;
 	}
 	
@@ -157,16 +158,16 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	
 	/** Initializes the views. */
 	private void initViews(View rootView){
-		tv_distance = (TextView)
+		mTv_distance = (TextView)
 				rootView.findViewById(R.id.careerstack_distanceSeekbar_text_value);
-		sb_seekbar = (SeekBar)
-				rootView.findViewById(R.id.careerstack_distanceSeekbar_seekBar);
-		seekbarWrapper = new SeekBarWrapper(sb_seekbar, 
+		mSliderSeekbar = (Slider)
+				rootView.findViewById(R.id.careerstack_distanceSeekbar_slider);
+		mSliderWrapper = new MaterialSliderWrapper(mSliderSeekbar, 
 				getResources().getInteger(R.integer.careerstack_seekBar_min), 
 				getResources().getInteger(R.integer.careerstack_seekBar_max), 
 				getResources().getInteger(R.integer.careerstack_seekBar_step));
-		seekbarWrapper.setOnValueChangedListener(this);
-		seekbarWrapper.setProgress(currentDistanceValue);		
+		mSliderWrapper.setOnValueChangedListener(this);
+		mSliderWrapper.setProgress(mCurrentDistanceValue);		
 	}
 	
 	/** Prepares the result.
@@ -174,10 +175,10 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	 */
 	private void prepareResults(boolean sendResult){
 		if (sendResult){
-		Intent data = new Intent();
-		data.putExtra(KEY_DISTANCE, currentDistanceValue);
-		getTargetFragment().onActivityResult(getTargetRequestCode(), 
-				Activity.RESULT_OK, data);
+			Intent data = new Intent();
+			data.putExtra(KEY_DISTANCE, mCurrentDistanceValue);
+			getTargetFragment().onActivityResult(getTargetRequestCode(), 
+					Activity.RESULT_OK, data);
 		} else {
 			getTargetFragment().onActivityResult(getTargetRequestCode(), 
 					Activity.RESULT_CANCELED, null);
@@ -190,17 +191,17 @@ implements SeekBarWrapper.OnValueChangedListener, DialogInterface.OnClickListene
 	
 	@Override
 	public void onValueUpdate(int value) {
-		currentDistanceValue = value;
-		String distance = UnitCheck.units(prefs, getResources(), value);
-		tv_distance.setText(distance);
-		sb_seekbar.setContentDescription(distance);
+		mCurrentDistanceValue = value;
+		String distance = UnitCheck.units(mPrefs, getResources(), value);
+		mTv_distance.setText(distance);
+		mSliderSeekbar.setContentDescription(distance);
 	}
 	
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
 		switch (which) {
 		case DialogInterface.BUTTON_POSITIVE:
-			currentDistanceValue = seekbarWrapper.getValue();
+			mCurrentDistanceValue = mSliderWrapper.getValue();
 			prepareResults(true);
 			dialog.dismiss();
 			break;

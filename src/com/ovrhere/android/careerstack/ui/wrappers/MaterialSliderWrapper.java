@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jason J.
+ * Copyright 2015 Jason J. (iamovrhere)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,53 +15,56 @@
  */
 package com.ovrhere.android.careerstack.ui.wrappers;
 
+import com.gc.materialdesign.views.Slider;
+
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
-/**  A wrapper to easily allow the seek bar to be given:
+/**  Based heavily on {@link SeekBarWrapper} (commit eff62ad) <br/> 
+ * A wrapper to easily allow the seek bar to be given:
  * <ul>
  * <li>A minimum value</li>
  * <li>A maximum value</li>
  * <li>A step value</li>
  * </ul>
  * and to easily set these. If additional actions are needed 
- * for {@link OnSeekBarChangeListener} please use the 
- * {@link SeekBarWrapper#setOnSeekBarChangeListener(OnSeekBarChangeListener)}
+ * for {@link com.gc.materialdesign.views.Slider.OnValueChangedListener} please use the 
+ * {@link MaterialSliderWrapper#setOnValueChangedListener(MaterialSliderWrapper.OnValueChangedListener)}
  * to attach the listener, as this class will override any previous listeners.
  * <p>
  * <b>Remember to discard of this object when changing context.</b>
  * </p>
  * @author Jason J.
- * @version 0.2.0-20140916
+ * @version 0.1.0-20151006
  */
-@Deprecated
-public class SeekBarWrapper implements OnSeekBarChangeListener {
+public class MaterialSliderWrapper implements Slider.OnValueChangedListener {
+	
 	/** Exception for when step <= 0 */
-	final static private String DETAILED_EXCEPTION_STEP_NEGATIVE = 
+	private static final String DETAILED_EXCEPTION_STEP_NEGATIVE = 
 			"Step must be >= 0";
 	/** Exception for when max <= min. Expects 2 ints. */
-	final static private String DETAILED_EXCEPTION_MAX_SMALLER = 
+	private static final String DETAILED_EXCEPTION_MAX_SMALLER = 
 			"Max (%d) cannot be smaller or equal to min (%d)";
 	/** Exception for when step > range. Expects 2 ints. */
-	final static private String DETAILED_EXCEPTION_STEP_LARGER = 
+	private static final String DETAILED_EXCEPTION_STEP_LARGER = 
 			"Range (%d) cannot be smaller than step (%d)";
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The progress listener. Can be null. */
-	private OnValueChangedListener onValueChangedListener = null;
-	/** An optional extra listener for external objects to perform 
-	 * their own actions in {@link OnSeekBarChangeListener}. Can be null. */
-	private OnSeekBarChangeListener extraListener = null;
+	private OnValueChangedListener mOnValueChangedListener = null;
 	
-	/** The minimum value the helper gives the seek bar. */
-	final private int min;
-	/** The steps between values. */
-	final private int step;
+		/** The steps between values. */
+	private final int mStep;
 	
-	/** The seekbar we are helping. */
-	final private SeekBar seekBar;	
+	/** The slider we are helping. */
+	private final Slider mSlider;
+
+	/** The current value of the slider. */
+	/* This is necessary as the current version of the Slider uses post when setting values
+	 * and can result in an inconsistent state. This helps with value-state consistency.	 */
+	private int mValue = 0;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End members
@@ -69,19 +72,20 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	
 	/** Builds a helper with a min value of 0, max value of the {@link SeekBar},
 	 * and a step of 1.
-	 * @param seekBar The seekbar to adjust	 
+	 * @param slider The slider to adjust	 
 	 * @param step The minimum step between allowed values. Must be positive */
-	public SeekBarWrapper(SeekBar seekBar, int step) {
-		this(seekBar, 0, seekBar.getMax(), step);
+	public MaterialSliderWrapper(Slider slider, int step) {
+		this(slider, 0, slider.getMax(), step);
 	}
+	
 	/** Builds a helper with given values.
-	 * @param seekBar The seekbar to adjust
+	 * @param slider The slider to adjust	 
 	 * @param min The minimum value (when at "0")
 	 * @param max the maximum value (when at "100"). Must be larger than min.
 	 * @param step he minimum step between allowed values. Must be positive
 	 */
-	public SeekBarWrapper(SeekBar seekBar, int min, int max, int step) {
-		this.seekBar = seekBar;
+	public MaterialSliderWrapper(Slider slider, int min, int max, int step) {
+		this.mSlider = slider;
 		if (max <= min){
 			throw new IllegalArgumentException(
 					String.format(DETAILED_EXCEPTION_MAX_SMALLER, max, min)
@@ -98,20 +102,12 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 					);
 		}
 		
-		this.min = min;	
-		this.step = step;
-		this.seekBar.setOnSeekBarChangeListener(this);
-		this.seekBar.setMax(range); 
-		this.seekBar.incrementProgressBy(step);
-		this.seekBar.incrementSecondaryProgressBy(step);
+		this.mStep = step;
+		this.mSlider.setOnValueChangedListener(this);		
+		this.mSlider.setMax(max); 
+		this.mSlider.setMin(min);
 	}
 	
-	/** Sets an additional OnSeekBarChangeListener to be called after the
-	 * helper performs its actions.
-	 * @param extraListener The listener to append to this.	 */
-	public void setOnSeekBarChangeListener(OnSeekBarChangeListener extraListener) {
-		this.extraListener = extraListener;
-	}
 	
 	/** Sets the value/progress listener which is fired every time the 
 	 * {@link OnSeekBarChangeListener#onProgressChanged(SeekBar, int, boolean)}
@@ -120,27 +116,27 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	 */
 	public void setOnValueChangedListener(
 			OnValueChangedListener onValueChangedListener) {
-		this.onValueChangedListener = onValueChangedListener;
+		this.mOnValueChangedListener = onValueChangedListener;
 	}
 	
 	
 	/** Sets the value of the seek bar according to min & step values given.
 	 * @param value The value to recalculate into progress and set	 */
 	public void setProgress(int value){
-		int progress = (value - min)/step * step;
-		seekBar.setProgress(progress);
+		mValue = value;
+		mSlider.setValue(value);
 	}
 	
 	/** Calculates and returns the seekbar's <i>value</i>
 	 * @return The stepped seek bar value (not to be confused with progress) */
 	public int getValue() {
-		return (seekBar.getProgress() + min)/step * step;
+		return mValue;
 	}
 	
-	/** Returns the seekbar as set in constructor.
-	 * @return The {@link SeekBar} for this stepper.	 */
-	public SeekBar getSeekBar() {
-		return seekBar;
+	/** Returns the slider as set in constructor.
+	 * @return The {@link Slider} for this stepper.	 */
+	public Slider getSlider() {
+		return mSlider;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,8 +147,8 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	 * @return The progress recalculated.
 	 */
 	private int recalculateProgress(int progress){
-		progress /= step; 
-		progress *= step; 
+		progress /= mStep; 
+		progress *= mStep; 
 		return progress;
 	}
 	
@@ -162,7 +158,7 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	
 	/** Informs listeners that the value has changed (after calculations)
 	 * @author Jason J.
-	 * @version 0.1.0-20140916	 */
+	 * @version 0.1.0-20151006	 */
 	public static interface OnValueChangedListener {
 		/** Updates the listener with the new (recalculated) value. 
 		 * It is advised you setContentDescription() here.
@@ -175,30 +171,14 @@ public class SeekBarWrapper implements OnSeekBarChangeListener {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress,
-			boolean fromUser) {
-		progress = recalculateProgress(progress);
-		if (onValueChangedListener != null){
-			onValueChangedListener.onValueUpdate(progress + min);
-		}
-		if (extraListener != null){
-			extraListener.onProgressChanged(seekBar, progress, fromUser);
-		}
-	}
-	
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-		// nothing to be done here
-		if (extraListener != null){
-			extraListener.onStartTrackingTouch(seekBar);
-		}
-	}
-	
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
-		// nothing to be done here
-		if (extraListener != null){
-			extraListener.onStopTrackingTouch(seekBar);
+	public void onValueChanged(int value) {
+		int progress = recalculateProgress(value);
+		if (progress != value) {
+			mSlider.setValue(progress);
+		} 
+		mValue = progress;
+		if (mOnValueChangedListener != null){
+			mOnValueChangedListener.onValueUpdate(progress);
 		}
 	}
 }
