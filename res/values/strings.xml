@@ -19,6 +19,9 @@
     <!-- The application name -->
     <string name="app_name">CareerStack</string>
     <!-- The settings string -->
+    <string name="activity_settings">Settings</string>
+    
+    <!-- The settings string -->
     <string name="action_settings">Settings</string>
     <!-- The refresh string  -->
     <string name="action_refresh">Refresh</string>

@@ -19,18 +19,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,25 +35,21 @@ import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
-import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.ui.fragments.CareerItemFragment;
 import com.ovrhere.android.careerstack.ui.fragments.MainFragment;
 import com.ovrhere.android.careerstack.ui.fragments.SearchResultsFragment;
-import com.ovrhere.android.careerstack.ui.fragments.SettingsFragment;
-import com.ovrhere.android.careerstack.ui.fragments.dialogs.ConfirmationDialogFragment;
 import com.ovrhere.android.careerstack.ui.fragments.dialogs.SearchBarDialogFragment;
 import com.ovrhere.android.careerstack.utils.TabletUtil;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.10.0-20151004
+ * @version 0.11.0-20151005
  */
-public class MainActivity extends AppCompatActivity 
+public class MainActivity extends AbstractThemedActivity 
 	implements OnBackStackChangedListener, DialogInterface.OnClickListener,
 	MainFragment.OnFragmentInteractionListener, 
 	CareerItemFragment.OnFragmentInteractionListener,
 	SearchResultsFragment.OnFragmentInteractionListener,
-	SettingsFragment.OnFragmentInteractionListener,
 	SearchBarDialogFragment.OnDialogResultsListener{
 	
 	/** Class name for debugging purposes. */
@@ -80,11 +72,7 @@ public class MainActivity extends AppCompatActivity
 	/** Bundle key. The current search state for the searchbar. Bundle. */
 	final static private String KEY_CURRENT_SEARCH_BAR_STATE = 
 			CLASS_NAME + ".KEY_CURRENT_SEARCH";
-	
-	
-	/** Extra Key. The theme intent value. Int. */
-	final static private String KEY_THEME_INTENT = 
-			CLASS_NAME + ".KEY_THEME_INTENT";
+		
 		
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Frag tags
@@ -103,10 +91,6 @@ public class MainActivity extends AppCompatActivity
 			CareerItem.class.getName();
 	
 	
-	/** The settings tag. */
-	final static private String TAG_SETTINGS_FRAG = 
-			SettingsFragment.class.getName();
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,9 +106,6 @@ public class MainActivity extends AppCompatActivity
 	
 	/** The current actionbar subtitle. */
 	private String actionBarTitle = "";
-	
-	/** The current theme. Default is -1. */
-	private int currThemeId = -1;
 	
 	/** The current shared preference. */
 	private SharedPreferences prefs = null;
@@ -155,16 +136,9 @@ public class MainActivity extends AppCompatActivity
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		setThemeByIntent();
 		super.onCreate(savedInstanceState);
-		getSupportFragmentManager().addOnBackStackChangedListener(this);
 		
-		if (PreferenceUtils.isFirstRun(this)){
-			PreferenceUtils.setToDefault(this);
-		}
-		prefs = PreferenceUtils.getPreferences(this);
-		//checks and, if necessary, restarts activity for theme
-		checkThemePref(); 
+		getSupportFragmentManager().addOnBackStackChangedListener(this);
 		
 		setContentView(R.layout.activity_main);
 		
@@ -228,23 +202,9 @@ public class MainActivity extends AppCompatActivity
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
 		case R.id.action_settings:
-			if (fragTagStack.peek().equals(TAG_SETTINGS_FRAG) == false){
-				loadFragment(
-						new SettingsFragment(),
-						TAG_SETTINGS_FRAG, 
-						true);
-				setActionBarTitle(getString(R.string.action_settings));
-			}
-			//hide settings when viewing settings
-			checkMenus();
-			return true;
+			Intent settings = new Intent(this, SettingsActivity.class);
+			startActivity(settings);
 			
-		case R.id.action_toggleTheme:
-			if (quickSwitchTheme()){
-				toggleDayNightMode();
-			} else {
-				showChangeThemeDialog();
-			}
 			return true;
 		
 		case R.id.action_refresh:
@@ -298,133 +258,6 @@ public class MainActivity extends AppCompatActivity
 	private void setActionBarTitle(String title) {
 		actionBarTitle = title;
 		getSupportActionBar().setTitle(actionBarTitle);
-	}
-	
-	/** Retreives the quick switch theme pref. */
-	private boolean quickSwitchTheme() {
-		return prefs != null &&
-			prefs.getBoolean(
-					getString(R.string.careerstack_pref_KEY_QUICK_THEME_SWITCH), 
-					false);
-	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Theme Helper methods
-	////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/* Theme flow explained:
-	 * Activity starts and them preferences are checked:
-	 * A) 1. If using quick switch mode, set theme. Done.
-	 * 
-	 * B) 1 If NOT using quick switch, set theme intent and restart
-	 *   2 If theme intent is set, set theme. Done.
-	 * 
-	 * ---
-	 * 
-	 * Changing themes:
-	 * A)1. If using quick switch mode: toggle theme
-	 *   2. Call recreate
-	 *   3. See A above. Done
-	 * 
-	 * B)1. If not using using quick switch: launch dialog
-	 *   2. Accept-> toggle theme
-	 *   3. Restart
-	 *   4. See B above. Done
-	 * 
-	 */
-	
-	
-	 /* Created to compensate for a bug. See: 
-	  * -https://code.google.com/p/android/issues/detail?id=3793#makechanges
-	  * -https://code.google.com/p/android/issues/detail?id=4394
-	  * -https://groups.google.com/forum/?fromgroups=#!topic/android-developers/vSZHsVWUCqk
-	  */
-	/** Sets theme before super.onCreate() via intent. */
-	private void setThemeByIntent() {
-		currThemeId = getIntent().getIntExtra(KEY_THEME_INTENT, -1);
-		if (currThemeId > 0){
-			setTheme(currThemeId);
-		}
-	}
-	
-	/** If #currThemeId is unset (-1) 
-	 * it checks theme preference, and restarts activity for application.
-	 * If #currThemeId  is set, it returns early.
-	 * <p>
-	 * Must be called before {@link #setContentView(int)} but 
-	 * after super.onCreate(). </p>*/
-	private void checkThemePref(){
-		if (currThemeId != -1){ //if it does not equal -1
-			return; //we must have our theme already set.
-		}
-		
-		final String dark = getString(R.string.careerstack_pref_VALUE_THEME_DARK);
-		//final String light = getString(R.string.careerstack_pref_VALUE_THEME_LIGHT);
-		final String currTheme = prefs.getString(
-				getString(R.string.careerstack_pref_KEY_THEME_PREF), 
-				dark);		
-		
-		if (currTheme.equals(dark)){
-			currThemeId = R.style.AppBaseTheme_Dark;
-		} else {
-			//light
-			currThemeId = R.style.AppBaseTheme_Light;
-		}
-		
-		final boolean quickSwitch =prefs.getBoolean(
-				getString(R.string.careerstack_pref_KEY_QUICK_THEME_SWITCH), 
-				false);
-		if (quickSwitch){ //if we are not in 
-			setTheme(currThemeId);
-		} else {
-			resetActivityForTheme(); //reset
-		}
-		
-	}
-	
-	/** Toggles day and night mode pref and restarts.
-	 * Assumes {@link #checkThemePref()} is called in {@link #onCreate(Bundle)}   */
-	@SuppressLint("NewApi")
-	private void toggleDayNightMode(){
-		final String key = getString(R.string.careerstack_pref_KEY_THEME_PREF);
-		final String dark = getString(R.string.careerstack_pref_VALUE_THEME_DARK);
-		final String light = getString(R.string.careerstack_pref_VALUE_THEME_LIGHT);
-		
-		if (currThemeId == R.style.AppBaseTheme_Dark) {
-			currThemeId = R.style.AppBaseTheme_Light;
-			prefs.edit().putString(key, light).commit(); //toggle values
-        } else {
-        	currThemeId = R.style.AppBaseTheme_Dark;
-        	prefs.edit().putString(key, dark).commit();
-        }
-		
-		resetActivityForTheme();
-	}
-		
-	/** Restarts/Recreates the activity with the theme set. 
-	 * Based upon the value of quick switch preference.  */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void resetActivityForTheme(){
-		final boolean quickSwitch = quickSwitchTheme();
-		
-		//if quick switching and supported
-		if (quickSwitch && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ){
-			//quick switch
-			super.recreate();  
-			
-		} else { 
-			//otherwise, we'll restart!
-			try{
-				Intent intent = getIntent();
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.putExtra(KEY_THEME_INTENT, currThemeId);
-				finish();
-				startActivity(intent); //restart same intent
-			} catch (Exception e){
-				Log.e(CLASS_NAME, "Error restarting activity: " + e);
-			}
-		}
-		
 	}
 	
 	
@@ -514,19 +347,7 @@ public class MainActivity extends AppCompatActivity
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Dialog helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/** Builds dialog for activity and shows it. */
-	private void showChangeThemeDialog(){
-		new ConfirmationDialogFragment.Builder()
-			.setTitle(R.string.action_toggleTheme)
-			.setMessage(R.string.careerstack_theme_dialogMsg)
-			.setPositive(R.string.careerstack_restart_dialogMsg_confirm)
-			.setNegative(android.R.string.no)
-			.create()
-			.show(getSupportFragmentManager(), 
-					ConfirmationDialogFragment.class.getName() +
-					CLASS_NAME);
-	}
+
 	
 	/** Initializes and shows the search bar dialog using the current
 	 * search state. 	 */
@@ -617,12 +438,8 @@ public class MainActivity extends AppCompatActivity
 			return;
 		}
 		final String currTag = fragTagStack.peek(); 
-		//if in settings frag
-		if (TAG_SETTINGS_FRAG.equals(currTag)){
-			menu.setGroupVisible(0, false);
-		} else {
-			menu.setGroupVisible(0, true);
-		}
+		
+		menu.setGroupVisible(0, true);
 		
 		boolean showSearch = false;
 		boolean showRefresh = false;
@@ -666,8 +483,8 @@ public class MainActivity extends AppCompatActivity
 		boolean show = false;
 		if (inTabletMode()){
 			final String tag = fragTagStack.peek();
-			if (!(TAG_MAIN_FRAG.equals(tag) || TAG_SETTINGS_FRAG.equals(tag))){
-				//if neither in main nor settings, do not show tablet container.
+			if (!(TAG_MAIN_FRAG.equals(tag))){
+				//if not in main, do not show tablet container.
 				show = true;
 				getSupportFragmentManager().executePendingTransactions();
 			}
@@ -867,22 +684,6 @@ public class MainActivity extends AppCompatActivity
 	}
 	
 	//end SearchResultsFragment listeners
-	
-	
-	/* (non-Javadoc)
-	 * @see com.ovrhere.android.careerstack.ui.fragments.SettingsFragment.OnFragmentInteractionListener#onRestartRequest()
-	 */
-	@Override
-	public boolean onRestartRequest() {
-		//pure restart
-		Intent intent = new Intent(this, MainActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		finish();
-		startActivity(intent);
-		return true;
-	}
-	
-	//end SettingsFragment
 	
 	
 	//start CareerItemFragment listeners
