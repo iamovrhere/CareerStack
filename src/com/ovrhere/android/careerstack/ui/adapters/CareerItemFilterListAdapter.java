@@ -21,7 +21,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,11 +32,12 @@ import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
+import com.ovrhere.android.careerstack.utils.Utility;
 
 /** The career item filter list adapter.
  * <p><b>Filtering will be done at a later date.</b></p>
  * @author Jason J.
- * @version 0.5.0-20141111
+ * @version 0.5.1-20151006
  */
 public class CareerItemFilterListAdapter extends BaseAdapter implements
 		Filterable {
@@ -239,15 +239,8 @@ public class CareerItemFilterListAdapter extends BaseAdapter implements
 	/// Helper methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Converts date to relative time. */
-	static private String getRelativeTime(Context context, Date date){
-		long millis = date.getTime();
-		String time = DateUtils.getRelativeDateTimeString(context, millis, 
-						DateUtils.MINUTE_IN_MILLIS, DateUtils.YEAR_IN_MILLIS, 
-						0).toString();
-		int commaIndex = time.lastIndexOf(",");
-		if (commaIndex > 0){
-			return time.substring(0, commaIndex);
-		} return time;
+	private static String getRelativeTime(Context context, Date date){
+		return Utility.getRelativeTime(context, date);
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////

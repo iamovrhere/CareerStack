@@ -1,9 +1,6 @@
 package com.ovrhere.android.careerstack.ui.fragments;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -25,7 +22,6 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ScrollView;
@@ -34,36 +30,38 @@ import android.widget.TextView;
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
+import com.ovrhere.android.careerstack.ui.widgets.floatingactionbutton.FloatingActionsMenu;
 import com.ovrhere.android.careerstack.utils.CompatClipboard;
 import com.ovrhere.android.careerstack.utils.ShareIntentUtil;
 import com.ovrhere.android.careerstack.utils.ToastManager;
+import com.ovrhere.android.careerstack.utils.Utility;
 
 /**
  * The listing of a job item. Provides ability to open, copy or share link
  * or launch a search from tags (via {@link OnFragmentInteractionListener})
  * 
  * @author Jason J.
- * @version 0.7.1-20141126
+ * @version 0.8.0-20151006
  */
 public class CareerItemFragment extends Fragment implements 
 	OnClickListener, OnCheckedChangeListener, 
 	SharedPreferences.OnSharedPreferenceChangeListener {
 	
 	/** Class name for debugging purposes. */
-	final static private String CLASS_NAME = CareerItemFragment.class
+	private static final String CLASS_NAME = CareerItemFragment.class
 			.getSimpleName();
 	/** Logtag for debugging. */
-	final static private String LOGTAG = CLASS_NAME;
+	private static final String LOGTAG = CLASS_NAME;
 	/** Whether or not debugging. */
-	final static private boolean DEBUG = false;
+	private static final boolean DEBUG = false;
 	
 	
 	/** Bundle Key. The career item for this fragment. Parcellable/CareerItem. */
-	final static private String KEY_CAREER_ITEM =
+	private static final String KEY_CAREER_ITEM =
 			CLASS_NAME +".KEY_CAREER_ITEM";
 	/** Bundle Key. The scroll position as a ratio of 
 	 * <code>pos/height</code>. Double. */
-	final static private String KEY_SCROLL_POSITION_RATIO =
+	private static final String KEY_SCROLL_POSITION_RATIO =
 			CLASS_NAME +".KEY_SCROLL_POSITION_RATIO";
 	
 		
@@ -71,10 +69,6 @@ public class CareerItemFragment extends Fragment implements
 	/// End keys
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	/** The output date format string to use. */
-	/* We could use DateUtils like in CareerItemFilterListAdapter, but I favour
-	 * this format above all.	 */
-	final static private String DATE_FORMAT = "yyyy-MM-dd HH:mm";
 	
 	
 	
@@ -83,12 +77,12 @@ public class CareerItemFragment extends Fragment implements
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The dark theme css to use with {@link #HTML_WRAPPER_DESCRIPTION}. */
-	final static private String CSS_DARK = "careeritem_darktheme";
+	private static final String CSS_DARK = "careeritem_darktheme";
 	/** The dark theme css to use with {@link #HTML_WRAPPER_DESCRIPTION}. */
-	final static private String CSS_LIGHT = "careeritem_lighttheme";
+	private static final String CSS_LIGHT = "careeritem_lighttheme";
 	
 	/** The light theme css to use with {@link #HTML_WRAPPER_TAGS}. */
-	final static private String HTML_TAGS_LIGHT_THEME = 
+	private static final String HTML_TAGS_LIGHT_THEME = 
 			"<link rel='stylesheet' href='./careeritem_tags_lighttheme.css' "
 			+ "type='text/css' media='screen'>";
 	
@@ -96,7 +90,7 @@ public class CareerItemFragment extends Fragment implements
 	 * <ol><li>The css file name (Either #CSS_DARK or #CSS_LIGHT)</li>
 	 * <li>The html to render</li></ol>
 	 */
-	final static private String HTML_WRAPPER_DESCRIPTION = "<!DOCTYPE html><html><head>"+
+	private static final String HTML_WRAPPER_DESCRIPTION = "<!DOCTYPE html><html><head>"+
 			"<link rel='stylesheet' href='./careeritem_styling.css' type='text/css' media='screen'>" +
 			"<link rel='stylesheet' href='./%s.css' type='text/css' media='screen'>" +
 			"<!--Previous lines refer to css files--></head>" +
@@ -104,14 +98,14 @@ public class CareerItemFragment extends Fragment implements
 	
 
 	/** The link/href to use in link work around. */
-	final static private String HREF_TAGS_ID = 
+	private static final String HREF_TAGS_ID = 
 			//must be lowercase for urls, uppercase for readability
 			"AndroidCareerItem:tag=".toLowerCase(Locale.US); 
 
 	/** The wrapper for the tags html. Takes one strings:
 	 * <ol><li>The list of #HTML_TAG_BUTTON s </li>
 	 * <li>The light css html or blank</li></ol>	 */
-	final static private String HTML_WRAPPER_TAGS = "<!DOCTYPE html><html><head>"+
+	private static final String HTML_WRAPPER_TAGS = "<!DOCTYPE html><html><head>"+
 			"<link rel='stylesheet' href='./careeritem_tags.css' type='text/css' media='screen'>" +
 			"%2$s"+
 			"<!--Previous lines refer to css files--></head>" +
@@ -121,7 +115,7 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** The HTML for the tag buttons. Takes one string (the name of the button). 
 	 *   */
-	final static private String HTML_TAG_BUTTON = 
+	private static final String HTML_TAG_BUTTON = 
 			"<a class='job-tag' " +
 			//dirt simple, href redirect
 			" href=\""+HREF_TAGS_ID+"%1$s\"" +
@@ -137,91 +131,95 @@ public class CareerItemFragment extends Fragment implements
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The character limit of twitter. */
-	final static private int TWITTER_LIMIT = 140;
+	private static final int TWITTER_LIMIT = 140;
 	/** The character limit urls. */
-	final static private int TWITTER_URL_LIMIT = 22;
+	private static final int TWITTER_URL_LIMIT = 22;
 	
 	/** The prepared twitter string; takes 2 strings - 1)job, 2) url. */
-	final static private String TWITTER_STUB = 
+	private static final String TWITTER_STUB = 
 			"%s (via Stack Overflow Careers & CareerStack app) %s @StackCareers";
 	/** Based on values in {@link #TWITTER_LIMIT} & {@link #TWITTER_STUB}: 
 	 * Remaining length for company name. */
-	final static private int TWITTER_COMPANY_LENGTH = 
+	private static final int TWITTER_COMPANY_LENGTH = 
 			(int) ((float) (TWITTER_LIMIT - TWITTER_STUB.length() 
 					- TWITTER_URL_LIMIT) * 0.3);	
 	/** Based on values in {@link #TWITTER_LIMIT} & {@link #TWITTER_STUB}:
 	 * Remaining length for job title. */
-	final static private int TWITTER_TITLE_LENGTH = 
+	private static final int TWITTER_TITLE_LENGTH = 
 			(int) ((float) (TWITTER_LIMIT - TWITTER_STUB.length() 
 					- TWITTER_URL_LIMIT) * 0.6);
 	
 	/** The prepared generic string; takes 2 strings - 1)job title + company, 
 	 * 2) url, 3) description. */
-	final static private String GENERIC_MSG_STUB = 
+	private static final String GENERIC_MSG_STUB = 
 			"%s \n%s - (via Stack Overflow Careers & CareerStack app) \n\n%s";
 	/** Character from description to include. */
-	final static private int GENERIC_MSG_DESCRIP_LENGTH = 80;
+	private static final int GENERIC_MSG_DESCRIP_LENGTH = 80;
 	
 	/** Short ellipses to use. */
-	final static private String SHORT_ELLIPSIS = "..";
+	private static final String SHORT_ELLIPSIS = "..";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End constants
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The preference handle. */
-	private SharedPreferences prefs = null;
+	private SharedPreferences mPrefs = null;
 	
 	/** The fragment interaction listener, namely main. */
 	private OnFragmentInteractionListener mFragInteractionListener = null;
 	
 	/** The simple toast manager. */
-	private ToastManager toastManager = null;
+	private ToastManager mToastManager = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// Start views 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The job description webview reference for animation + proper destruction. */
-	private WebView wv_jobDescription = null;
+	private WebView mWv_jobDescription = null;
 	
 	/** The tags webview reference for animation + proper destruction. */
-	private WebView wv_tags= null;
+	private WebView mWv_tags= null;
 		
 	/** The parent scroll view. */
-	private ScrollView sv_scrollView = null;
+	private ScrollView mSv_scrollView = null;
 	
 	/** The reference for toggling tags. */
-	private CompoundButton chk_toggleTags = null;
+	private CompoundButton mChk_toggleTags = null;
+	
+	/** Used to load the open, copy, share options. */
+	private FloatingActionsMenu mFloatingActionButtonMenu = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End views
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The local instance of career item to display. */
-	private CareerItem careerItem = null;
+	private CareerItem mCareerItem = null;
 	
 	/** Whether or not to show the "show tags" button. 
 	 * Should only be true if: 1. The resolution supports it, 2. There are tags */
-	private boolean showTagButtonVisible  = false;
+	private boolean mShowTagButtonVisible  = false;
 	
 	/** Bool for backstack safety of whether view has been built. */
-	private boolean viewBuilt = false;
+	private boolean mViewBuilt = false;
 	
 	/** Bool for when scroll view is pending. 
 	 * Set <code>true</code> in {@link #jobDescriptionWebViewListener}*/
-	private boolean scrollViewPending1 = false;	
+	private boolean mScrollViewPending1 = false;	
 	/** Bool for when scroll view is pending. 
 	 * Set <code>true</code> in {@link #tagsWebViewListener}*/
-	private boolean scrollViewPending2 = false;
+	private boolean mScrollViewPending2 = false;
 	
 	/** The current scroll ratio for how far down the scroll. */
 	/* A ratio is used since the height WILL almost always change between 
 	 * orientation shifts. As such, scrolling to a pixel will be inaccurate 
 	 * between rotations, quickly creeping upwards. 
 	 * We use double to reduce rounding-creep. 	*/
-	private double scrollRatio = 0.0d;
+	private double mScrollRatio = 0.0d;
 	
+	// TODO re-do old code to be cleaner and more functional.
 	
 	
 	/**
@@ -246,26 +244,26 @@ public class CareerItemFragment extends Fragment implements
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putParcelable(KEY_CAREER_ITEM, careerItem);
-		if (viewBuilt){
+		outState.putParcelable(KEY_CAREER_ITEM, mCareerItem);
+		if (mViewBuilt){
 			double scrollRatio = 
 					/* Note that the webview height is added. 
 					 * The reason for this is that the scroll view will ignore the
 					 * WebView height as its contents (thus height) 
 					 * is not present at loading.
 					 */
-					(double) sv_scrollView.getScrollY()/
-					(double) (sv_scrollView.getHeight() + wv_jobDescription.getHeight());
+					(double) mSv_scrollView.getScrollY()/
+					(double) (mSv_scrollView.getHeight() + mWv_jobDescription.getHeight());
 			
 			if (DEBUG){
-				Log.d(LOGTAG, "Scroll ratio (" + sv_scrollView.getScrollY() 
-						+ "/"+sv_scrollView.getChildAt(0).getHeight()+") ");
+				Log.d(LOGTAG, "Scroll ratio (" + mSv_scrollView.getScrollY() 
+						+ "/"+mSv_scrollView.getChildAt(0).getHeight()+") ");
 				Log.d(LOGTAG, "Scroll ratio stored: " + scrollRatio);
 			}
 			outState.putDouble(KEY_SCROLL_POSITION_RATIO, scrollRatio);
 		} else {
 			//use the preset value if no view is available
-			outState.putDouble(KEY_SCROLL_POSITION_RATIO, scrollRatio);
+			outState.putDouble(KEY_SCROLL_POSITION_RATIO, mScrollRatio);
 		}
 	}
 
@@ -273,16 +271,16 @@ public class CareerItemFragment extends Fragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
-			careerItem = getArguments().getParcelable(KEY_CAREER_ITEM);
+			mCareerItem = getArguments().getParcelable(KEY_CAREER_ITEM);
 		} else if (savedInstanceState != null){
-			careerItem = savedInstanceState.getParcelable(KEY_CAREER_ITEM);
+			mCareerItem = savedInstanceState.getParcelable(KEY_CAREER_ITEM);
 		}
 		
-		prefs = PreferenceUtils.getPreferences(getActivity());
+		mPrefs = PreferenceUtils.getPreferences(getActivity());
 		
-		if (careerItem.getCategories() != null ){
+		if (mCareerItem.getCategories() != null ){
 			/* If the resolution supports it AND there are actually tags to show. */ 
-			showTagButtonVisible = careerItem.getCategories().length > 0 &&
+			mShowTagButtonVisible = mCareerItem.getCategories().length > 0 &&
 				getResources().getBoolean(R.bool.careerstack_show_tags_toggle);
 		}	
 	}
@@ -293,14 +291,14 @@ public class CareerItemFragment extends Fragment implements
 		View rootView = inflater.inflate(R.layout.fragment_career_item, 
 				container, false);
 		
-		prefs.registerOnSharedPreferenceChangeListener(this);
-		toastManager = new ToastManager(getActivity());
+		mPrefs.registerOnSharedPreferenceChangeListener(this);
+		mToastManager = new ToastManager(getActivity());
 		
 		initOutputViews(rootView);
 		initButtons(rootView);
 		initScrollView(rootView, savedInstanceState);
 		
-		viewBuilt = true;
+		mViewBuilt = true;
 		return rootView;
 	}
 	
@@ -308,11 +306,11 @@ public class CareerItemFragment extends Fragment implements
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		prefs.unregisterOnSharedPreferenceChangeListener(this);
+		mPrefs.unregisterOnSharedPreferenceChangeListener(this);
 		
-		destroyWebView(wv_jobDescription);
-		destroyWebView(wv_tags);
-		viewBuilt = false;
+		destroyWebView(mWv_jobDescription);
+		destroyWebView(mWv_tags);
+		mViewBuilt = false;
 	}
 
 	@Override
@@ -334,17 +332,17 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** Initializes the scroll view. This must be done last. */
 	private void initScrollView(View rootView, Bundle saveState){
-		sv_scrollView = (ScrollView)
+		mSv_scrollView = (ScrollView)
 				rootView.findViewById(R.id.careerstack_careerItem_scrollView);
 		if (saveState == null){
 			return;
 		}
-		scrollRatio = saveState.getDouble(KEY_SCROLL_POSITION_RATIO);
+		mScrollRatio = saveState.getDouble(KEY_SCROLL_POSITION_RATIO);
 		if (DEBUG){
-			Log.d(LOGTAG, "Scroll ratio retrieved: "+scrollRatio);
+			Log.d(LOGTAG, "Scroll ratio retrieved: "+mScrollRatio);
 		}
 		
-		if (scrollViewPending1){
+		if (mScrollViewPending1){
 			resetScrollView();
 		}
 	}
@@ -353,11 +351,11 @@ public class CareerItemFragment extends Fragment implements
 	private void initOutputViews(View rootView){
 		TextView jobTitle = (TextView)
 				rootView.findViewById(R.id.careerstack_careerItem_text_jobTitle);
-		jobTitle.setText(careerItem.getTitle());
+		jobTitle.setText(mCareerItem.getTitle());
 				
 		TextView companyEtc = (TextView)
 				rootView.findViewById(R.id.careerstack_careerItem_text_companyLocationEtc);
-		companyEtc.setText(careerItem.getCompanyLocationEtc());	
+		companyEtc.setText(mCareerItem.getCompanyLocationEtc());	
 		
 		initTags(rootView);
 		initJobDescription(rootView);
@@ -366,8 +364,8 @@ public class CareerItemFragment extends Fragment implements
 				rootView.findViewById(R.id.careerstack_careerItem_text_updateDate);
 		updateDate.setText(
 				String.format(getString(R.string.careerstack_formatString_publishUpdateDate),
-						processDate(careerItem.getPublishDate()),
-						processDate(careerItem.getUpdateDate()))
+						Utility.getRelativeTime(getActivity(), mCareerItem.getPublishDate()),
+						Utility.getPreciseDate(mCareerItem.getUpdateDate()))
 				);
 	}
 
@@ -410,14 +408,14 @@ public class CareerItemFragment extends Fragment implements
 	/** Sets up the job description, including styling. */
 	@SuppressLint("SetJavaScriptEnabled")
 	private void initTags(View rootView) {
-		wv_tags = (WebView)
+		mWv_tags = (WebView)
 				rootView.findViewById(R.id.careerstack_careerItem_webview_tags);
-		wv_tags.setScrollContainer(false);
+		mWv_tags.setScrollContainer(false);
 		
 		int colour = getBackgroundColour();		
-		wv_tags.setBackgroundColor(colour);
+		mWv_tags.setBackgroundColor(colour);
 		
-		WebSettings webSettings = wv_tags.getSettings();
+		WebSettings webSettings = mWv_tags.getSettings();
 		
 		webSettings.setDefaultFontSize(12); //TODO abstract
 		webSettings.setSupportZoom(false);
@@ -426,7 +424,7 @@ public class CareerItemFragment extends Fragment implements
 		webSettings.setJavaScriptEnabled(true);
 		
 		/* Hack to disable copying. */
-		wv_tags.setOnLongClickListener(new View.OnLongClickListener() {
+		mWv_tags.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
             public boolean onLongClick(View v) {
                 return true;
@@ -439,8 +437,8 @@ public class CareerItemFragment extends Fragment implements
 		 * subsequently, this will control if it fades in or just loads quietly in background. */
 		checkTagVisiblity();
 		
-		wv_tags.setWebViewClient(tagsWebViewListener);
-		wv_tags.post(new Runnable() {	@Override
+		mWv_tags.setWebViewClient(tagsWebViewListener);
+		mWv_tags.post(new Runnable() {	@Override
 			public void run() {
 				//increase likelihood of first time load.
 				buildAndLoadTags();
@@ -458,14 +456,14 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** Sets up the job description, including styling. */
 	private void initJobDescription(View rootView) {
-		wv_jobDescription = (WebView)
+		mWv_jobDescription = (WebView)
 				rootView.findViewById(R.id.careerstack_careerItem_webview_jobDescription);
-		wv_jobDescription.setScrollContainer(false);
+		mWv_jobDescription.setScrollContainer(false);
 		
 		int colour = getBackgroundColour();		
-		wv_jobDescription.setBackgroundColor(colour);
+		mWv_jobDescription.setBackgroundColor(colour);
 		
-		WebSettings webSettings = wv_jobDescription.getSettings();
+		WebSettings webSettings = mWv_jobDescription.getSettings();
 		//webSettings.setUseWideViewPort(true);
 		webSettings.setDefaultFontSize(14); //TODO abstract
 		webSettings.setSupportZoom(false);
@@ -473,26 +471,26 @@ public class CareerItemFragment extends Fragment implements
 		/* ----- Initial setup complete. ----- */
 		
 		long delay = 1;
-		if (showTagButtonVisible && 
-			prefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false)){
+		if (mShowTagButtonVisible && 
+			mPrefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false)){
 			//if the tags are being shown, delay job description
 			delay = getResources().getInteger(R.integer.careerstack_jobdescription_delay);
 		}
 		
 		//always fade in
-		wv_jobDescription.setVisibility(View.INVISIBLE);
+		mWv_jobDescription.setVisibility(View.INVISIBLE);
 		
-		wv_jobDescription.setWebViewClient(jobDescriptionWebViewListener);
-		wv_jobDescription.postDelayed((new Runnable() {	@Override
+		mWv_jobDescription.setWebViewClient(jobDescriptionWebViewListener);
+		mWv_jobDescription.postDelayed((new Runnable() {	@Override
 			public void run() {
 				//increase likelihood of first time load.
 				loadJobDescription();
 			}
 		}), delay);		
 
-		wv_jobDescription.setContentDescription(
+		mWv_jobDescription.setContentDescription(
 				//strip html for accessibility 
-				Html.fromHtml(careerItem.getDescription()).toString()
+				Html.fromHtml(mCareerItem.getDescription()).toString()
 				);
 		
 	}
@@ -502,34 +500,32 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** Initializes the buttons. */
 	private void initButtons(View rootView){
-		Button share = (Button)
-				rootView.findViewById(R.id.careerstack_careerItem_button_share);
-		share.setOnClickListener(this);
+		mFloatingActionButtonMenu = 
+				(FloatingActionsMenu) rootView.findViewById(R.id.careerstack_careerItem_button_link_actions);
 		
-		Button openLink = (Button)
-				rootView.findViewById(R.id.careerstack_careerItem_button_openLink);
-		openLink.setOnClickListener(this);
+		rootView.findViewById(R.id.careerstack_careerItem_button_share)
+			.setOnClickListener(this);
+		rootView.findViewById(R.id.careerstack_careerItem_button_openLink)
+				.setOnClickListener(this);
+		rootView.findViewById(R.id.careerstack_careerItem_button_copyUrl)
+			.setOnClickListener(this);  
 		
-		Button copyUrl = (Button)
-				rootView.findViewById(R.id.careerstack_careerItem_button_copyUrl);
-		copyUrl.setOnClickListener(this);  
-		
-		chk_toggleTags = (CompoundButton)
+		mChk_toggleTags = (CompoundButton)
 				rootView.findViewById(R.id.careerstack_careerItem_check_showTags);
-		chk_toggleTags.setVisibility(showTagButtonVisible ? View.VISIBLE : View.GONE);
-		chk_toggleTags.setOnCheckedChangeListener(this);
+		mChk_toggleTags.setVisibility(mShowTagButtonVisible ? View.VISIBLE : View.GONE);
+		mChk_toggleTags.setOnCheckedChangeListener(this);
 		
 		setToggleTagsCheck();
 	}
 
 	/** Sets the toggle tag check according to preference. */
 	private void setToggleTagsCheck() {
-		if (prefs == null || chk_toggleTags == null){
+		if (mPrefs == null || mChk_toggleTags == null){
 			return; //give up if null
 		}
-		boolean checked = prefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false);
-		chk_toggleTags.setChecked(checked);
-		onCheckedChanged(chk_toggleTags, checked);
+		boolean checked = mPrefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false);
+		mChk_toggleTags.setChecked(checked);
+		onCheckedChanged(mChk_toggleTags, checked);
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -556,9 +552,9 @@ public class CareerItemFragment extends Fragment implements
 	/** Checks the preference for tag visibility, and 
 	 * sets visibility accordingly. */ 
 	private void checkTagVisiblity(){
-		final boolean isVisible = prefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false);
-		if (wv_tags != null ){ //safety			
-			wv_tags.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+		final boolean isVisible = mPrefs.getBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), false);
+		if (mWv_tags != null ){ //safety			
+			mWv_tags.setVisibility(isVisible ? View.VISIBLE : View.GONE);
 		}		
 	}
 	
@@ -567,16 +563,16 @@ public class CareerItemFragment extends Fragment implements
 		//extra safety
 		try {
 			/* ensure the view is valid and our fragment is still attached (for async calls) */
-			if (wv_tags != null && !isDetached()){
+			if (mWv_tags != null && !isDetached()){
 				String buttons = "";
-				String cats[] = careerItem.getCategories();
+				String cats[] = mCareerItem.getCategories();
 				final int SIZE = cats.length;
 				for (int index = 0; index < SIZE; index++){
 					buttons += String.format(HTML_TAG_BUTTON, cats[index]);
 				}
 				String extraCss = isLightTheme() ? HTML_TAGS_LIGHT_THEME : "";
 				String htmlData = String.format(HTML_WRAPPER_TAGS, buttons, extraCss);
-				wv_tags.loadDataWithBaseURL( "file:///android_asset/", 
+				mWv_tags.loadDataWithBaseURL( "file:///android_asset/", 
 				htmlData, "text/html", "UTF-8", null);
 			}
 		} catch (Exception e){
@@ -589,9 +585,9 @@ public class CareerItemFragment extends Fragment implements
 		//extra safety
 		try {
 			/* ensure the view is valid and our fragment is still attached (for async calls) */
-			if (wv_jobDescription != null && !isDetached()){
-				String htmlData = wrapDescription(careerItem.getDescription());
-				wv_jobDescription.loadDataWithBaseURL( "file:///android_asset/", 
+			if (mWv_jobDescription != null && !isDetached()){
+				String htmlData = wrapDescription(mCareerItem.getDescription());
+				mWv_jobDescription.loadDataWithBaseURL( "file:///android_asset/", 
 						htmlData, "text/html", "UTF-8", null);
 			}
 		} catch (Exception e){
@@ -603,18 +599,18 @@ public class CareerItemFragment extends Fragment implements
 	/** Resets scroll view to scrollRatio according to its height, 
 	 * if not <code>null</code> and scroll view is pending. */
 	private void resetScrollView(){
-		if (sv_scrollView != null && scrollViewPending1 && scrollViewPending2){
-			sv_scrollView.post(new Runnable() {@Override
+		if (mSv_scrollView != null && mScrollViewPending1 && mScrollViewPending2){
+			mSv_scrollView.post(new Runnable() {@Override
 				public void run() {
 					double height = 
-							sv_scrollView.getHeight() + wv_jobDescription.getHeight();
-					if (sv_scrollView.getScrollY() > 0 ){
+							mSv_scrollView.getHeight() + mWv_jobDescription.getHeight();
+					if (mSv_scrollView.getScrollY() > 0 ){
 						//perhaps we have scrolled already?
 						return;
 					}
-					sv_scrollView.scrollBy(0, (int) (height * scrollRatio));
-					scrollViewPending1 = false;
-					scrollViewPending2 = false;
+					mSv_scrollView.scrollBy(0, (int) (height * mScrollRatio));
+					mScrollViewPending1 = false;
+					mScrollViewPending2 = false;
 				}
 			});
 		}
@@ -638,23 +634,12 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** @return <code>true</code> if it is light theme, <code>false</code> for dark. */
 	private boolean isLightTheme(){		
-		final String theme = prefs.getString(
+		final String theme = mPrefs.getString(
 				getString(R.string.careerstack_pref_KEY_THEME_PREF), 
 				"");
 		return theme.equals(getString(R.string.careerstack_pref_VALUE_THEME_LIGHT));
 	}
 	
-	
-	/** Processes the date into a semi-readable string of 
-	 * {@link #DATE_FORMAT}.
-	 * @param date The date to process
-	 * @return The readable date.	 */
-	static private String processDate(Date date){
-		SimpleDateFormat dateFormat = 
-				new SimpleDateFormat(DATE_FORMAT, Locale.US);
-		dateFormat.setTimeZone(TimeZone.getDefault());
-		return dateFormat.format(date);
-	}
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -663,7 +648,7 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** Launches internal url. */
 	private void launchUrl(){
-		String url = careerItem.getUrl();
+		String url = mCareerItem.getUrl();
 		try {
 			Intent browserIntent = 
 					new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -675,24 +660,24 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** Copies url. */
 	private void copyUrl(){
-		String url = careerItem.getUrl();
+		String url = mCareerItem.getUrl();
 		CompatClipboard.copyToClipboard(getActivity(), 
 				getString(android.R.string.copyUrl), 
 				url);
-		toastManager.toastShort(getString(R.string.careerstack_toast_copiedLink));
+		mToastManager.toastShort(getString(R.string.careerstack_toast_copiedLink));
 	}
 	
 	/** Shares the post. */
 	private void shareIntent(){
 		String shareTitle = getString(R.string.careerstack_careerItem_button_shareJob);
-		String jobTitle = careerItem.getTitle();
+		String jobTitle = mCareerItem.getTitle();
 		String company = 
-				Html.fromHtml(careerItem.getCompanyLocationEtc()).toString();
-		String url = careerItem.getUrl();
+				Html.fromHtml(mCareerItem.getCompanyLocationEtc()).toString();
+		String url = mCareerItem.getUrl();
 		
 		//create generic string
 		String description = 
-				careerItem.getDescription().substring(0, GENERIC_MSG_DESCRIP_LENGTH)
+				mCareerItem.getDescription().substring(0, GENERIC_MSG_DESCRIP_LENGTH)
 				+ SHORT_ELLIPSIS;
 		String genericMsg = 
 				String.format(GENERIC_MSG_STUB, 
@@ -730,7 +715,7 @@ public class CareerItemFragment extends Fragment implements
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * The JavaScript interface of the {@link #wv_tags}
+	 * The JavaScript interface of the {@link #mWv_tags}
 	 * @author Jason J.
 	 * @version 0.1.1-20141124
 	 */
@@ -748,7 +733,7 @@ public class CareerItemFragment extends Fragment implements
 		@JavascriptInterface
 		public void onTagClick(final String tag){
 			//send the tag to the main activity
-			careerItemFragment.wv_tags.post(new Runnable() {
+			careerItemFragment.mWv_tags.post(new Runnable() {
 				@Override
 				public void run() {
 					try {
@@ -763,12 +748,12 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** A simple class to reduce repetition. 
 	 * @version 0.1.0-20141121 */
-	static private class AnimatedRetryWebViewClient extends WebViewClient {
+	private static class AnimatedRetryWebViewClient extends WebViewClient {
 		/** The number of load attempts. */
 		protected int attempts = 0;
 		
 		/** Number of retries before giving up on loading the job description. */ 
-		final static private int RETRY_LIMIT = 5;
+		private static final int RETRY_LIMIT = 5;
 		
 		private RetryListener retryListener = null;
 		private CareerItemFragment careerItemFragment = null;
@@ -789,9 +774,9 @@ public class CareerItemFragment extends Fragment implements
 				public void run() {
 					if (DEBUG){
 						Log.d(LOGTAG, "webview height: " + webView.getHeight());
-						if (careerItemFragment.sv_scrollView != null){
+						if (careerItemFragment.mSv_scrollView != null){
 							Log.d(LOGTAG, "full height: " + 
-									careerItemFragment.sv_scrollView.getChildAt(0).getHeight());
+									careerItemFragment.mSv_scrollView.getChildAt(0).getHeight());
 						}
 					}
 
@@ -851,7 +836,7 @@ public class CareerItemFragment extends Fragment implements
 					@Override
 					public void onAnimationSet() {
 						//nothing to do here
-						scrollViewPending2 = true;
+						mScrollViewPending2 = true;
 						resetScrollView();
 					}
 				}){
@@ -896,7 +881,7 @@ public class CareerItemFragment extends Fragment implements
 					@Override
 					public void onAnimationSet() {
 						//we have finished loading, reset scroll
-						scrollViewPending1 = true;
+						mScrollViewPending1 = true;
 						resetScrollView();
 					}
 				});
@@ -905,6 +890,7 @@ public class CareerItemFragment extends Fragment implements
 	
 	@Override
 	public void onClick(View v) {
+		mFloatingActionButtonMenu.toggle();
 		switch (v.getId()) {
 		case R.id.careerstack_careerItem_button_openLink:
 			launchUrl();
@@ -930,7 +916,7 @@ public class CareerItemFragment extends Fragment implements
 			//change the button text
 			buttonView.setText(isChecked ? getString(R.string.careerstack_careeritem_showtags_on) : 
 											getString(R.string.careerstack_careeritem_showtags_off) );
-			prefs.edit()
+			mPrefs.edit()
 				.putBoolean(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS), 
 							isChecked)
 				.commit();
@@ -946,9 +932,9 @@ public class CareerItemFragment extends Fragment implements
 			String key) {
 		if (key.equals(getString(R.string.careerstack_pref_KEY_SHOW_ITEM_TAGS))){
 			boolean prefValue = sharedPreferences.getBoolean(key, false);
-			if (chk_toggleTags.isChecked() != prefValue){
+			if (mChk_toggleTags.isChecked() != prefValue){
 				//ensure the value is the same, the listener will deal with the rest
-				chk_toggleTags.setChecked(prefValue);
+				mChk_toggleTags.setChecked(prefValue);
 			}
 		}
 	}
@@ -963,7 +949,7 @@ public class CareerItemFragment extends Fragment implements
 	 * @author Jason J.
 	 * @version 0.1.0-20141124
 	 */
-	static public interface OnFragmentInteractionListener {	
+	public static interface OnFragmentInteractionListener {	
 		
 		/** Sends activity a search a tag. 
 		 * @param tag The tag that is clicked and for the activity to search. 

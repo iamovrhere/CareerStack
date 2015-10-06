@@ -17,10 +17,7 @@
  
   	/* near black grey. */
     background-color: #22222f;
-    border: solid 3pt;
-    /* near black grey. */
-    border-color: #202026;
-    border-top-color: #2a2a3a;
+    border: solid 3pt #22222f;
     
     margin: 4pt 10pt 4pt 0pt;
     padding: 4pt 8pt;
@@ -41,8 +38,8 @@
 .job-tag:hover,
 .job-tag:active,
 .job-tag:focus { 
-	background-color: rgba(224, 118, 20, 200);
-	border-color: rgba(229, 123, 25, 100);
+	background-color: rgba(251, 140, 24, 200);
+	border-color: rgba(251, 140, 24, 100);
 	
 	color: #222;
 	text-decoration:none;
