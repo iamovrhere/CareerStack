@@ -62,5 +62,8 @@
 	<color name="colorControlNormal">@color/careerstack_translucent_grey</color>
 	<color name="colorAccent">#fb8c18</color>
 	<color name="colorAccent_dark">#E07614</color>	
+	
+	<!-- Highly translucent white -->
+	<color name="materialClick">#33ffffff</color>
     
 </resources>

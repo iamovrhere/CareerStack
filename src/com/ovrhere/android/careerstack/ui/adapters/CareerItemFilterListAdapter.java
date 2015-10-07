@@ -39,6 +39,7 @@ import com.ovrhere.android.careerstack.utils.Utility;
  * @author Jason J.
  * @version 0.5.1-20151006
  */
+@Deprecated
 public class CareerItemFilterListAdapter extends BaseAdapter implements
 		Filterable {
 	/* For debugging purposes. 

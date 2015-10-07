@@ -33,7 +33,7 @@
          android:layout_alignParentLeft="true"
          android:layout_alignParentTop="true"
          
-         android:background="@drawable/transparent_btn_holo_dark"
+         android:background="@drawable/transparent_btn_focusable"
          android:contentDescription="@android:string/cancel"
          android:src="@drawable/ic_action_back" />
 

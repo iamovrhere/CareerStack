@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,17 +19,15 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.dao.CareerItem;
 import com.ovrhere.android.careerstack.model.CareersStackOverflowModel;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
-import com.ovrhere.android.careerstack.ui.adapters.CareerItemFilterListAdapter;
+import com.ovrhere.android.careerstack.ui.adapters.CareerItemRecyclerAdapter;
+import com.ovrhere.android.careerstack.ui.adapters.CareerItemRecyclerAdapter.OnCareerItemClickListener;
 import com.ovrhere.android.careerstack.utils.UnitCheck;
 
 /**
@@ -34,35 +35,35 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * Expects Activity to implement {@link OnFragmentInteractionListener} and 
  * will throw {@link ClassCastException} otherwise.
  * @author Jason J.
- * @version 0.8.2-20141127
+ * @version 0.9.0-20151007
  */
 public class SearchResultsFragment extends Fragment 
-implements OnClickListener, OnItemClickListener, Handler.Callback {
+	implements OnClickListener, OnCareerItemClickListener, Handler.Callback {
 	
 	/** Class name for debugging purposes. */
-	final static private String CLASS_NAME = SearchResultsFragment.class
+	private static final String CLASS_NAME = SearchResultsFragment.class
 			.getSimpleName();	
 	/**Logtag for debugging purposes. */
-	final static private String LOGTAG = CLASS_NAME;
+	private static final String LOGTAG = CLASS_NAME;
 	/** Whether or not to debug. */
-	final static private boolean DEBUG = false;
+	private static final boolean DEBUG = false;
 	
 		
-	/** Bundle key. This stores {@link #careerList}.
+	/** Bundle key. This stores {@link #mCareerList}.
 	 *  List<Parcelable>/List<CareerItem> */
-	final static private String KEY_CAREER_LIST = 
+	private static final String KEY_CAREER_LIST = 
 			CLASS_NAME +".KEY_CAREER_LIST";
 	/** Bundle key. Whether or not the fragment is currently loading results
-	 * {@link #isLoadingResults}. Boolean */
-	final static private String KEY_IS_LOADING_RESULTS = 
+	 * {@link #mIsLoadingResults}. Boolean */
+	private static final String KEY_IS_LOADING_RESULTS = 
 			CLASS_NAME +".KEY_IS_LOADING_RESULTS";
 	/** Bundle key. Whether or not the fragment has failed with last results
-	 * {@link #resultsTimeout}. Boolean */
-	final static private String KEY_RESULTS_TIMEOUT = 
+	 * {@link #mResultsTimeout}. Boolean */
+	private static final String KEY_RESULTS_TIMEOUT = 
 			CLASS_NAME +".KEY_RESULTS_TIMEOUT";
 	
 	/** Bundle key. The previous query state. Bundle. */
-	final static private String KEY_PREV_QUERY = 
+	private static final String KEY_PREV_QUERY = 
 			CLASS_NAME +".KEY_PREV_QUERY";
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,22 +80,22 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	 */
 	
 	/** Bundle key. The value of tags. String */
-	final static public String KEY_TAG_TEXT = 
+	public static final String KEY_TAG_TEXT = 
 			CareersStackOverflowModel.KEY_TAG_TEXT;
 	/** Bundle key. The value of keyword. String */
-	final static public String KEY_KEYWORD_TEXT = 
+	public static final String KEY_KEYWORD_TEXT = 
 			CareersStackOverflowModel.KEY_KEYWORD_TEXT;
 	/** Bundle key. The value of location. String. */
-	final static public String KEY_LOCATION_TEXT = 
+	public static final String KEY_LOCATION_TEXT = 
 			CareersStackOverflowModel.KEY_LOCATION_TEXT;
 	/** Bundle key. The whether the remote check is set. Boolean. */
-	final static public String KEY_REMOTE_ALLOWED = 
+	public static final String KEY_REMOTE_ALLOWED = 
 			CareersStackOverflowModel.KEY_REMOTE_ALLOWED;
 	/** Bundle key. The whether the relocation check is set. Boolean. */
-	final static public String KEY_RELOCATE_OFFER = 
+	public static final String KEY_RELOCATE_OFFER = 
 			CareersStackOverflowModel.KEY_RELOCATE_OFFER;
 	/** Bundle Key. The current distance in the seek bar. Int. */
-	final static public String KEY_DISTANCE = 
+	public static final String KEY_DISTANCE = 
 			CareersStackOverflowModel.KEY_DISTANCE;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,29 +105,29 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	
 	
 	/** The container for retry. */
-	private View retryContainer = null;
+	private View mRetryContainer = null;
 	/** The container for canceling + progress bar. */
-	private View progressContainer = null;
+	private View mProgressContainer = null;
 	/** The list of results. */
-	private ListView lv_resultsView = null;
+	private RecyclerView mResultsList = null;
 	
 	/** The loading progress, set to blank by default. */
-	private TextView tv_progress = null;
+	private TextView mTv_progress = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End views
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** The list of elements. Should never be <code>null</code>. */
-	private ArrayList<CareerItem> careerList = new ArrayList<CareerItem>();	
+	private ArrayList<CareerItem> mCareerList = new ArrayList<CareerItem>();	
 	/** The adapter for the results. */
-	private CareerItemFilterListAdapter resultAdapter = null;
+	private CareerItemRecyclerAdapter mResultAdapter = null;
 	
 	
 	/** If the fragment is currently loading results. Default false. */
-	private boolean isLoadingResults = false;
+	private boolean mIsLoadingResults = false;
 	
 	/** If the fragment failed during last load.  Default false. */
-	private boolean resultsTimeout = false;
+	private boolean mResultsTimeout = false;
 		
 	/** The fragment request listener from activity. */
 	private OnFragmentInteractionListener mFragInteractionListener = null;
@@ -135,15 +136,15 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	 * Set true in {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}
 	 * false in {@link #onDestroyView()} */
 	@SuppressWarnings("unused")
-	private boolean viewBuilt = false;
+	private boolean mViewBuilt = false;
 	
 	/** The async model for making requests. */
-	private CareersStackOverflowModel asyncModel = null;
+	private CareersStackOverflowModel mAsyncModel = null;
 	/** The args for previous query performed. Starts off as args. */ 
-	private Bundle prevQuery = null;
+	private Bundle mPrevQuery = null;
 	
 	/** The shared preferences to used. */
-	private SharedPreferences prefs = null;
+	private SharedPreferences mPrefs = null;
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/// End members
@@ -174,20 +175,20 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		prefs = PreferenceUtils.getPreferences(getActivity());
+		mPrefs = PreferenceUtils.getPreferences(getActivity());
 		
-		asyncModel = new CareersStackOverflowModel(getActivity());
-		asyncModel.addMessageHandler(new Handler(this));		
+		mAsyncModel = new CareersStackOverflowModel(getActivity());
+		mAsyncModel.addMessageHandler(new Handler(this));		
 	}
 	
 	@Override
 	public void onDestroy() {
-		synchronized (asyncModel) {
+		synchronized (mAsyncModel) {
 			super.onDestroy();
-			if (isLoadingResults){
-				asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_PAUSE_QUERY);
+			if (mIsLoadingResults){
+				mAsyncModel.sendMessage(CareersStackOverflowModel.REQUEST_PAUSE_QUERY);
 			}
-			asyncModel.dispose();		
+			mAsyncModel.dispose();		
 		}
 	}
 
@@ -216,38 +217,38 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			processArgBundle(args);
 			
 			//if no values are set and we aren't loading, request.
-			if (!isLoadingResults){ 
+			if (!mIsLoadingResults){ 
 				sendModelRequest(args);
 			}
 			showLoadingBlock(false);
 		} 
 		
-		viewBuilt = true;
+		mViewBuilt = true;
 		return rootView;
 	}
 	
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (isLoadingResults){
-			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RESUME_QUERY);
+		if (mIsLoadingResults){
+			mAsyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RESUME_QUERY);
 		}
 		//prevQuery still empty?
-		if (prevQuery == null){
-			prevQuery = getArguments(); //still set args
+		if (mPrevQuery == null){
+			mPrevQuery = getArguments(); //still set args
 		}
 	}
 	
 	
 	@Override
 	public void onDestroyView() {
-		synchronized (asyncModel) {
+		synchronized (mAsyncModel) {
 			Bundle state = new Bundle();
 			buildSaveState(state); //holds the state
 			mFragInteractionListener.onHoldSavedStateRequest(state);
 			
 			super.onDestroyView();
-			viewBuilt = false;
+			mViewBuilt = false;
 		}
 	}
 	
@@ -276,10 +277,10 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		//we are about to request, set up loading
 		showLoadingBlock(true);
 		
-		if (prevQuery == null){
-			prevQuery = new Bundle();
+		if (mPrevQuery == null){
+			mPrevQuery = new Bundle();
 		}
-		prevQuery.clear(); //clean the old request //TODO reallow
+		mPrevQuery.clear(); //clean the old request //TODO reallow
 		
 		sendModelRequest(args);		
 	}
@@ -288,12 +289,12 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	/** Resends the previous request. If no request was previously sent, an
 	 * empty request is sent.	 */
 	public void retryRequest() {
-		if (prevQuery == null){ //should never be null, but just in case
-			prevQuery = new Bundle();
+		if (mPrevQuery == null){ //should never be null, but just in case
+			mPrevQuery = new Bundle();
 		}
 		//we are about to request, set up loading
 		showLoadingBlock(true);
-		sendModelRequest(prevQuery);
+		sendModelRequest(mPrevQuery);
 	};
 	
 	
@@ -303,19 +304,24 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	
 	/** Initializes the output views. */
 	private void initOutputs(View rootView){
-		resultAdapter = new CareerItemFilterListAdapter(getActivity());
+		mResultAdapter = new CareerItemRecyclerAdapter(getActivity(), this);
 						
-		lv_resultsView = (ListView)
+		mResultsList = (RecyclerView)
 				rootView.findViewById(R.id.careerstack_searchResults_list_searchResults);
-		lv_resultsView.setAdapter(resultAdapter);
-		lv_resultsView.setOnItemClickListener(this);
+		mResultsList.setAdapter(mResultAdapter);
+		mResultsList.setHasFixedSize(true);
+		 // use a vertical linear layout manager
+        LinearLayoutManager listContainer  = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        
+        mResultsList.setLayoutManager(listContainer); 
+        mResultsList.setItemAnimator(new DefaultItemAnimator());
 		
-		retryContainer =
+		mRetryContainer =
 				rootView.findViewById(R.id.careerstack_searchResults_layout_retry);
-		progressContainer =
+		mProgressContainer =
 				rootView.findViewById(R.id.careerstack_searchResults_layout_progressBar);
 		
-		tv_progress = (TextView)
+		mTv_progress = (TextView)
 				rootView.findViewById(R.id.careerstack_searchResults_text_progress);
 	}
 	
@@ -339,13 +345,13 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 		//safety first, always try restore block
 		try {
 			//if we began loading results before the view was recreated
-			isLoadingResults = isLoadingResults || args.getBoolean(KEY_IS_LOADING_RESULTS, false);
+			mIsLoadingResults = mIsLoadingResults || args.getBoolean(KEY_IS_LOADING_RESULTS, false);
 			//if results timeout out before view was recreated
-			resultsTimeout = resultsTimeout || args.getBoolean(KEY_RESULTS_TIMEOUT, false);
+			mResultsTimeout = mResultsTimeout || args.getBoolean(KEY_RESULTS_TIMEOUT, false);
 			
-			if (resultsTimeout){
+			if (mResultsTimeout){
 				showRetryBlock(false);
-			} else if (isLoadingResults){
+			} else if (mIsLoadingResults){
 				showLoadingBlock(false);
 			} else {
 				showResults(false);
@@ -353,18 +359,18 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			
 			if (args.getParcelableArrayList(KEY_CAREER_LIST) != null){
 				try {
-						careerList = args.getParcelableArrayList(KEY_CAREER_LIST);
-						resultAdapter.setCareerItems(careerList);
+						mCareerList = args.getParcelableArrayList(KEY_CAREER_LIST);
+						mResultAdapter.setCareerItems(mCareerList);
 					} catch (ClassCastException e){
 						Log.e(LOGTAG, "Career list mistmatched class?" + e);
 					}
 			}
 			
-			if (prevQuery == null){
+			if (mPrevQuery == null){
 				//only restore previous query if we don't have one already 
-				prevQuery = args.getBundle(KEY_PREV_QUERY);
-				if (prevQuery == null){ //still null? try the args.
-					prevQuery = getArguments();
+				mPrevQuery = args.getBundle(KEY_PREV_QUERY);
+				if (mPrevQuery == null){ //still null? try the args.
+					mPrevQuery = getArguments();
 				}
 			}
 			setSearchTerms();
@@ -386,25 +392,25 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	 * No view setting.
 	 * @param args The args to send according to the KEYS given.  */
 	private void sendModelRequest(Bundle args) {
-		if (prevQuery == null){ //should never be null, but just in case
-			prevQuery = new Bundle();
+		if (mPrevQuery == null){ //should never be null, but just in case
+			mPrevQuery = new Bundle();
 		}
-		prevQuery.putAll(args);
-		prevQuery.putBoolean(
+		mPrevQuery.putAll(args);
+		mPrevQuery.putBoolean(
 				CareersStackOverflowModel.KEY_USE_METRIC, 
-				UnitCheck.useMetric(prefs, getResources()) );
+				UnitCheck.useMetric(mPrefs, getResources()) );
 		 
-		asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RECORD_QUERY, prevQuery);
+		mAsyncModel.sendMessage(CareersStackOverflowModel.REQUEST_RECORD_QUERY, mPrevQuery);
 	}
 	
 	/** Builds the saved state from views and other elements. */
 	private void buildSaveState(Bundle outState) {
-		outState.putParcelableArrayList(KEY_CAREER_LIST, careerList);
+		outState.putParcelableArrayList(KEY_CAREER_LIST, mCareerList);
 		
-		outState.putBoolean(KEY_IS_LOADING_RESULTS, isLoadingResults);
-		outState.putBoolean(KEY_RESULTS_TIMEOUT, resultsTimeout);
+		outState.putBoolean(KEY_IS_LOADING_RESULTS, mIsLoadingResults);
+		outState.putBoolean(KEY_RESULTS_TIMEOUT, mResultsTimeout);
 		
-		outState.putBundle(KEY_PREV_QUERY, prevQuery);
+		outState.putBundle(KEY_PREV_QUERY, mPrevQuery);
 		
 		debugSavedState(outState);
 	}
@@ -418,29 +424,29 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 								outState.get(key))
 						);
 			}
-			Log.d(LOGTAG, "careerList size: " + careerList.size());
+			Log.d(LOGTAG, "careerList size: " + mCareerList.size());
 		}
 	}
 	
 	/** Sets the search terms for the adapter. */
 	private void setSearchTerms(){
-		if (prevQuery == null){
-			prevQuery = new Bundle();
+		if (mPrevQuery == null){
+			mPrevQuery = new Bundle();
 		}
-		String keyword = prevQuery.getString(KEY_KEYWORD_TEXT); 
+		String keyword = mPrevQuery.getString(KEY_KEYWORD_TEXT); 
 		if (keyword == null){
-			keyword = prevQuery.getString(KEY_TAG_TEXT);
+			keyword = mPrevQuery.getString(KEY_TAG_TEXT);
 		}
 		
-		String location = prevQuery.getString(KEY_LOCATION_TEXT);
+		String location = mPrevQuery.getString(KEY_LOCATION_TEXT);
 		if (location == null){
 			location = "";
 		}
-		resultAdapter.setSearchTerms(
+		mResultAdapter.setSearchTerms(
 				keyword, 
 				location, 
-				prevQuery.getBoolean(KEY_REMOTE_ALLOWED, false), 
-				prevQuery.getBoolean(KEY_RELOCATE_OFFER, false));		
+				mPrevQuery.getBoolean(KEY_REMOTE_ALLOWED, false), 
+				mPrevQuery.getBoolean(KEY_RELOCATE_OFFER, false));		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -496,22 +502,22 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	
 	
 	/** Shows the retry block, hiding the other 2 views. Sets
-	 * {@link #isLoadingResults} to false and 
-	 * {@link #resultsTimeout} to <code>true</code>	
+	 * {@link #mIsLoadingResults} to false and 
+	 * {@link #mResultsTimeout} to <code>true</code>	
 	 * @param animate <code>true</code> to fade views, <code>false</code> 
 	 * to just switch visibility. */
 	private void showRetryBlock(boolean animate){
-		isLoadingResults = false;
-		resultsTimeout = true;
+		mIsLoadingResults = false;
+		mResultsTimeout = true;
 		
-		if (	retryContainer != null && progressContainer != null && 
-				lv_resultsView != null ){ //ensure views valid
+		if (	mRetryContainer != null && mProgressContainer != null && 
+				mResultsList != null ){ //ensure views valid
 			if (animate){
-				fadeViews(retryContainer, progressContainer, lv_resultsView);
+				fadeViews(mRetryContainer, mProgressContainer, mResultsList);
 			} else {
-				retryContainer.setVisibility(View.VISIBLE);
-				progressContainer.setVisibility(View.GONE);
-				lv_resultsView.setVisibility(View.GONE);
+				mRetryContainer.setVisibility(View.VISIBLE);
+				mProgressContainer.setVisibility(View.GONE);
+				mResultsList.setVisibility(View.GONE);
 			}
 		}
 		
@@ -521,25 +527,25 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	}
 	
 	/** Shows the loading/progress block, hiding the other 2 views. Sets
-	 * {@link #isLoadingResults} to true and 
-	 * {@link #resultsTimeout} to <code>false</code>.	
+	 * {@link #mIsLoadingResults} to true and 
+	 * {@link #mResultsTimeout} to <code>false</code>.	
 	 * @param animate <code>true</code> to fade views, <code>false</code> 
 	 * to just switch visibility.  */
 	private void showLoadingBlock(boolean animate){
-		isLoadingResults = true;
-		resultsTimeout = false;	
+		mIsLoadingResults = true;
+		mResultsTimeout = false;	
 		
-		if (	retryContainer != null && progressContainer != null && 
-				lv_resultsView != null && tv_progress != null){ //ensure views valid
+		if (	mRetryContainer != null && mProgressContainer != null && 
+				mResultsList != null && mTv_progress != null){ //ensure views valid
 			//always clear progress
-			tv_progress.setText("");
+			mTv_progress.setText("");
 			
 			if (animate){
-				fadeViews(progressContainer, retryContainer, lv_resultsView);
+				fadeViews(mProgressContainer, mRetryContainer, mResultsList);
 			} else {
-				retryContainer.setVisibility(View.GONE);
-				progressContainer.setVisibility(View.VISIBLE);
-				lv_resultsView.setVisibility(View.GONE);
+				mRetryContainer.setVisibility(View.GONE);
+				mProgressContainer.setVisibility(View.VISIBLE);
+				mResultsList.setVisibility(View.GONE);
 			}
 		}
 		
@@ -549,22 +555,22 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	}
 	
 	/** Shows the list view, hiding the other 2 views. Sets
-	 * {@link #isLoadingResults} to false and 
-	 * {@link #resultsTimeout} to <code>false</code>	
+	 * {@link #mIsLoadingResults} to false and 
+	 * {@link #mResultsTimeout} to <code>false</code>	
 	 * @param animate <code>true</code> to fade views, <code>false</code> 
 	 * to just switch visibility.  */
 	private void showResults(boolean animate){
-		isLoadingResults = false;
-		resultsTimeout = false;	
+		mIsLoadingResults = false;
+		mResultsTimeout = false;	
 		
-		if (	retryContainer != null && progressContainer != null && 
-				lv_resultsView != null ){ //ensure views valid
+		if (	mRetryContainer != null && mProgressContainer != null && 
+				mResultsList != null ){ //ensure views valid
 			if (animate){
-				fadeViews(lv_resultsView, progressContainer, retryContainer);
+				fadeViews(mResultsList, mProgressContainer, mRetryContainer);
 			} else {
-				retryContainer.setVisibility(View.GONE);
-				progressContainer.setVisibility(View.GONE);
-				lv_resultsView.setVisibility(View.VISIBLE);
+				mRetryContainer.setVisibility(View.GONE);
+				mProgressContainer.setVisibility(View.GONE);
+				mResultsList.setVisibility(View.VISIBLE);
 			}
 		}
 		
@@ -575,14 +581,14 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 	
 	/** Resets the list position to top. */
 	private void resetListPosition(){
-		if (lv_resultsView != null){ //ensure view valid
+		if (mResultsList != null){ //ensure view valid
 			//ensure we are at the top. 
-			lv_resultsView.setSelectionFromTop(0, 0);
-			lv_resultsView.postDelayed(new Runnable() {@Override
+			mResultsList.scrollToPosition(0);
+			mResultsList.postDelayed(new Runnable() {@Override
 				public void run() {
-					try{ //catch as we are delaying
-						lv_resultsView.setSelectionFromTop(0, 0);
-					}catch(Exception e){}
+					try { //catch as we are delaying
+						mResultsList.scrollToPosition(0);
+					} catch(Exception e) {}
 				}
 			}, 50);
 		}
@@ -602,28 +608,21 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 			break;
 			
 		case R.id.careerstack_searchResults_button_cancel:
-			if (careerList.isEmpty()){
+			if (mCareerList.isEmpty()){
 				showRetryBlock(false);
 			} else {
 				showResults(true);
 			}
 			//set cancelled appearance first, before cancelling
-			asyncModel.sendMessage(CareersStackOverflowModel.REQUEST_QUERY_CANCEL);
+			mAsyncModel.sendMessage(CareersStackOverflowModel.REQUEST_QUERY_CANCEL);
 			//fall through
 		}
 	}
 
 	
-	
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-		try{
-			CareerItem item = (CareerItem) resultAdapter.getItem(position);
-			if (item != null){
-				mFragInteractionListener.onCareerItemRequest(item);
-			}
-		} catch (ClassCastException e){}
+	public void onCareerItemClick(CareerItem item) {
+		mFragInteractionListener.onCareerItemRequest(item);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -644,9 +643,9 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 					return true;
 					
 				case CareersStackOverflowModel.NOTIFY_PROGRESS_UPDATE:
-					if (msg.arg1 > -1 && msg.arg2 > 0 && tv_progress != null){
+					if (msg.arg1 > -1 && msg.arg2 > 0 && mTv_progress != null){
 						//updates to be x / y; e.g. "5 / 133"
-						tv_progress.setText(
+						mTv_progress.setText(
 								new StringBuilder().append(msg.arg1)
 													.append(" / ")
 													.append(msg.arg2)
@@ -658,14 +657,14 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 					
 					if (msg.obj instanceof List<?>){
 						try {
-							careerList = (ArrayList<CareerItem>) msg.obj;
+							mCareerList = (ArrayList<CareerItem>) msg.obj;
 							//cast check
-							if (careerList.size() > 0){
+							if (mCareerList.size() > 0){
 								@SuppressWarnings("unused")
-								CareerItem item = careerList.get(0);
+								CareerItem item = mCareerList.get(0);
 							}
 							
-							resultAdapter.setCareerItems(careerList);
+							mResultAdapter.setCareerItems(mCareerList);
 							setSearchTerms();
 							
 						} catch (ClassCastException e){
@@ -673,22 +672,22 @@ implements OnClickListener, OnItemClickListener, Handler.Callback {
 						}
 					}
 					
-					if (isLoadingResults){ //if we have not cancelled
+					if (mIsLoadingResults){ //if we have not cancelled
 						showResults(true);
 						resetListPosition();
 					}
-					isLoadingResults = false; //ensure we are complete
+					mIsLoadingResults = false; //ensure we are complete
 					
 					return true;
 					
 				case CareersStackOverflowModel.ERROR_REQUEST_TIMEOUT:
-					if (isLoadingResults){ //if we were loading results, and timeout
+					if (mIsLoadingResults){ //if we were loading results, and timeout
 						showRetryBlock(true);
 					}
 					return true;
 					
 				case CareersStackOverflowModel.ERROR_REQUEST_FAILED:
-					if (careerList.isEmpty() || isLoadingResults){
+					if (mCareerList.isEmpty() || mIsLoadingResults){
 						//if we have no elements, or were still loading results 
 						//i.e. not cancelled, retry block
 						showRetryBlock(true);

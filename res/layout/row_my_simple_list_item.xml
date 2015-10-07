@@ -23,6 +23,7 @@
     android:paddingBottom="8dp"
     android:paddingLeft="@dimen/row_list_horizontal_padding"
     android:paddingRight="@dimen/row_list_horizontal_padding"
+    android:background="@drawable/transparent_click_background"
 >
     
 	<TextView android:id="@android:id/text1"
