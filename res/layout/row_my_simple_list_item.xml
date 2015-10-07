@@ -33,6 +33,7 @@
     	android:layout_marginTop="8dip"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:textStyle="bold"
+		android:textColor="?android:attr/textColorPrimary"
 	/>
 		
 	<TextView android:id="@android:id/text2"

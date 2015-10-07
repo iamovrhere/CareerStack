@@ -27,6 +27,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,7 +45,7 @@ import com.ovrhere.android.careerstack.utils.TabletUtil;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.11.0-20151005
+ * @version 0.11.1-20151006
  */
 public class MainActivity extends AbstractThemedActivity 
 	implements OnBackStackChangedListener, DialogInterface.OnClickListener,
@@ -191,7 +193,7 @@ public class MainActivity extends AbstractThemedActivity
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.menu = menu;
-		checkMenus();
+		checkActionBar();
 		return true;
 	}
 
@@ -245,7 +247,7 @@ public class MainActivity extends AbstractThemedActivity
 	    }
 	  
 	    //show settings when not viewing settings
-	    checkMenus();
+	    checkActionBar();
 	    checkTabletFrag();
 	    return true;
 	}
@@ -433,7 +435,7 @@ public class MainActivity extends AbstractThemedActivity
 	 * If so deactivate menu, if not, re-enable it. Must be called after
 	 * {@link #onCreateOptionsMenu(Menu)} 
 	 */
-	private void checkMenus(){
+	private void checkActionBar(){
 		if (menu == null){
 			return;
 		}
@@ -441,19 +443,23 @@ public class MainActivity extends AbstractThemedActivity
 		
 		menu.setGroupVisible(0, true);
 		
+		int displayOptions = ActionBar.DISPLAY_USE_LOGO;
 		boolean showSearch = false;
 		boolean showRefresh = false;
 		
 		if (TAG_MAIN_FRAG.equals(currTag)){
 			showSearch = false;
 			showRefresh = false;
+			displayOptions = ActionBar.DISPLAY_USE_LOGO | ActionBar.DISPLAY_SHOW_HOME;
 		} else if (TAG_SEARCH_RESULTS_FRAG.equals(currTag)){
 			showSearch = true;
 			showRefresh = true;
+			displayOptions = ActionBar.DISPLAY_USE_LOGO | ActionBar.DISPLAY_SHOW_HOME;
 		} else if (TAG_CAREER_ITEM_FRAG.equals(currTag)){
 			 //FIXME the search results frag needs to "back search" before search can be enabled from items
 			showSearch = false;
 			showRefresh = false;
+			displayOptions = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME;
 		}
 
 		menu.findItem(R.id.action_search)
@@ -462,6 +468,7 @@ public class MainActivity extends AbstractThemedActivity
 		menu.findItem(R.id.action_refresh)
 			.setVisible(showRefresh)
 			.setEnabled(showRefresh);
+		getSupportActionBar().setDisplayOptions(displayOptions);
 				
 	}
 	
@@ -493,7 +500,6 @@ public class MainActivity extends AbstractThemedActivity
 			.setVisibility(show ? View.VISIBLE : View.GONE);
 	}
 	
-	
 	/** Loads a fragment either by adding or replacing and then adds it to
 	 * the fragTagList.
 	 * @param fragment The fragment to add
@@ -503,18 +509,34 @@ public class MainActivity extends AbstractThemedActivity
 	 */
 	private void loadFragment(Fragment fragment, String tag, 
 			boolean backStack){
+		loadFragment(fragment, tag, backStack, null);
+	}
+	
+	/** Loads a fragment either by adding or replacing and then adds it to
+	 * the fragTagList.
+	 * @param fragment The fragment to add
+	 * @param tag The tag to give the fragment
+	 * @param backStack <code>true</code> to add to backstack, 
+	 * <code>false</code> to not.
+	 * @param ft The transaction in progress or null.
+	 */
+	private void loadFragment(Fragment fragment, String tag, 
+			boolean backStack, FragmentTransaction ft){
 		
 		FragmentManager fragManager = getSupportFragmentManager();
 		
+		if (ft == null) {
+			ft = fragManager.beginTransaction(); 
+		}
 		if (backStack){
 			String prevTag = fragTagStack.peek();
-			fragManager.beginTransaction()
+			ft
 				.addToBackStack(prevTag)
 				.replace(R.id.container, fragment, tag).commit();
 		} else {
 			//clear the entire backstack
 			fragManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-			fragManager.beginTransaction()
+			ft
 					.replace(R.id.container, fragment, tag)
 					.commit();
 			fragTagStack.clear();
@@ -524,7 +546,7 @@ public class MainActivity extends AbstractThemedActivity
 		fragTagStack.push(tag);
 		
 		checkTabletFrag();
-		checkMenus();
+		checkActionBar();
 		checkHomeButtonBack();		
 	}
 	

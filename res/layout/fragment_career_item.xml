@@ -53,7 +53,8 @@
 			android:text="Company Inc, At location!"
 			android:textAppearance="?android:attr/textAppearanceMedium" 
 			tools:ignore="HardcodedText"
-			android:textColor="@color/careerstack_translucent_grey"
+			android:textColor="?android:attr/textColorSecondary"
+			android:textSize="20sp"
 			/>
 
 			
@@ -65,17 +66,32 @@
 		        
 		        android:gravity="center_vertical"
 		        >
-	
-		        <TextView
-		            android:id="@+id/careerstack_careerItem_text_updateDate"
-		            android:layout_width="0dp"
-		            android:layout_height="wrap_content"
-		            
-		            android:text="@string/careerstack_formatString_publishUpdateDate"
-		            android:textColor="@color/careerstack_translucent_grey"
-		            
-		            android:layout_weight="1.0"
-		            android:textSize="14sp" />
+		        <LinearLayout 
+		            android:layout_width="0dp" 
+		        	android:layout_height="wrap_content"
+			        android:layout_weight="1.0"
+			        android:orientation="vertical"
+		            >
+		 			<TextView
+			            android:id="@+id/careerstack_careerItem_text_publishDate"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            
+			            android:text="@string/careerstack_formatString_publishDate"
+			            android:textColor="?android:attr/textColorSecondary"			            
+						android:textAppearance="?android:attr/textAppearanceMedium" 
+			            />
+			        <TextView
+			            android:id="@+id/careerstack_careerItem_text_updateDate"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            
+			            android:text="@string/careerstack_formatString_updateDate"
+			            
+						android:textAppearance="?android:attr/textAppearanceMedium" 
+			            android:textColor="@color/careerstack_translucent_grey"
+			            android:textSize="14sp" />
+		        </LinearLayout>
 	
 			    <!-- Set  saveEnabled to false as it is set by a preference which is,
 			     in turn, set in multiple places -->

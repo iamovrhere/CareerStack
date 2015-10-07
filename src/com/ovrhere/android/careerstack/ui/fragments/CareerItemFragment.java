@@ -41,7 +41,7 @@ import com.ovrhere.android.careerstack.utils.Utility;
  * or launch a search from tags (via {@link OnFragmentInteractionListener})
  * 
  * @author Jason J.
- * @version 0.8.0-20151006
+ * @version 0.8.1-20151007
  */
 public class CareerItemFragment extends Fragment implements 
 	OnClickListener, OnCheckedChangeListener, 
@@ -302,6 +302,11 @@ public class CareerItemFragment extends Fragment implements
 		return rootView;
 	}
 	
+	@Override
+	public void onPause() {
+		super.onPause();
+		collapseFloatingActionButton();
+	}
 	
 	@Override
 	public void onDestroyView() {
@@ -310,8 +315,11 @@ public class CareerItemFragment extends Fragment implements
 		
 		destroyWebView(mWv_jobDescription);
 		destroyWebView(mWv_tags);
+		collapseFloatingActionButton();
 		mViewBuilt = false;
 	}
+
+	
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -349,25 +357,27 @@ public class CareerItemFragment extends Fragment implements
 	
 	/** Initializes the output views. */
 	private void initOutputViews(View rootView){
-		TextView jobTitle = (TextView)
-				rootView.findViewById(R.id.careerstack_careerItem_text_jobTitle);
-		jobTitle.setText(mCareerItem.getTitle());
-				
-		TextView companyEtc = (TextView)
-				rootView.findViewById(R.id.careerstack_careerItem_text_companyLocationEtc);
-		companyEtc.setText(mCareerItem.getCompanyLocationEtc());	
+		findAndSetText(rootView, 
+				R.id.careerstack_careerItem_text_jobTitle, mCareerItem.getTitle());
+		
+		findAndSetText(rootView, 
+				R.id.careerstack_careerItem_text_companyLocationEtc, mCareerItem.getCompanyLocationEtc());
 		
 		initTags(rootView);
 		initJobDescription(rootView);
 		
-		TextView updateDate = (TextView)
-				rootView.findViewById(R.id.careerstack_careerItem_text_updateDate);
-		updateDate.setText(
-				String.format(getString(R.string.careerstack_formatString_publishUpdateDate),
-						Utility.getRelativeTime(getActivity(), mCareerItem.getPublishDate()),
-						Utility.getPreciseDate(mCareerItem.getUpdateDate()))
-				);
+		findAndSetText(rootView, 
+				R.id.careerstack_careerItem_text_publishDate,
+				String.format(getString(R.string.careerstack_formatString_publishDate),
+						Utility.getRelativeTime(getActivity(), mCareerItem.getPublishDate())
+				));
+		findAndSetText(rootView, 
+				R.id.careerstack_careerItem_text_updateDate,
+				String.format(getString(R.string.careerstack_formatString_updateDate),
+						Utility.getPreciseDate(mCareerItem.getUpdateDate())
+				));
 	}
+	
 
 	/* 
 	 * Point of reference:
@@ -532,6 +542,19 @@ public class CareerItemFragment extends Fragment implements
 	/// Helper/Utility section
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/** Finds and textview content. */
+	private static TextView findAndSetText(View rootView, int id, String string) {
+		TextView text = (TextView) rootView.findViewById(id);
+		text.setText(string);
+		return text;
+	}
+	
+	/** Safely collapses the floating action button. */
+	private void collapseFloatingActionButton() {
+		if (mFloatingActionButtonMenu != null && mFloatingActionButtonMenu.isExpanded()) {
+			mFloatingActionButtonMenu.toggle();
+		}
+	}
 
 	/** Destroys the webview for safety reasons 
 	 * ( java.lang.IllegalArgumentException:  bitmap exceeds 32 bits exception ) */
@@ -890,7 +913,8 @@ public class CareerItemFragment extends Fragment implements
 	
 	@Override
 	public void onClick(View v) {
-		mFloatingActionButtonMenu.toggle();
+		collapseFloatingActionButton();
+		
 		switch (v.getId()) {
 		case R.id.careerstack_careerItem_button_openLink:
 			launchUrl();

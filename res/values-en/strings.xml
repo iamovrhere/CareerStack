@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
    Copyright 2014 Jason J.
 
@@ -14,7 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <!-- The application name -->
     <string name="app_name">CareerStack</string>
@@ -131,9 +131,12 @@
     <string name="careerstack_careerItem_button_openLink">Open Link</string>
     <!-- The share this job button. -->
     <string name="careerstack_careerItem_button_shareJob">Share this job</string>
-    <!-- Published & last update string. Formatted: accepts 2 strigns. -->
-    <string name="careerstack_formatString_publishUpdateDate"
-        >Published: %1$s \nLast updated: %2$s</string>
+    <!-- Published string. Formatted: accepts 1 string. -->
+    <string name="careerstack_formatString_publishDate"
+        >Published: %1$s</string>
+    <!-- Last update string. Formatted: accepts 1 string. -->
+    <string name="careerstack_formatString_updateDate"
+        >Last updated: %1$s</string>
     <!-- Copied Link. -->
     <string name="careerstack_toast_copiedLink">Copied link to clipboard</string>
     <!-- The string for "%1$s(job) at %2$s(place) -->
