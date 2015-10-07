@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TODO pull and submit the editted version -->
+<com.ovrhere.android.careerstack.ui.widgets.floatingactionbutton.FloatingActionsMenu
+     xmlns:android="http://schemas.android.com/apk/res/android"
+   	xmlns:fab="http://schemas.android.com/apk/res-auto"
+   	xmlns:tools="http://schemas.android.com/tools"
+       android:id="@+id/careerstack_careerItem_button_link_actions"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       
+       fab:fab_addButtonColorNormal="@color/colorAccent"
+       fab:fab_addButtonColorPressed="@color/colorAccent_dark"
+       fab:fab_icon="@drawable/ic_action_link"
+       fab:fab_expandDirection="up"
+       >
+
+       <com.ovrhere.android.careerstack.ui.widgets.floatingactionbutton.FloatingActionButton
+           android:id="@+id/careerstack_careerItem_button_openLink"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           fab:fab_colorNormal="@android:color/white"
+           fab:fab_colorPressed="@android:color/darker_gray"
+           fab:fab_icon="@drawable/ic_action_open_link"
+           fab:fab_size="mini"
+           fab:fab_title="@string/careerstack_careerItem_button_openLink"
+           />
+
+       <com.ovrhere.android.careerstack.ui.widgets.floatingactionbutton.FloatingActionButton
+           android:id="@+id/careerstack_careerItem_button_copyUrl"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           fab:fab_colorNormal="@android:color/white"
+           fab:fab_colorPressed="@android:color/darker_gray"
+           fab:fab_icon="@drawable/ic_action_copy_content"
+           fab:fab_size="mini"
+           fab:fab_title="@android:string/copyUrl"
+           />
+
+       <com.ovrhere.android.careerstack.ui.widgets.floatingactionbutton.FloatingActionButton
+           android:id="@+id/careerstack_careerItem_button_share"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           fab:fab_colorNormal="@android:color/white"
+           fab:fab_colorPressed="@android:color/darker_gray"
+           fab:fab_icon="@drawable/ic_action_share"
+           fab:fab_size="mini"
+           fab:fab_title="@string/careerstack_careerItem_button_shareJob"
+           />
+
+   </com.ovrhere.android.careerstack.ui.widgets.floatingactionbutton.FloatingActionsMenu>
