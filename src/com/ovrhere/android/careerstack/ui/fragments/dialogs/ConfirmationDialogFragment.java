@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jason J.
+ * Copyright 2014 Jason J. (iamovrhere)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,6 +14,8 @@
  * the License.
  */
 package com.ovrhere.android.careerstack.ui.fragments.dialogs;
+
+import com.ovrhere.android.careerstack.R;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -31,7 +33,7 @@ import android.util.Log;
  * call {@link Builder#setTargetFragment(Fragment, int)}. 
  * Note that upon a given button press, the dialog dismisses itself.
  * @author Jason J.
- * @version 0.2.1-20151009
+ * @version 0.2.2-20151008
  */
 public class ConfirmationDialogFragment extends DialogFragment 
 	implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
@@ -100,7 +102,7 @@ public class ConfirmationDialogFragment extends DialogFragment
 		return new AlertDialog.Builder(getActivity())
 					.setTitle(titleResource)
 					.setMessage(msg)
-					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setIcon(R.drawable.ic_warning)
 					.setPositiveButton(positiveResource, this)
 					.setNegativeButton(negativeResource, this)
 					.setOnCancelListener(this)
