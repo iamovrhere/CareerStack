@@ -15,14 +15,16 @@
  */
 package com.ovrhere.android.careerstack.utils;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
 import com.ovrhere.android.careerstack.R;
+import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 
 /** Simple util used by this project.
  * @author Jason J.
- * @version 0.1.1-20141112
+ * @version 0.2.0-2015108
  */
 public class TabletUtil {
 	
@@ -30,7 +32,20 @@ public class TabletUtil {
 	 * <ol><li>Screen size</li><li>Ads enabled</li><li>Tablet mode enabled</li></ol>
 	 * @return <code>true</code> if currently in tablet mode, <code>false</code>
 	 * otherwise.	 */
-	static public boolean inTabletMode(Resources r, SharedPreferences prefs){
+	public static boolean inTabletMode(Context context){
+		SharedPreferences prefs = PreferenceUtils.getPreferences(context);
+		return context.getResources().getBoolean(R.bool.careerstack_in_tablet_mode) &&					
+					prefs.getBoolean(
+						context.getString(R.string.careerstack_pref_KEY_USE_TABLET_LAYOUT), false);
+		
+	}
+	
+	/** Checks that the device is currently in tablet mode based on:
+	 * <ol><li>Screen size</li><li>Ads enabled</li><li>Tablet mode enabled</li></ol>
+	 * @return <code>true</code> if currently in tablet mode, <code>false</code>
+	 * otherwise.	 */
+	@Deprecated
+	protected static boolean inTabletMode(Resources r, SharedPreferences prefs){
 		return r.getBoolean(R.bool.careerstack_in_tablet_mode) &&
 		
 		prefs.getBoolean(r.getString(R.string.careerstack_pref_KEY_USE_TABLET_LAYOUT), false);

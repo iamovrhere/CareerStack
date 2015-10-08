@@ -21,7 +21,6 @@ import java.util.Map;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -45,7 +44,7 @@ import com.ovrhere.android.careerstack.utils.TabletUtil;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.11.1-20151006
+ * @version 0.11.2-20151008
  */
 public class MainActivity extends AbstractThemedActivity 
 	implements OnBackStackChangedListener, DialogInterface.OnClickListener,
@@ -55,24 +54,24 @@ public class MainActivity extends AbstractThemedActivity
 	SearchBarDialogFragment.OnDialogResultsListener{
 	
 	/** Class name for debugging purposes. */
-	final static private String CLASS_NAME = MainActivity.class.getSimpleName();
+	private static final String CLASS_NAME = MainActivity.class.getSimpleName();
 	/** Whether or not to debug. */
-	final static private boolean DEBUG = true;
+	private static final boolean DEBUG = true;
 	
 	/** Bundle key. The last fragment to be loaded (and so reloaded). 
 	 * Array<String> */
-	final static private String KEY_FRAG_TAG_TACK = 
+	private static final String KEY_FRAG_TAG_TACK = 
 			CLASS_NAME + ".KEY_LAST_FRAG_TAG";
 	/** Bundle key. The group of saved states to retain.
 	 *  Hashmap<String,Bundle>/Serializable. */
-	final static private String KEY_FRAG_SAVED_STATES = 
+	private static final String KEY_FRAG_SAVED_STATES = 
 			CLASS_NAME + ".KEY_FRAG_SAVED_STATES";
 	/** Bundle key. The actionbar title in #actionBarTitle. String. */
-	final static private String KEY_ACTIONBAR_TITLE =
+	private static final String KEY_ACTIONBAR_TITLE =
 			CLASS_NAME + ".KEY_ACTIONBAR_SUBTITLE";
 	
 	/** Bundle key. The current search state for the searchbar. Bundle. */
-	final static private String KEY_CURRENT_SEARCH_BAR_STATE = 
+	private static final String KEY_CURRENT_SEARCH_BAR_STATE = 
 			CLASS_NAME + ".KEY_CURRENT_SEARCH";
 		
 		
@@ -81,15 +80,15 @@ public class MainActivity extends AbstractThemedActivity
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The main fragment tag. */
-	final static private String TAG_MAIN_FRAG = 
+	private static final String TAG_MAIN_FRAG = 
 			MainFragment.FRAGTAG;
 	
 	/** The tag for the search resultsfrag. */
-	final static private String TAG_SEARCH_RESULTS_FRAG = 
+	private static final String TAG_SEARCH_RESULTS_FRAG = 
 			SearchResultsFragment.class.getName();
 	
 	/** The tag for the career item frag. */
-	final static private String TAG_CAREER_ITEM_FRAG = 
+	private static final String TAG_CAREER_ITEM_FRAG = 
 			CareerItem.class.getName();
 	
 	
@@ -98,41 +97,38 @@ public class MainActivity extends AbstractThemedActivity
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** The list of all fragments in play. */
-	final private ArrayListStack<String> fragTagStack = 
+	private final ArrayListStack<String> mFragTagStack = 
 			new ArrayListStack<String>();	
 	
 	/** A map of all back stack fragment states. 
 	 * Key: fragment tag (String), Value: savedState (Bundle) */
-	final private HashMap<String, Bundle> fragSavedStates =
+	private final HashMap<String, Bundle> mFragSavedStates =
 			new HashMap<String, Bundle>();
 	
 	/** The current actionbar subtitle. */
-	private String actionBarTitle = "";
-	
-	/** The current shared preference. */
-	private SharedPreferences prefs = null;
+	private String mActionBarTitle = "";
 	
 	/** The current menu as built by activity.
 	 *  Initialized in {@link #onCreateOptionsMenu(Menu)} */
-	private Menu menu = null;
+	private Menu mMenu = null;
 	
 	/** The tablet container message for tablet mode. */
-	private TextView tabletMessage = null;
+	private TextView mTabletMessage = null;
 	
 	
 	/** The current search of the application set according to the keys of
 	 * {@link SearchBarDialogFragment}.
 	 * Set in {@link #onSearchRequest(Bundle)} & {@link #onSearch(DialogFragment, Bundle)} */ 
-	private Bundle currSearchBarState = new Bundle();
+	private Bundle mCurrSearchBarState = new Bundle();
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putStringArrayList(KEY_FRAG_TAG_TACK, fragTagStack.getArrayList());
-		outState.putSerializable(KEY_FRAG_SAVED_STATES, fragSavedStates);
-		outState.putString(KEY_ACTIONBAR_TITLE, actionBarTitle);
+		outState.putStringArrayList(KEY_FRAG_TAG_TACK, mFragTagStack.getArrayList());
+		outState.putSerializable(KEY_FRAG_SAVED_STATES, mFragSavedStates);
+		outState.putString(KEY_ACTIONBAR_TITLE, mActionBarTitle);
 		
-		outState.putBundle(KEY_CURRENT_SEARCH_BAR_STATE, currSearchBarState);
+		outState.putBundle(KEY_CURRENT_SEARCH_BAR_STATE, mCurrSearchBarState);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -144,31 +140,31 @@ public class MainActivity extends AbstractThemedActivity
 		
 		setContentView(R.layout.activity_main);
 		
-		tabletMessage = (TextView) findViewById(R.id.careerstack_main_text_job_description_message);
+		mTabletMessage = (TextView) findViewById(R.id.careerstack_main_text_job_description_message);
 		
 		if (savedInstanceState == null) {			
 			loadFragment( new MainFragment(), TAG_MAIN_FRAG, false);
-			actionBarTitle = getString(R.string.app_name);
+			mActionBarTitle = getString(R.string.app_name);
 			
 		} else {
 			try {
-				currSearchBarState = 
+				mCurrSearchBarState = 
 						savedInstanceState.getBundle(KEY_CURRENT_SEARCH_BAR_STATE);
 				
 				if (savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK) != null){
-					fragTagStack.addAll(
+					mFragTagStack.addAll(
 							savedInstanceState.getStringArrayList(KEY_FRAG_TAG_TACK));
 				}
 				
 				if (savedInstanceState.getString(KEY_ACTIONBAR_TITLE) != null){
-					actionBarTitle = 
+					mActionBarTitle = 
 							savedInstanceState.getString(KEY_ACTIONBAR_TITLE);
 				}
 				reattachLastFragment();
 				
 				if (savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES) != null){
 					try {
-				fragSavedStates.putAll((Map<? extends String, ? extends Bundle>) 
+				mFragSavedStates.putAll((Map<? extends String, ? extends Bundle>) 
 						savedInstanceState.getSerializable(KEY_FRAG_SAVED_STATES));
 					} catch (ClassCastException e){}
 				}
@@ -181,7 +177,7 @@ public class MainActivity extends AbstractThemedActivity
 			}
 		}
 		
-		getSupportActionBar().setTitle(actionBarTitle);
+		getSupportActionBar().setTitle(mActionBarTitle);
 		
 	}
 	
@@ -192,7 +188,7 @@ public class MainActivity extends AbstractThemedActivity
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
-		this.menu = menu;
+		this.mMenu = menu;
 		checkActionBar();
 		return true;
 	}
@@ -238,9 +234,9 @@ public class MainActivity extends AbstractThemedActivity
 	    //This method is called when the up button is pressed. Just the pop back stack.
 		setActionBarTitle(getString(R.string.app_name));
 	    getSupportFragmentManager().popBackStack();
-	    fragTagStack.pop();	    
+	    mFragTagStack.pop();	    
 	    
-	    if (TAG_CAREER_ITEM_FRAG.equals(fragTagStack.peek()) && inTabletMode()){
+	    if (TAG_CAREER_ITEM_FRAG.equals(mFragTagStack.peek()) && inTabletMode()){
 	    	//if we popped back to have the career item & tablet mode
 	    	reattachLastFragment(); 
 	    	return true;
@@ -256,10 +252,10 @@ public class MainActivity extends AbstractThemedActivity
 	/// Misc. Helpers
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	/** Sets actionbar title in {@link #actionBarTitle} & sets title to it. */
+	/** Sets actionbar title in {@link #mActionBarTitle} & sets title to it. */
 	private void setActionBarTitle(String title) {
-		actionBarTitle = title;
-		getSupportActionBar().setTitle(actionBarTitle);
+		mActionBarTitle = title;
+		getSupportActionBar().setTitle(mActionBarTitle);
 	}
 	
 	
@@ -272,7 +268,7 @@ public class MainActivity extends AbstractThemedActivity
 	 * @return <code>true</code> if currently in tablet mode, <code>false</code>
 	 * otherwise.	 */
 	private boolean inTabletMode(){
-		return TabletUtil.inTabletMode(getResources(), prefs);		
+		return TabletUtil.inTabletMode(this);		
 	}
 	
 	/** Sends the search request off the SearchResultsFragment;
@@ -296,7 +292,7 @@ public class MainActivity extends AbstractThemedActivity
 				requestSent = true;
 				
 				//if not at front, clear stack and re-add
-				if (!TAG_SEARCH_RESULTS_FRAG.equals(fragTagStack.peek())){
+				if (!TAG_SEARCH_RESULTS_FRAG.equals(mFragTagStack.peek())){
 					loadFragment(frag, TAG_SEARCH_RESULTS_FRAG, false);	
 				}				
 			}
@@ -325,7 +321,7 @@ public class MainActivity extends AbstractThemedActivity
 	 * available nothing happens. 	 */
 	private void refreshSearchRequest(){
 		//if we are already in the search frag
-		if (TAG_SEARCH_RESULTS_FRAG.equals(fragTagStack.peek())){
+		if (TAG_SEARCH_RESULTS_FRAG.equals(mFragTagStack.peek())){
 			try {
 				//get fragment then send results.
 				SearchResultsFragment frag = (SearchResultsFragment)
@@ -354,7 +350,7 @@ public class MainActivity extends AbstractThemedActivity
 	/** Initializes and shows the search bar dialog using the current
 	 * search state. 	 */
 	private void showSearchBarDialog(){
-		SearchBarDialogFragment.newInstance(currSearchBarState)
+		SearchBarDialogFragment.newInstance(mCurrSearchBarState)
 			.show(	getSupportFragmentManager(),
 					SearchBarDialogFragment.class.getName());
 	}
@@ -388,7 +384,7 @@ public class MainActivity extends AbstractThemedActivity
 		//first, always check tablet fragment.
 		checkTabletFrag();
 		
-		String currentTag = fragTagStack.peek();
+		String currentTag = mFragTagStack.peek();
 		FragmentManager fm = getSupportFragmentManager();
 		Log.d("Main", "currentTag: "+ currentTag);
 		
@@ -436,12 +432,12 @@ public class MainActivity extends AbstractThemedActivity
 	 * {@link #onCreateOptionsMenu(Menu)} 
 	 */
 	private void checkActionBar(){
-		if (menu == null){
+		if (mMenu == null){
 			return;
 		}
-		final String currTag = fragTagStack.peek(); 
+		final String currTag = mFragTagStack.peek(); 
 		
-		menu.setGroupVisible(0, true);
+		mMenu.setGroupVisible(0, true);
 		
 		int displayOptions = ActionBar.DISPLAY_USE_LOGO;
 		boolean showSearch = false;
@@ -462,10 +458,10 @@ public class MainActivity extends AbstractThemedActivity
 			displayOptions = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME;
 		}
 
-		menu.findItem(R.id.action_search)
+		mMenu.findItem(R.id.action_search)
 			.setVisible(showSearch)
 			.setEnabled(showSearch);
-		menu.findItem(R.id.action_refresh)
+		mMenu.findItem(R.id.action_refresh)
 			.setVisible(showRefresh)
 			.setEnabled(showRefresh);
 		getSupportActionBar().setDisplayOptions(displayOptions);
@@ -489,7 +485,7 @@ public class MainActivity extends AbstractThemedActivity
 	private void checkTabletFrag(){
 		boolean show = false;
 		if (inTabletMode()){
-			final String tag = fragTagStack.peek();
+			final String tag = mFragTagStack.peek();
 			if (!(TAG_MAIN_FRAG.equals(tag))){
 				//if not in main, do not show tablet container.
 				show = true;
@@ -529,7 +525,7 @@ public class MainActivity extends AbstractThemedActivity
 			ft = fragManager.beginTransaction(); 
 		}
 		if (backStack){
-			String prevTag = fragTagStack.peek();
+			String prevTag = mFragTagStack.peek();
 			ft
 				.addToBackStack(prevTag)
 				.replace(R.id.container, fragment, tag).commit();
@@ -539,11 +535,11 @@ public class MainActivity extends AbstractThemedActivity
 			ft
 					.replace(R.id.container, fragment, tag)
 					.commit();
-			fragTagStack.clear();
-			fragSavedStates.clear();
+			mFragTagStack.clear();
+			mFragSavedStates.clear();
 		}
 		
-		fragTagStack.push(tag);
+		mFragTagStack.push(tag);
 		
 		checkTabletFrag();
 		checkActionBar();
@@ -557,7 +553,7 @@ public class MainActivity extends AbstractThemedActivity
 		FragmentManager fragManager = getSupportFragmentManager();
 		checkTabletFrag();
 		
-		tabletMessage.setVisibility(View.GONE);
+		mTabletMessage.setVisibility(View.GONE);
 		fragManager.beginTransaction()
 				.replace(R.id.tablet_container, fragment, tag)
 				.commit();				
@@ -565,7 +561,7 @@ public class MainActivity extends AbstractThemedActivity
 	
 	/** Resets the tablet container message by clearing it and inflating view stub. */
 	private void resetTabletContainerMessage(){
-		tabletMessage.setVisibility(View.VISIBLE);
+		mTabletMessage.setVisibility(View.VISIBLE);
 		Fragment frag = getSupportFragmentManager()
 				.findFragmentByTag(TAG_CAREER_ITEM_FRAG);
 		if (frag != null){
@@ -581,36 +577,36 @@ public class MainActivity extends AbstractThemedActivity
 	/** Simple wrapper to manage array list as a stack. */
 	@SuppressWarnings("unused")
 	private static class ArrayListStack <Obj>{
-		final private ArrayList<Obj> listStack = new ArrayList<Obj>();
+		private final ArrayList<Obj> mListStack = new ArrayList<Obj>();
 		
 		/** Returns stack size. */
-		public int size(){ return listStack.size(); }
+		public int size(){ return mListStack.size(); }
 		
 		/** Clears all elements */
-		public void clear(){ listStack.clear(); }
+		public void clear(){ mListStack.clear(); }
 		
 		/** Adds all elements to stack. */
 		public void addAll(ArrayList<Obj> arrayList){	
-			listStack.addAll(arrayList); }
+			mListStack.addAll(arrayList); }
 		
 		/** Returns all elements to as {@link ArrayList}. */
 		public ArrayList<Obj> getArrayList(){
-			return this.listStack;	}
+			return this.mListStack;	}
 		
 		/** Pushes object onto "stack" */
-		public boolean push(Obj object){	return listStack.add(object);	}
+		public boolean push(Obj object){	return mListStack.add(object);	}
 		
 		/** Pops the last element and returns it or <code>null</code>. */
 		public Obj pop(){
-			if (listStack.size() > 0){
-				return listStack.remove(listStack.size()-1);
+			if (mListStack.size() > 0){
+				return mListStack.remove(mListStack.size()-1);
 			}
 			return null;
 		}
 		/** Displays last element without removing it. (or null) */
 		public Obj peek(){
-			if (listStack.size() > 0){
-				return listStack.get(listStack.size()-1);
+			if (mListStack.size() > 0){
+				return mListStack.get(mListStack.size()-1);
 			}
 			return null;
 		}
@@ -629,32 +625,32 @@ public class MainActivity extends AbstractThemedActivity
 	@Override
 	public boolean onSearchRequest(Bundle bundle) {
 		Bundle args = new Bundle();
-		currSearchBarState = new Bundle();
+		mCurrSearchBarState = new Bundle();
 		
 		args.putString(SearchResultsFragment.KEY_KEYWORD_TEXT, 
 				bundle.getString(MainFragment.KEY_KEYWORD_TEXT));
-		currSearchBarState.putString(SearchBarDialogFragment.KEY_KEYWORD_TEXT, 
+		mCurrSearchBarState.putString(SearchBarDialogFragment.KEY_KEYWORD_TEXT, 
 				bundle.getString(MainFragment.KEY_KEYWORD_TEXT));
 		
 		args.putString(SearchResultsFragment.KEY_LOCATION_TEXT, 
 				bundle.getString(MainFragment.KEY_LOCATION_TEXT));
-		currSearchBarState.putString(SearchBarDialogFragment.KEY_LOCATION_TEXT, 
+		mCurrSearchBarState.putString(SearchBarDialogFragment.KEY_LOCATION_TEXT, 
 				bundle.getString(MainFragment.KEY_LOCATION_TEXT));
 		
 		args.putBoolean(SearchResultsFragment.KEY_RELOCATE_OFFER, 
 				bundle.getBoolean(MainFragment.KEY_RELOCATE_OFFER));
-		currSearchBarState.putBoolean(SearchBarDialogFragment.KEY_RELOCATE_OFFER, 
+		mCurrSearchBarState.putBoolean(SearchBarDialogFragment.KEY_RELOCATE_OFFER, 
 				bundle.getBoolean(MainFragment.KEY_RELOCATE_OFFER));
 		
 		args.putBoolean(SearchResultsFragment.KEY_REMOTE_ALLOWED, 
 				bundle.getBoolean(MainFragment.KEY_REMOTE_ALLOWED));
-		currSearchBarState.putBoolean(SearchBarDialogFragment.KEY_REMOTE_ALLOWED, 
+		mCurrSearchBarState.putBoolean(SearchBarDialogFragment.KEY_REMOTE_ALLOWED, 
 				bundle.getBoolean(MainFragment.KEY_REMOTE_ALLOWED));
 		
 		int distance = bundle.getInt(MainFragment.KEY_DISTANCE, -1);
 		if (distance > 0){
 			args.putInt(SearchResultsFragment.KEY_DISTANCE, distance);
-			currSearchBarState.putInt(SearchBarDialogFragment.KEY_DISTANCE, distance);
+			mCurrSearchBarState.putInt(SearchBarDialogFragment.KEY_DISTANCE, distance);
 		}
 		
 		
@@ -693,7 +689,7 @@ public class MainActivity extends AbstractThemedActivity
 	 */
 	@Override
 	public boolean onHoldSavedStateRequest(Bundle savedState) {
-		fragSavedStates.put(TAG_SEARCH_RESULTS_FRAG, savedState);
+		mFragSavedStates.put(TAG_SEARCH_RESULTS_FRAG, savedState);
 		return true;
 	}
 	
@@ -702,7 +698,7 @@ public class MainActivity extends AbstractThemedActivity
 	 */
 	@Override
 	public Bundle onPopSavedStateRequest() {
-		return fragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG);
+		return mFragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG);
 	}
 	
 	//end SearchResultsFragment listeners
@@ -714,11 +710,11 @@ public class MainActivity extends AbstractThemedActivity
 		Bundle searchArgs = new Bundle(); //prepare search args for tag
 		searchArgs.putString(SearchResultsFragment.KEY_TAG_TEXT, tag);
 		
-		currSearchBarState = new Bundle(); //replace search with tag only
-		currSearchBarState.putString(SearchBarDialogFragment.KEY_KEYWORD_TEXT,  tag);
+		mCurrSearchBarState = new Bundle(); //replace search with tag only
+		mCurrSearchBarState.putString(SearchBarDialogFragment.KEY_KEYWORD_TEXT,  tag);
 		
 		//remove any previous states
-		fragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG); 
+		mFragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG); 
 		//launch request
 		sendSearchRequest(searchArgs);
 		return true;
@@ -732,8 +728,8 @@ public class MainActivity extends AbstractThemedActivity
 	 */
 	@Override
 	public void onSearch(DialogFragment dialog, Bundle searchParams) {
-		currSearchBarState = null;
-		currSearchBarState = searchParams; //replace search
+		mCurrSearchBarState = null;
+		mCurrSearchBarState = searchParams; //replace search
 		//unpack request from dialog
 		Bundle args = new Bundle();
 		args.putString(SearchResultsFragment.KEY_KEYWORD_TEXT, 
@@ -752,7 +748,7 @@ public class MainActivity extends AbstractThemedActivity
 		}
 		
 		//remove any previous states
-		fragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG); 
+		mFragSavedStates.remove(TAG_SEARCH_RESULTS_FRAG); 
 		//launch request
 		sendSearchRequest(args);
 	}

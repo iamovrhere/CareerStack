@@ -6,7 +6,8 @@
     tools:context="com.ovrhere.android.careerstack.ui.MainActivity"
     tools:ignore="MergeRootFrame" 
     android:orientation="horizontal"
-    android:baselineAligned="false"
+    android:baselineAligned="false"    
+    android:background="?attr/careerstack_background_color"
     >
 	<FrameLayout 
 	    android:id="@+id/container"
