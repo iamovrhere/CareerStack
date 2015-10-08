@@ -28,10 +28,11 @@ import android.view.MenuItem;
 import com.ovrhere.android.careerstack.R;
 import com.ovrhere.android.careerstack.prefs.PreferenceUtils;
 import com.ovrhere.android.careerstack.ui.fragments.dialogs.ConfirmationDialogFragment;
+import com.ovrhere.android.careerstack.utils.Utility;
 
 /** The main entry point into the application.
  * @author Jason J.
- * @version 0.1.0-20151005
+ * @version 0.1.1-20151008
  */
 abstract public class AbstractThemedActivity extends AppCompatActivity {
 	
@@ -64,6 +65,7 @@ abstract public class AbstractThemedActivity extends AppCompatActivity {
 		//checks and, if necessary, restarts activity for theme
 		checkThemePref();
 	}
+
 	
 
 
@@ -111,20 +113,23 @@ abstract public class AbstractThemedActivity extends AppCompatActivity {
 	 * Activity starts and them preferences are checked:
 	 * A) 1. If using quick switch mode, set theme. Done.
 	 * 
-	 * B) 1 If NOT using quick switch, set theme intent and restart
-	 *   2 If theme intent is set, set theme. Done.
+	 * B) 1. If NOT using quick switch, set theme intent and restart
+	 *    2. If theme intent is set, set theme. Done.
+	 *    (WARNING! Beware of loops from unset themes)
 	 * 
 	 * ---
 	 * 
 	 * Changing themes:
-	 * A)1. If using quick switch mode: toggle theme
-	 *   2. Call recreate
-	 *   3. See A above. Done
+	 * A) 1. If using quick switch mode: toggle theme 
+	 *      i.  call setTheme()
+	 *      ii. set status bar color (Lollipop and up)
+	 *    2. Call recreate
+	 *    3. See A above. Done
 	 * 
-	 * B)1. If not using using quick switch: launch dialog
-	 *   2. Accept-> toggle theme
-	 *   3. Restart
-	 *   4. See B above. Done
+	 * B) 1. If not using using quick switch: launch dialog
+	 *    2. Accept-> toggle theme
+	 *    3. Restart
+	 *    4. See B above. Done
 	 * 
 	 */
 	
@@ -171,11 +176,12 @@ abstract public class AbstractThemedActivity extends AppCompatActivity {
 				false);
 		if (quickSwitch){ //if we are not in 
 			setTheme(currThemeId);
+			Utility.setStatusBarColor(this);
 		} else {
 			resetActivityForTheme(); //reset
-		}
-		
+		}		
 	}
+	
 	
 	/** Toggles day and night mode pref and restarts.
 	 * Assumes {@link #checkThemePref()} is called in {@link #onCreate(Bundle)}   */

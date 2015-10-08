@@ -5,13 +5,34 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.ovrhere.android.careerstack.R;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.text.format.DateUtils;
+import android.util.TypedValue;
+import android.view.Window;
+import android.view.WindowManager;
 
 /** A collection of helpful methods for this project. 
- * @version 0.1.0-20151006 */
+ * @version 0.2.0-20151008 */
 public class Utility {
 	
+	/**
+	 * Sets the status bar color for theme switching.
+	 */
+	@SuppressLint("NewApi") 
+	public static void setStatusBarColor(Activity activity) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+		    Window window = activity.getWindow();
+		    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		    TypedValue typedValue = new TypedValue();
+			activity.getTheme().resolveAttribute(R.attr.colorPrimaryDark, typedValue, true);
+		    window.setStatusBarColor(typedValue.data);
+		}
+	}
 
 	/** The output date format string to use. */
 	/* We could use DateUtils like in CareerItemFilterListAdapter, but I favour
