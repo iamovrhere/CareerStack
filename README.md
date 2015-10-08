@@ -19,10 +19,14 @@ This project is primarily hosted on [Bitbucket](https://bitbucket.org/iamovrhere
 
 This project requires:
 
-* Compatibility v7 library
-* 3rd-party [v4-preferencefragment](https://github.com/kolavar/android-support-v4-preferencefragment "android-support-v4-preferencefragment by kolavar")
+* AppCompat v7 library (build 22)
+* [v4-preferencefragment (2014-02-23](https://github.com/kolavar/android-support-v4-preferencefragment "android-support-v4-preferencefragment by kolavar")
+* [MaterialDesignLibrary 1.3](https://github.com/navasmdc/MaterialDesignLibrary/tree/1.3 "Material Design Android Library") [With my patch](https://github.com/navasmdc/MaterialDesignLibrary/pull/340). (Requires [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids "NineOldAndroids
+"))
+* [FloatingActionButton 1.10.0](https://github.com/str4d/android-floating-action-button/tree/support-1.10.0 "FloatingActionButton") with some tweaks. (Requires [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids "NineOldAndroids
+"))
 
-And uses resources from [Android Holo Colors Generator](http://android-holo-colors.com/ "Android Holo Colors Generator").
+For a nice comprehensive list of Material Libraries you might find useful see: [Material Library List](https://github.com/wasabeef/awesome-android-ui/blob/master/pages/Material.md "Material Android Libraries")
 
 ###Features
 

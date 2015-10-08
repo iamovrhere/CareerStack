@@ -18,3 +18,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# Necessary to keep animators for floating action buttons
+-keepclassmembers class net.i2p.android.ext.floatingactionbutton.* { *; }
+-keepclassmembers class com.ovrhere.android.careerstack.ui.widgets.floatingactionbutton.* { *; }
