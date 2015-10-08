@@ -16,12 +16,12 @@
 package com.ovrhere.android.careerstack.ui.fragments.dialogs;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 /** Simple confirmation dialog that retains it's instance.
@@ -31,7 +31,7 @@ import android.util.Log;
  * call {@link Builder#setTargetFragment(Fragment, int)}. 
  * Note that upon a given button press, the dialog dismisses itself.
  * @author Jason J.
- * @version 0.2.0-20141010
+ * @version 0.2.1-20151009
  */
 public class ConfirmationDialogFragment extends DialogFragment 
 	implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
@@ -96,7 +96,7 @@ public class ConfirmationDialogFragment extends DialogFragment
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		String msg = messageResource > 0 ? getString(messageResource) : "";
-		
+
 		return new AlertDialog.Builder(getActivity())
 					.setTitle(titleResource)
 					.setMessage(msg)

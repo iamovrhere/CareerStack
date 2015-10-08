@@ -33,23 +33,23 @@
         <!-- Set colours like spinner arrows & unselected radios/checkboxes -->
         <item name="colorControlNormal">@color/colorControlNormal</item>
         
-        
+        <item name="careerstack_background_color">@color/windowBackground_darkTheme</item>
         <item name="android:windowBackground">@color/windowBackground_darkTheme</item>
-        <item name="careerstack_background_color">@color/windowBackground_darkTheme</item>         
-         
-        <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
+                 
         <item name="careerstack_title_color">@android:color/white</item>
+        <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
+        
         <!-- Attribue drawable for the dark icon -->
         <item name="ic_careerstack" >@drawable/ic_careerstack_dark</item>
         
-       
-        <!-- The colour of the x miles/km text -->
+         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		
    		<!-- Assume black for dark theme -->
         <item name="careerstack_searchbar_color">@color/colorPrimaryDark_darkTheme</item>
         
    		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle.Dark</item>
+   		<item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
     </style>
     
     <!-- Light theme -->
@@ -63,17 +63,15 @@
         
         <!-- Set colours like spinner arrows & unselected radios/checkboxes -->
         <item name="colorControlNormal">@color/colorControlNormal</item>
-        
-        
+                
+        <item name="careerstack_background_color">@color/windowBackground_lightTheme</item>
         <item name="android:windowBackground">@color/windowBackground_lightTheme</item>
-        <item name="careerstack_background_color">@color/windowBackground_lightTheme</item>  
         
         <item name="careerstack_title_color">@android:color/black</item>        
         <item name="android:colorBackgroundCacheHint">?android:windowBackground</item>
         
         <!-- Attribue drawable for the light icon -->
-        <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>        
-        
+        <item name="ic_careerstack" >@drawable/ic_careerstack_light</item>                
          
         <!-- Assume grey for light theme -->
         <item name="careerstack_searchbar_color">@color/colorPrimaryDark_lightTheme</item>
@@ -81,7 +79,8 @@
         <!-- The colour of the x miles/km text -->
    		<item name="careerstack_distance_color" >@color/careerstack_translucent_grey</item>
    		
-   		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle.Light</item>   		
+   		<item name="actionBarStyle">@style/ActionBar.Solid.CareerStack.NoTitle.Light</item> 
+   		<item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Light</item>  		
     </style>
     
     <!-- End basic application themes -->
@@ -110,11 +109,12 @@
     
     
     <!-- The styling for the search bar; ensures it is always full -->
-    <style name="SearchBarDialogStyle"   >
+    <style name="SearchBarDialogStyle"  >
         <!-- These ensure there is no border -->
 	    <item name="android:windowNoTitle">true</item>
 	    <item name="android:windowFullscreen">true</item>
-	    <item name="android:windowIsFloating">true</item>
+	    <item name="android:windowIsFloating">true</item>    
+	    
 	</style>
 	
 	
@@ -131,26 +131,37 @@
 	    <item name="android:windowTitleSize" >0dp</item>
 		
         <!-- Support library compatibility -->
-        <item name="windowActionBar" >false</item>
-	    
+        <item name="windowActionBar" >false</item>        
+        
         <!-- Set colours like spinner arrows & unselected radios/checkboxes -->
         <item name="colorControlNormal">@color/colorControlNormal</item>
         <item name="colorAccent">@color/colorAccent</item>
   	</style>
-  	
+  	    
+    <style name="AppCompatAlertDialogStyle.Dark" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary_darkTheme</item>        
+        <item name="android:textColorSecondary">@color/textColorSecondary_darkTheme</item>        
+        <item name="android:background">@color/windowBackground_darkTheme</item>
+        
+        <item name="colorPrimary">@color/colorPrimary_darkTheme</item>
+    	<item name="colorPrimaryDark">@color/colorPrimaryDark_darkTheme</item>
+    </style>
     
+    <style name="AppCompatAlertDialogStyle.Light" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary_lightTheme</item>        
+        <item name="android:textColorSecondary">@color/textColorSecondary_lightTheme</item>        
+        <item name="android:background">@color/windowBackground_lightTheme</item>
+        
+        <item name="colorPrimary">@color/colorPrimary_lightTheme</item>
+    	<item name="colorPrimaryDark">@color/colorPrimaryDark_lightTheme</item>
+    </style>
     
     <!-- The animation for the dialog.  -->
     <style name="SearchBarAnimation">
 		<item name="android:windowEnterAnimation">@anim/slide_in_down</item>
 		<item name="android:windowExitAnimation">@anim/slide_out_up</item>
-	</style>
-    
-    
-    <!-- Dialog theme fix for 2.3.3 -->
-    <style name="DialogTheme" parent="@android:style/Theme.Dialog">
-        <!-- The colour of the x miles/km text -->
-        <item  name="careerstack_distance_color" >@android:color/primary_text_dark</item>
 	</style>
 	
     

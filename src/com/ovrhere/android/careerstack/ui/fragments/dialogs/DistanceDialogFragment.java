@@ -17,7 +17,6 @@ package com.ovrhere.android.careerstack.ui.fragments.dialogs;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +27,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.TextView;
@@ -42,7 +42,7 @@ import com.ovrhere.android.careerstack.utils.UnitCheck;
  * layout <code>viewstub_distance_seekbar.xml</code>. Requires the user use
  * <code>onActivityResult</code> and request codes to get result.
  * @author Jason J.
- * @version 0.3.0-20151006
+ * @version 0.3.1-20151008
  */
 public class DistanceDialogFragment extends DialogFragment implements 
 	MaterialSliderWrapper.OnValueChangedListener, DialogInterface.OnClickListener {
@@ -118,17 +118,15 @@ public class DistanceDialogFragment extends DialogFragment implements
 	@SuppressLint("InflateParams")
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		Context ctx = getCompatContext();
 		AlertDialog dialog  = 
-		new AlertDialog.Builder(ctx)
+		new AlertDialog.Builder(getActivity())
 			.setTitle(getResources().getString(R.string.careerstack_dialog_distance_title))
 			.setPositiveButton(android.R.string.ok, this)
 			.setNegativeButton(android.R.string.cancel, this)
 			.create(); //create basic dialog
 				
 		//insert custom views
-		View content = View.inflate(ctx, 
-				R.layout.viewstub_distance_seekbar, null);
+		View content = View.inflate(getActivity(), R.layout.viewstub_distance_seekbar, null);
 		initViews(content); //preload views
 		
 		Resources r = getResources();
@@ -148,11 +146,12 @@ public class DistanceDialogFragment extends DialogFragment implements
 	/// Helper methods
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Gets the context and, by extension, the theme to use. */
+	@Deprecated
 	private Context getCompatContext(){
 		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1){
 			return getActivity();
 		}
-		int themeId = R.style.DialogTheme;
+		int themeId = 0;
 		return new ContextThemeWrapper(getActivity(), themeId);
 	}
 	

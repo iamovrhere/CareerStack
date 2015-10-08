@@ -102,8 +102,9 @@
 			        android:gravity="center"
 			        android:text="@string/careerstack_careeritem_showtags_on"
 			        android:button="@null"
-			        android:background="@null"
+       		        android:background="@drawable/btn_normal_mtrl"
 			        android:saveEnabled="false"
+			        android:textColor="?android:attr/textColorPrimary"
 			        />
 		        
 	        </LinearLayout>
