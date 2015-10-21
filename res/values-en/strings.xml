@@ -19,6 +19,9 @@
     <!-- The application name -->
     <string name="app_name">CareerStack</string>
     <!-- The settings string -->
+    <string name="activity_settings">Settings</string>
+    
+    <!-- The settings string -->
     <string name="action_settings">Settings</string>
     <!-- The refresh string  -->
     <string name="action_refresh">Refresh</string>
@@ -61,12 +64,12 @@
     <string name="careerstack_label_distance">Distance</string>
     <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
     <string name="careerstack_formatString_distanceValue_miles"
-        >%1$d miles</string>
+        ><xliff:g id="distance">%1$d</xliff:g> miles</string>
     <!-- Miles short. Prepared string for formating via String.format(). Takes one integer. -->
     <string name="careerstack_formatString_distanceValue_milesShort"
-        >%1$d mi.</string>
+        ><xliff:g id="distance">%1$d</xliff:g> mi.</string>
     <!-- Kilometers. Prepared string for formating via String.format(). Takes one integer. -->
-    <string name="careerstack_formatString_distanceValue_km">%1$d km</string>
+    <string name="careerstack_formatString_distanceValue_km"><xliff:g id="distance">%1$d</xliff:g> km</string>
 
     <!-- Work remotely check string for main. -->
     <string name="careerstack_main_check_workRemotely">Work remotely</string>
@@ -106,17 +109,17 @@
     
     <!-- No matching results statement, takes one term. -->
     <string name="careerstack_careerlist_noResults_stub" 
-        >No matching results for \"%1$s\"</string>
+        >No matching results for \"<xliff:g id="search_term">%1$s</xliff:g>\"</string>
     
     <!-- Matching results statement, takes one term. -->
     <string name="careerstack_careerlist_matchingResults_stub" 
-        >Matching results for \"%1$s\"</string>
+        >Matching results for \"<xliff:g id="search_term">%1$s</xliff:g>\"</string>
     
     <!-- Simply "Matching results" statement. -->
     <string name="careerstack_careerlist_matchingResults">Matching results</string>
     
     <!-- Results near statement, takes 1 statment. -->
-    <string name="careerstack_careerlist_resultsNear">\u0020near %1$s</string>
+    <string name="careerstack_careerlist_resultsNear">\u0020near <xliff:g id="location">%1$s</xliff:g></string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment />
@@ -133,16 +136,24 @@
     <string name="careerstack_careerItem_button_shareJob">Share this job</string>
     <!-- Published string. Formatted: accepts 1 string. -->
     <string name="careerstack_formatString_publishDate"
-        >Published: %1$s</string>
+        >Published: <xliff:g id="date">%1$s</xliff:g></string>
     <!-- Last update string. Formatted: accepts 1 string. -->
     <string name="careerstack_formatString_updateDate"
-        >Last updated: %1$s</string>
+        >Last updated: <xliff:g id="date">%1$s</xliff:g></string>
     <!-- Copied Link. -->
     <string name="careerstack_toast_copiedLink">Copied link to clipboard</string>
     <!-- The string for "%1$s(job) at %2$s(place) -->
     <string name="careerstack_formatString_jobAtPlace"
-        >%1$s at %2$s</string>
-
+        ><xliff:g id="job_title">%1$s</xliff:g> at <xliff:g id="company_name">%2$s</xliff:g></string>
+     
+    <!-- The string to show when tags are on. -->
+    <string name="careerstack_careeritem_showtags_on"
+        >[ - ]</string>
+    
+    <!-- The string to show when tags are off. -->
+    <string name="careerstack_careeritem_showtags_off"
+        >[ + ]</string>
+    
 	<!-- Ends career item  fragment strings -->
     <eat-comment />
     
@@ -183,6 +194,12 @@
         and may not work on all devices. Try it anyway? 
         \n\n(Requires restart to take effect.)</string>
     
+        <!-- The pref title for showing tags -->
+    <string name="careerstack_settings_showTags_title"
+        >Show search tags</string>
+    <!-- The pref description for showing tags  -->
+    <string name="careerstack_settings_showTags_summary"
+        >Displays search tags for job description</string>
     
    
     

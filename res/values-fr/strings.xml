@@ -18,6 +18,9 @@
 
     <!-- The application name -->
     <string name="app_name">"CareerStack"</string>
+    
+    <!-- The settings string -->
+    <string name="activity_settings">"Paramètres"</string>
     <!-- The settings string -->
     <string name="action_settings">"Paramètres"</string>
     
@@ -53,7 +56,8 @@
     <!-- Label for the distance progress bar -->
     <string name="careerstack_label_distance">"Distance"</string>
     <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
-    <string name="careerstack_formatString_distanceValue_miles">"%1$d miles"</string>
+    <string name="careerstack_formatString_distanceValue_miles"
+        >"<xliff:g id="distance">%1$d</xliff:g> miles"</string>
     
 
     <!-- Work remotely check string for main. -->
@@ -83,11 +87,11 @@
     <string name="careerstack_careerlist_noResults">"Pas de résultats correspondants"</string>
     
          <string name = "careerstack_careerlist_noResults_stub"
-         > Il n\'y aucun résultat pour \"%1$s\" </string>
+         >Il n\'y aucun résultat pour \"<xliff:g id="search_term">%1$s</xliff:g>\"</string>
 
 
      <string name = "careerstack_careerlist_matchingResults_stub"
-         > Résultats de correspondants pour  \"%1$s\" </string>
+         >Résultats de correspondants pour  \"<xliff:g id="search_term">%1$s</xliff:g>\"</string>
 
 
      <string name = "careerstack_careerlist_matchingResults"
@@ -95,7 +99,7 @@
 
 
 
-     <string name = "careerstack_careerlist_resultsNear"> \u0020proche de %1$s </string>
+     <string name = "careerstack_careerlist_resultsNear">\u0020proche de <xliff:g id="location">%1$s</xliff:g></string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment/>
@@ -107,14 +111,15 @@
     <!-- The share this job button. -->
     <string name="careerstack_careerItem_button_shareJob">"Partagez-vous cet emploi"</string>
     <!-- Published string. Formatted: accepts 1 string. -->
-    <string name="careerstack_formatString_publishDate">"Publié: %1$s"</string>
+    <string name="careerstack_formatString_publishDate">"Publié: <xliff:g id="date">%1$s</xliff:g>"</string>
     <!-- Last update string. Formatted: accepts 1 string. -->
-    <string name="careerstack_formatString_updateDate">"Dernière mise à jour: %1$s"</string>
+    <string name="careerstack_formatString_updateDate">"Dernière mise à jour: <xliff:g id="date">%1$s</xliff:g>"</string>
     
     <!-- Copied Link. -->
     <string name="careerstack_toast_copiedLink">"Lien vers le presse-papier copié"</string>
     <!-- The string for "%1$s(job) at %2$s(place) -->
-    <string name="careerstack_formatString_jobAtPlace">"%1$s à %2$s"</string>
+    <string name="careerstack_formatString_jobAtPlace"
+        >"<xliff:g id="job_title">%1$s</xliff:g> à <xliff:g id="company_name">%2$s</xliff:g>"</string>
 
 	<!-- Ends career item  fragment strings -->
     <eat-comment/>

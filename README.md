@@ -20,7 +20,7 @@ This project is primarily hosted on [Bitbucket](https://bitbucket.org/iamovrhere
 This project requires:
 
 * AppCompat v7 library (build 22)
-* [v4-preferencefragment (2014-02-23](https://github.com/kolavar/android-support-v4-preferencefragment "android-support-v4-preferencefragment by kolavar")
+* [v4-preferencefragment (2014-02-23)](https://github.com/kolavar/android-support-v4-preferencefragment "android-support-v4-preferencefragment by kolavar")
 * [MaterialDesignLibrary 1.3](https://github.com/navasmdc/MaterialDesignLibrary/tree/1.3 "Material Design Android Library") [With my patch](https://github.com/navasmdc/MaterialDesignLibrary/pull/340). (Requires [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids "NineOldAndroids
 "))
 * [FloatingActionButton 1.10.0](https://github.com/str4d/android-floating-action-button/tree/support-1.10.0 "FloatingActionButton") with some tweaks. (Requires [NineOldAndroids](https://github.com/JakeWharton/NineOldAndroids "NineOldAndroids

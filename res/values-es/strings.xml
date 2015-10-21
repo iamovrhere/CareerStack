@@ -17,7 +17,9 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <!-- The application name -->
-    <string name="app_name">"CareerStack"</string>
+    <string name="app_name">"CareerStack"</string>    
+    <!-- The settings string -->
+    <string name="activity_settings">Configuración</string>
     <!-- The settings string -->
     <string name="action_settings">"Configuración"</string>
     
@@ -54,7 +56,8 @@
     <!-- Label for the distance progress bar -->
     <string name="careerstack_label_distance">"Distancia"</string>
     <!-- Miles. Prepared string for formating via String.format(). Takes one integer. -->
-    <string name="careerstack_formatString_distanceValue_miles">"%1$d milla"</string>
+    <string name="careerstack_formatString_distanceValue_miles"
+        >"<xliff:g id="distance">%1$d</xliff:g> milla"</string>
     
     
     <!-- Work remotely check string for main. -->
@@ -85,16 +88,16 @@
     
     
     <string name = "careerstack_careerlist_noResults_stub"
-         > No hay coincidencia para \"%1$s\" </string>
+         > No hay coincidencia para \"<xliff:g id="search_term">%1$s</xliff:g>\"</string>
 
 	<string name = "careerstack_careerlist_matchingResults_stub"
-         > Coincidencia de resultados para \"%1$s\" </string>
+         > Coincidencia de resultados para \"<xliff:g id="search_term">%1$s</xliff:g>\"</string>
 
 
-	<string name ="careerstack_careerlist_matchingResults">  Los resultados coinciden con </string>
+	<string name ="careerstack_careerlist_matchingResults">Los resultados coinciden con</string>
 
 
-	<string name = "careerstack_careerlist_resultsNear"> \u0020cerca de %1$s </string>
+	<string name = "careerstack_careerlist_resultsNear">\u0020cerca de <xliff:g id="location">%1$s</xliff:g> </string>
     
     <!-- Ends Results fragment strings -->
     <eat-comment/>
@@ -106,13 +109,14 @@
     <!-- The share this job button. -->
     <string name="careerstack_careerItem_button_shareJob">"Comparte esta oferta de empleo"</string>
     <!-- Published string. Formatted: accepts 1 string. -->
-    <string name="careerstack_formatString_publishDate">"Publicado: %1$s"</string>
+    <string name="careerstack_formatString_publishDate">"Publicado: <xliff:g id="date">%1$s</xliff:g>"</string>
     <!-- Last update string. Formatted: accepts 1 string. -->
-    <string name="careerstack_formatString_updateDate">"Última actualización: %1$s"</string>
+    <string name="careerstack_formatString_updateDate">"Última actualización: <xliff:g id="date">%1$s</xliff:g>"</string>
     <!-- Copied Link. -->
     <string name="careerstack_toast_copiedLink">"Enlace al portapapeles copiado"</string>
     <!-- The string for "%1$s(job) at %2$s(place) -->
-    <string name="careerstack_formatString_jobAtPlace">"%1$s a %2$s"</string>
+    <string name="careerstack_formatString_jobAtPlace"
+        >"<xliff:g id="job_title">%1$s</xliff:g> a <xliff:g id="company_name">%2$s</xliff:g>"</string>
 
 	<!-- Ends career item  fragment strings -->
     <eat-comment/>
